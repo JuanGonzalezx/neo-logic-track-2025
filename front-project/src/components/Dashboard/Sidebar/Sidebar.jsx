@@ -1,0 +1,118 @@
+import { useState } from 'react';
+import { NavLink } from 'react-router-dom';
+import { 
+  LayoutDashboard, 
+  Users, 
+  Shield, 
+  Package2, 
+  Plus,
+  ChevronDown
+} from 'lucide-react';
+import './Sidebar.css';
+
+const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
+  const [activeSection, setActiveSection] = useState(null);
+
+  const toggleSection = (section) => {
+    setActiveSection(activeSection === section ? null : section);
+  };
+
+  const handleNavLinkClick = () => {
+    if (window.innerWidth <= 768) {
+      closeMobileMenu();
+    }
+  };
+
+  return (
+    <>
+      <aside className={`sidebar ${collapsed ? 'collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`}>
+        <div className="sidebar-header">
+          <h1 className="sidebar-title">
+            {collapsed ? "IM" : "Inventory Manager"}
+          </h1>
+        </div>
+
+        <nav className="sidebar-nav">
+          <ul className="sidebar-nav-list">
+            <li className="sidebar-nav-item">
+              <NavLink to="/dashboard" className="sidebar-nav-link" onClick={handleNavLinkClick}>
+                <LayoutDashboard size={20} className="sidebar-icon" />
+                {!collapsed && <span>Dashboard</span>}
+              </NavLink>
+            </li>
+
+            <li className="sidebar-nav-item">
+              <div 
+                className={`sidebar-nav-section ${activeSection === 'users' ? 'active' : ''}`} 
+                onClick={() => toggleSection('users')}
+              >
+                <div className="section-content">
+                  <Users size={20} className="sidebar-icon" />
+                  {!collapsed && <span>Users</span>}
+                </div>
+                {!collapsed && <ChevronDown size={16} className={`section-arrow ${activeSection === 'users' ? 'active' : ''}`} />}
+              </div>
+              
+              {(activeSection === 'users' || collapsed) && (
+                <ul className="sidebar-subnav">
+                  <li className="sidebar-subnav-item">
+                    <NavLink to="/dashboard/users" className="sidebar-nav-link" onClick={handleNavLinkClick}>
+                      {collapsed ? <Users size={20} /> : <span>All Users</span>}
+                    </NavLink>
+                  </li>
+                  <li className="sidebar-subnav-item">
+                    <NavLink to="/dashboard/users/create" className="sidebar-nav-link" onClick={handleNavLinkClick}>
+                      {collapsed ? <Plus size={20} /> : <span>Add User</span>}
+                    </NavLink>
+                  </li>
+                </ul>
+              )}
+            </li>
+
+            <li className="sidebar-nav-item">
+              <div 
+                className={`sidebar-nav-section ${activeSection === 'roles' ? 'active' : ''}`} 
+                onClick={() => toggleSection('roles')}
+              >
+                <div className="section-content">
+                  <Shield size={20} className="sidebar-icon" />
+                  {!collapsed && <span>Roles</span>}
+                </div>
+                {!collapsed && <ChevronDown size={16} className={`section-arrow ${activeSection === 'roles' ? 'active' : ''}`} />}
+              </div>
+              
+              {(activeSection === 'roles' || collapsed) && (
+                <ul className="sidebar-subnav">
+                  <li className="sidebar-subnav-item">
+                    <NavLink to="/dashboard/roles" className="sidebar-nav-link" onClick={handleNavLinkClick}>
+                      {collapsed ? <Shield size={20} /> : <span>All Roles</span>}
+                    </NavLink>
+                  </li>
+                  <li className="sidebar-subnav-item">
+                    <NavLink to="/dashboard/roles/create" className="sidebar-nav-link" onClick={handleNavLinkClick}>
+                      {collapsed ? <Plus size={20} /> : <span>Add Role</span>}
+                    </NavLink>
+                  </li>
+                </ul>
+              )}
+            </li>
+
+            <li className="sidebar-nav-item">
+              <NavLink to="/dashboard/inventory" className="sidebar-nav-link" onClick={handleNavLinkClick}>
+                <Package2 size={20} className="sidebar-icon" />
+                {!collapsed && <span>Inventory</span>}
+              </NavLink>
+            </li>
+          </ul>
+        </nav>
+
+        <div className="sidebar-footer">
+          {!collapsed && <p>© 2025 Inventory Manager</p>}
+        </div>
+      </aside>
+      {mobileOpen && <div className="sidebar-backdrop" onClick={closeMobileMenu}></div>}
+    </>
+  );
+};
+
+export default Sidebar;

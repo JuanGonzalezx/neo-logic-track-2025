@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id                              String         @id @default(auto()) @map("_id") @db.ObjectId
+  roleId                          String         @db.ObjectId
+  role                            Role?          @relation(fields: [roleId], references: [id])
+  fullname                        String
+  status                          Status         @default(PENDING)
+  verificationCode                String?
+  verificationCodeExpires         DateTime?
+  passwordStatus                  PasswordStatus @default(VERIFIED)
+  PasswordVerificationCode        String?
+  PasswordVerificationCodeExpires DateTime?
+  email                           String         @unique
+  number                          String?        @unique
+  current_password                String
+  createdAt                       DateTime       @default(now())
+  updatedAt                       DateTime       @updatedAt
+}
+
+model Role {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  name          String   @unique
+  description   String?  @default("no description available")
+  permissionIds String[] @db.ObjectId // Guardamos IDs de permisos (referencia manual)
+  Users         Users[]
+}
+
+model Permission {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String  @unique
+  url         String // ejemplo: "/api/users"
+  method      String // ejemplo: "GET", "POST", etc.
+  description String? @default("no description available")
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+  PENDING
+}
+
+enum PasswordStatus {
+  PENDING
+  VERIFIED
+}

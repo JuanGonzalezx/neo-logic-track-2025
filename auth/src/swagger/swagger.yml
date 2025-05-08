@@ -1,0 +1,852 @@
+openapi: 3.0.0
+info:
+  title: Software2 API Documentation
+  description: |
+    This is the API documentation for the Software2 project. It provides details about the available authentication, permission, and role endpoints, their usage, and expected inputs/outputs.
+  termsOfService: https://example.com/terms/
+  contact:
+    email: support@software2.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Local development server
+  - url: https://api.software2.com
+    description: Production server
+tags:
+  - name: auth
+    description: Operations related to authentication
+  - name: permission
+    description: Operations related to permissions
+  - name: role
+    description: Operations related to roles
+  - name: user
+    description: Operations related to users
+paths:
+  /auth/signup:
+    post:
+      tags:
+        - auth
+      summary: User signup
+      description: Register a new user in the system.
+      operationId: signUp
+      requestBody:
+        description: User signup data
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullname:
+                  type: string
+                  example: "John Doe"
+                email:
+                  type: string
+                  example: "john.doe@example.com"
+                current_password:
+                  type: string
+                  example: "Correcp@ssword123"
+                number:
+                  type: string
+                  example: "3001234567"
+      responses:
+        '201':
+          description: User registered successfully
+        '400':
+          description: Invalid input
+        '500':
+          description: Server error
+  /auth/signin:
+    post:
+      tags:
+        - auth
+      summary: User signin
+      description: Authenticate a user and generate a token.
+      operationId: signIn
+      requestBody:
+        description: User signin data
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "john.doe@example.com"
+                current_password:
+                  type: string
+                  example: "Correcp@ssword123"
+                methodContact:
+                  type: string
+                  example: "email"
+      responses:
+        '200':
+          description: User authenticated successfully
+        '400':
+          description: Invalid input
+        '500':
+          description: Server error
+  /auth/verify:
+    post:
+      tags:
+        - auth
+      summary: Verify user account
+      description: Verify a user's account using a verification code.
+      operationId: verifyCode
+      requestBody:
+        description: Verification data
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "john.doe@example.com"
+                code:
+                  type: string
+                  example: "123456"
+      responses:
+        '200':
+          description: Account verified successfully
+        '400':
+          description: Invalid or expired code
+        '500':
+          description: Server error
+  /auth/resend:
+    post:
+      tags:
+        - auth
+      summary: Resend verification code
+      description: Resend the verification code to the user's email.
+      operationId: resendVerificationCode
+      requestBody:
+        description: Resend verification data
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "john.doe@example.com"
+      responses:
+        '200':
+          description: Verification code resent successfully
+        '400':
+          description: Invalid input
+        '500':
+          description: Server error
+  /auth/2fa:
+    post:
+      tags:
+        - auth
+      summary: Two-factor authentication
+      description: Authenticate a user using two-factor authentication.
+      operationId: secondFactorAuthentication
+      requestBody:
+        description: Two-factor authentication data
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "john.doe@example.com"
+                code:
+                  type: string
+                  example: "123456"
+      responses:
+        '200':
+          description: Authentication successful
+        '400':
+          description: Invalid or expired code
+        '500':
+          description: Server error
+  /auth/changepassword/{id}:
+    patch:
+      tags:
+        - auth
+      summary: Change user password
+      description: Change the password of a user.
+      operationId: changePassword
+      parameters:
+        - name: 68156310a2bcde0782740346
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the user
+      requestBody:
+        description: Password change data
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                currentPassword:
+                  type: string
+                  example: "Correcp@ssword123"
+                newPassword:
+                  type: string
+                  example: "Correcp@ssword1234"
+                confirmNewPassword:
+                  type: string
+                  example: "Correcp@ssword1234"
+      responses:
+        '200':
+          description: Password changed successfully
+        '400':
+          description: Invalid input
+        '500':
+          description: Server error
+  /auth/resendsms:
+    patch:
+      tags:
+        - auth
+      summary: Resend SMS verification code
+      description: Resend the SMS verification code to the user's phone.
+      operationId: resendSMS
+      requestBody:
+        description: Resend SMS data
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                number:
+                  type: string
+                  example: "3001234567"
+      responses:
+        '200':
+          description: SMS code resent successfully
+        '400':
+          description: Invalid input
+        '500':
+          description: Server error
+  /auth/verifypasscode:
+    post:
+      tags:
+        - auth
+      summary: Verify password reset code
+      description: Verify the password reset code sent to the user.
+      operationId: verifyPassCode
+      requestBody:
+        description: Verification data
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "john.doe@example.com"
+                code:
+                  type: string
+                  example: "123456"
+      responses:
+        '200':
+          description: Code verified successfully
+        '400':
+          description: Invalid or expired code
+        '500':
+          description: Server error
+  /auth/resetpassword:
+    post:
+      tags:
+        - auth
+      summary: Reset user password
+      description: Send a password reset code to the user's email.
+      operationId: resetPassword
+      requestBody:
+        description: Reset password data
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "john.doe@example.com"
+      responses:
+        '200':
+          description: Password reset code sent successfully
+        '400':
+          description: Invalid input
+        '500':
+          description: Server error
+  /auth/changeresetpassword/{id}:
+    put:
+      tags:
+        - auth
+      summary: Change reset password
+      description: Change the password after verifying the reset code.
+      operationId: ChangeResetPassword
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the user
+      requestBody:
+        description: Change reset password data
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                newPassword:
+                  type: string
+                  example: "Correcp@ssword12345"
+                confirmNewPassword:
+                  type: string
+                  example: "Correcp@ssword12345"
+      responses:
+        '200':
+          description: Password changed successfully
+        '400':
+          description: Invalid input
+        '500':
+          description: Server error
+  /permissions:
+    post:
+      tags:
+        - permission
+      summary: Create a new permission
+      description: Add a new permission to the system.
+      operationId: createPermission
+      requestBody:
+        description: Permission object to be created
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "View Users"
+                url:
+                  type: string
+                  example: "/api/users"
+                method:
+                  type: string
+                  example: "GET"
+                description:
+                  type: string
+                  example: "Permission to view user details"
+      responses:
+        '201':
+          description: Permission created successfully
+        '400':
+          description: Invalid input
+        '500':
+          description: Server error
+    get:
+      tags:
+        - permission
+      summary: Get all permissions
+      description: Retrieve a list of all permissions in the system.
+      operationId: getPermissions
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Permission'
+        '500':
+          description: Server error
+  /permissions/{id}:
+    get:
+      tags:
+        - permission
+      summary: Get permission by ID
+      description: Retrieve a specific permission by its ID.
+      operationId: getPermissionById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the permission
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Permission'
+        '404':
+          description: Permission not found
+        '500':
+          description: Server error
+    put:
+      tags:
+        - permission
+      summary: Update a permission
+      description: Update the details of an existing permission.
+      operationId: updatePermission
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the permission
+      requestBody:
+        description: Permission object to be updated
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Edit Users"
+                url:
+                  type: string
+                  example: "/api/users/edit"
+                method:
+                  type: string
+                  example: "PUT"
+                description:
+                  type: string
+                  example: "Permission to edit user details"
+      responses:
+        '200':
+          description: Permission updated successfully
+        '400':
+          description: Invalid input
+        '500':
+          description: Server error
+    delete:
+      tags:
+        - permission
+      summary: Delete a permission
+      description: Remove a permission from the system.
+      operationId: deletePermission
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the permission
+      responses:
+        '200':
+          description: Permission deleted successfully
+        '404':
+          description: Permission not found
+        '500':
+          description: Server error
+  /roles:
+    post:
+      tags:
+        - role
+      summary: Create a new role
+      description: Add a new role to the system.
+      operationId: createRole
+      requestBody:
+        description: Role object to be created
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Admin"
+                description:
+                  type: string
+                  example: "Administrator role with full access"
+      responses:
+        '201':
+          description: Role created successfully
+        '400':
+          description: Invalid input
+        '500':
+          description: Server error
+    get:
+      tags:
+        - role
+      summary: Get all roles
+      description: Retrieve a list of all roles in the system.
+      operationId: getRoles
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Role'
+        '500':
+          description: Server error
+  /roles/{id}:
+    get:
+      tags:
+        - role
+      summary: Get role by ID
+      description: Retrieve a specific role by its ID.
+      operationId: getRoleById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the role
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        '404':
+          description: Role not found
+        '500':
+          description: Server error
+    put:
+      tags:
+        - role
+      summary: Update a role
+      description: Update the details of an existing role.
+      operationId: updateRole
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the role
+      requestBody:
+        description: Role object to be updated
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Editor"
+                description:
+                  type: string
+                  example: "Editor role with limited access"
+      responses:
+        '200':
+          description: Role updated successfully
+        '400':
+          description: Invalid input
+        '500':
+          description: Server error
+    delete:
+      tags:
+        - role
+      summary: Delete a role
+      description: Remove a role from the system.
+      operationId: deleteRole
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the role
+      responses:
+        '200':
+          description: Role deleted successfully
+        '404':
+          description: Role not found
+        '500':
+          description: Server error
+  /roles/{id}/permissions:
+    post:
+      tags:
+        - role
+      summary: Add permissions to a role
+      description: Add permissions to a specific role.
+      operationId: addPermissionsToRole
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the role
+      requestBody:
+        description: Permissions to be added
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                permissions:
+                  type: array
+                  items:
+                    type: string
+                  example: ["permissionId1", "permissionId2"]
+      responses:
+        '200':
+          description: Permissions added successfully
+        '400':
+          description: Invalid input
+        '500':
+          description: Server error
+    delete:
+      tags:
+        - role
+      summary: Remove permissions from a role
+      description: Remove permissions from a specific role.
+      operationId: removePermissionsFromRole
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the role
+      requestBody:
+        description: Permissions to be removed
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                permissions:
+                  type: array
+                  items:
+                    type: string
+                  example: ["permissionId1", "permissionId2"]
+      responses:
+        '200':
+          description: Permissions removed successfully
+        '400':
+          description: Invalid input
+        '500':
+          description: Server error
+  /users:
+    get:
+      tags:
+        - user
+      summary: Get all users
+      description: Retrieve a list of all users in the system.
+      operationId: getAllUsers
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '500':
+          description: Server error
+    post:
+      tags:
+        - user
+      summary: Create a new user
+      description: Add a new user to the system.
+      operationId: createUser
+      requestBody:
+        description: User object to be created
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullname:
+                  type: string
+                  example: "John Doe"
+                email:
+                  type: string
+                  example: "john.doe@example.com"
+                current_password:
+                  type: string
+                  example: "password123"
+                number:
+                  type: string
+                  example: "+573001234567"
+                rolId:
+                  type: string
+                  example: "6813d88bd0cb1281aaa26120"
+                status:
+                  type: string
+                  example: "PENDING"
+      responses:
+        '201':
+          description: User created successfully
+        '400':
+          description: Invalid input
+        '500':
+          description: Server error
+  /users/{id}:
+    get:
+      tags:
+        - user
+      summary: Get user by ID
+      description: Retrieve a specific user by their ID.
+      operationId: getUserById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the user
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+        '500':
+          description: Server error
+    put:
+      tags:
+        - user
+      summary: Update a user
+      description: Update the details of an existing user.
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the user
+      requestBody:
+        description: User object to be updated
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullname:
+                  type: string
+                  example: "Jane Doe"
+                email:
+                  type: string
+                  example: "jane.doe@example.com"
+                current_password:
+                  type: string
+                  example: "newpassword123"
+                number:
+                  type: string
+                  example: "+573001234568"
+                rolId:
+                  type: string
+                  example: "6813d88bd0cb1281aaa26120"
+                status:
+                  type: string
+                  example: "ACTIVE"
+      responses:
+        '200':
+          description: User updated successfully
+        '400':
+          description: Invalid input
+        '500':
+          description: Server error
+    delete:
+      tags:
+        - user
+      summary: Delete a user
+      description: Remove a user from the system.
+      operationId: deleteUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the user
+      responses:
+        '200':
+          description: User deleted successfully
+        '404':
+          description: User not found
+        '500':
+          description: Server error
+components:
+  schemas:
+    Permission:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "abcde"
+        name:
+          type: string
+          example: "View Users"
+        url:
+          type: string
+          example: "/api/users"
+        method:
+          type: string
+          example: "GET"
+        description:
+          type: string
+          example: "Permission to view user details"
+    Role:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "67890"
+        name:
+          type: string
+          example: "Admin"
+        description:
+          type: string
+          example: "Administrator role with full access"
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "12345"
+        fullname:
+          type: string
+          example: "John Doe"
+        email:
+          type: string
+          example: "john.doe@example.com"
+        number:
+          type: string
+          example: "+573001234567"
+        rolId:
+          type: string
+          example: "6813d88bd0cb1281aaa26120"
+        status:
+          type: string
+          example: "ACTIVE"

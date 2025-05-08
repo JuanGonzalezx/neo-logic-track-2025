@@ -1,0 +1,126 @@
+.authentication-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+  }
+  
+  .authentication-modal-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    color: #333;
+    position: relative;
+  }
+  
+  .authentication-close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #eee;
+    border: none;
+    border-radius: 50%;
+    padding: 5px 8px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #444;
+  }
+  
+  .authentication-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    color: #2d2d2d;
+    margin-bottom: 1.5rem;
+  }
+  
+  .authentication-description {
+    text-align: center;
+    color: #555;
+    margin-bottom: 1.2rem;
+  }
+  
+  .authentication-form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .authentication-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #555;
+  }
+  
+  .authentication-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    background: white;
+    color: black;
+  }
+  
+  .authentication-input:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 2px rgba(74, 144, 226, 0.2);
+  }
+  
+  .authentication-error {
+    color: #e53935;
+    font-size: 14px;
+    margin-top: 5px;
+    display: block;
+  }
+  
+  .authentication-submit-btn {
+    width: 100%;
+    padding: 10px 16px;
+    background-color: #0b3f83;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .authentication-submit-btn:hover {
+    background-color: #0b3f83 ;
+  }
+  
+  .authentication-resend-text {
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+    margin-top: 16px;
+  }
+  
+  .authentication-resend-link {
+    color: #1e90ff;
+    font-weight: 500;
+    cursor: pointer;
+    background: none;
+    border: none;
+    text-decoration: underline;
+    margin-left: 4px;
+  }
+  
+  .authentication-success-message {
+    text-align: center;
+    color: #0b3f83;
+    font-size: 14px;
+    margin-top: 8px;
+  }
+  
