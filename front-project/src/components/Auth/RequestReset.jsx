@@ -1,11 +1,12 @@
 // src/components/Auth/RequestReset.jsx
 
 import React, { useState } from 'react';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import { Card, Input, Button, Alert, Spin, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { requestPasswordReset, verifyResetCode } from '../../api/auth'; // importa verifyPassCode
 import VerificationModal from './VerificationModal';
-import './Register.css';
+import './requestReset.css';
 
 const { Title } = Typography;
 
@@ -54,6 +55,14 @@ export default function RequestReset() {
     return (
         <div className="register-container" style={{ maxWidth: 400, margin: '50px auto' }}>
             <Card>
+                <Button 
+                    type="link"
+                    icon={<ArrowLeftOutlined />}
+                    onClick={() => navigate('/')}
+                    style={{ padding: 0, marginBottom: 16 }}
+                >
+                    Back to login
+                </Button>
                 <Title level={3} style={{ textAlign: 'center' }}>Reset Password</Title>
 
                 {alert && (
@@ -77,7 +86,7 @@ export default function RequestReset() {
                             onChange={e => setEmail(e.target.value)}
                         />
                     </div>
-                    <Button
+                    <Button className="reset-button"
                         block
                         type="primary"
                         htmlType="submit"

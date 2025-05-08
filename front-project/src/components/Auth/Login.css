@@ -13,8 +13,23 @@
 }
 
 .login-button {
+  width: 50%;
+  padding: 10px 0;
+  font-size: 16px;
   background-color: #0b3f83;
   color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: block;
+  margin: 20px auto 0 auto; /* centrado */
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.login-button:hover {
+  background-color: #0a356f;
+  transform: translateY(-1px);
 }
 
 .form-group label {

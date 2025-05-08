@@ -28,19 +28,19 @@ const Dashboard = () => {
 
   return (
     <div className={`dashboard ${sidebarCollapsed ? 'sidebar-collapsed' : ''} ${mobileMenuOpen ? 'mobile-menu-open' : ''}`}>
-      <Sidebar 
-        collapsed={sidebarCollapsed} 
+      <Sidebar
+        collapsed={sidebarCollapsed}
         mobileOpen={mobileMenuOpen}
         closeMobileMenu={() => setMobileMenuOpen(false)}
       />
-      
+
       <div className="dashboard-content">
-        <Header 
-          toggleSidebar={toggleSidebar} 
+        <Header
+          toggleSidebar={toggleSidebar}
           toggleMobileMenu={toggleMobileMenu}
           onLogout={handleLogout}
         />
-        
+
         <main className="dashboard-main">
           <Breadcrumb />
           <div className="dashboard-container">
