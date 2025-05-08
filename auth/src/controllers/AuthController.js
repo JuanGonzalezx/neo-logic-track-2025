@@ -79,8 +79,8 @@ const sendEmail = async (email, code, fullname, use) => {
 
 const sendSMS = async (code, number) => {
   try {
-    const accountSid = 'ACd629ae24fafc66916a443d594f2fcccd';
-    const authToken = '0f4e8f04edf79b7bd90f1277ee73deaf';
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
     const sms = require('twilio')(accountSid, authToken);
 
     sms.messages
