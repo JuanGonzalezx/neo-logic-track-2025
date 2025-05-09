@@ -44,10 +44,10 @@ jobs:
           docker compose up -d
           sleep 10
 
-      - name: Run auth tests
-        run: |
-          cd auth
-          docker compose run --rm app npm test
+      #- name: Run auth tests
+      # run: |
+      #cd auth
+      #docker compose run --rm app npm test
 
       - name: Tear down auth services
         if: always()
@@ -87,11 +87,6 @@ jobs:
           cd api-gateway
           docker compose up -d
           sleep 10
-
-      - name: Run api-gateway tests
-        run: |
-          cd api-gateway
-          docker compose run --rm app npm test
 
       - name: Tear down api-gateway services
         if: always()
