@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import './App.css';
 
@@ -14,12 +14,16 @@ import RoleForm from "./components/Dashboard/Roles/RoleForm";
 import Profile from "./components/Dashboard/Profile/Profile";
 import RequestReset from "./components/Auth/RequestReset";
 import NewPassword from "./components/Auth/NewPassword";
+import RedirectByRole from "./components/Auth/RedirectByRole";
+
 function App() {
+  const navigate = useNavigate();
   let { isAuthenticated } = useSelector((state) => state.auth);
 
-  if(localStorage.getItem("token")){
+  if (localStorage.getItem("token")) {
     isAuthenticated = true;
   }
+
   // Component to protect routes
   const ProtectedRoute = ({ children }) => {
     if (!isAuthenticated) {
@@ -31,7 +35,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={isAuthenticated ? <Navigate to="/redirect" /> : <Login />} />
+        <Route path="/redirect" element={<RedirectByRole />} />
         <Route path="/signup" element={<Register />} />
         <Route path="/reset-password" element={<RequestReset />} />
         <Route path="/reset-password/new" element={<NewPassword />} />
@@ -46,9 +51,9 @@ function App() {
         <Route
           path="/dashboard"
           element={
-             <ProtectedRoute>
+            <ProtectedRoute>
               <Dashboard />
-             </ProtectedRoute>
+            </ProtectedRoute>
           }
         >
           <Route index element={<DashboardHome />} />
@@ -60,7 +65,6 @@ function App() {
           <Route path="roles/edit/:id" element={<RoleForm editMode={true} />} />
           <Route path="inventory" element={<div>Inventory Management Coming Soon</div>} />
           <Route path="profile" element={<Profile />} />
-
         </Route>
       </Routes>
     </BrowserRouter>

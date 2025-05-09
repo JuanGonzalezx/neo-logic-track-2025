@@ -381,11 +381,12 @@ const verifyCode = async (req, res) => {
         expiresIn: "2h",
       }
     );
-    
+
 
     res.status(200).json({
       message: "Account verified successfully",
       token,
+      role: role.name,
     });
 
   } catch (error) {
@@ -480,7 +481,7 @@ const secondFactorAuthentication = async (req, res) => {
         id: { in: role.permissionIds },
       },
     });
-    
+
 
     const now = new Date();
     if (now > findUser.verificationCodeExpires) {
@@ -504,10 +505,11 @@ const secondFactorAuthentication = async (req, res) => {
         expiresIn: "2h",
       }
     );
-    
+
     res.status(200).json({
       message: "Login successfull",
       token,
+      role: role.name,
     });
 
   } catch (error) {
@@ -681,7 +683,7 @@ const resetPassword = async (req, res) => {
   const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
   const resetLink = `http://localhost:3000/reset-password?token=${token}`;
   try {
-    await sendPassVerificationEmail(user.email, resetLink, user.email);
+    await sendPassVerificationEmail(user.email, resetLink, user.fullname);
 
     res.status(200).json({ message: 'Reset email sent' });
 
@@ -748,8 +750,7 @@ const ChangeResetPassword = async (req, res) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decoded)
-    const user = await prisma.users.findUnique({where: {id: decoded.userId}});
+    const user = await prisma.users.findUnique({ where: { id: decoded.userId } });
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const password = await bcrypt.hash(newPassword, 10);
@@ -807,19 +808,19 @@ const checkPermission = (url, methodExpected) => {
       const user = await prisma.users.findUnique({
         where: { id: decoded.id },
       });
-  
+
       if (!user || user.status !== "ACTIVE") {
         return res.status(401).json({ message: "Unauthorized user" });
       }
-  
+
       const role = await prisma.role.findUnique({
         where: { id: user.roleId },
       });
-  
+
       if (!role) {
         return res.status(403).json({ message: "Role not found" });
       }
-  
+
       const permissions = await prisma.permission.findMany({
         where: {
           id: { in: role.permissionIds },

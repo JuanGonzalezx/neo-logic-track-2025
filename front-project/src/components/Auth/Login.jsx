@@ -10,6 +10,7 @@ import "./Login.css";
 
 import { useNavigate } from "react-router-dom";
 import SecondFA from "./SecondFA";
+import RedirectByRole from "../../utils/redirectedByRole";
 
 const { Title } = Typography;
 
@@ -83,7 +84,8 @@ const Login = () => {
         else if (response.token) {
           dispatch(setUser({ token: response.token, isAuthenticated: true }));
           localStorage.setItem("token", response.token);
-          navigate("/file");
+          localStorage.setItem("role", response.role);
+          RedirectByRole();
         }
       } else if (response.status === 400) {
         // alerta roja
