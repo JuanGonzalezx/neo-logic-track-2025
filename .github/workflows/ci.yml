@@ -1,0 +1,125 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  auth:
+    name: Auth Service Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout auth code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Create .env file for auth
+        run: |
+          mkdir -p auth
+          cat <<EOF > auth/.env
+          DATABASE_URL=${{ vars.DATABASE_URL }}
+          PORT=${{ vars.PORT }}
+          JWT_SECRET=${{ vars.JWT_SECRET }}
+          EMAIL_SERVICE=${{ vars.EMAIL_SERVICE }}
+          EMAIL_USER=${{ vars.EMAIL_USER }}
+          EMAIL_PASS=${{ vars.EMAIL_PASS }}
+          FRONTEND_URL=${{ vars.FRONTEND_URL }}
+          TWILIO_ACCOUNT_SID=${{ vars.TWILIO_ACCOUNT_SID }}
+          TWILIO_AUTH_TOKEN=${{ vars.TWILIO_AUTH_TOKEN }}
+          TWILIO_PHONE_NUMBER=${{ vars.TWILIO_PHONE_NUMBER }}
+          EOF
+
+      - name: Build auth image
+        working-directory: auth
+        run: |
+          docker buildx build --platform linux/amd64 -t auth-service:latest --load .
+
+      - name: Start auth service with Docker Compose
+        run: |
+          cd auth
+          docker compose up -d
+          sleep 10
+
+      - name: Run auth tests
+        run: |
+          cd auth
+          docker compose run --rm app npm test
+
+      - name: Tear down auth services
+        if: always()
+        run: |
+          cd auth
+          docker compose down
+
+  api-gateway:
+    name: API Gateway Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout api-gateway code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Create .env file for api-gateway
+        run: |
+          mkdir -p api-gateway
+          cat <<EOF > api-gateway/.env
+          GATEWAY_PORT=${{ vars.GATEWAY_PORT }}
+          JWT_SECRET=${{ vars.JWT_SECRET }}
+          FRONTEND_URL=${{ vars.FRONTEND_URL }}
+          AUTH_SERVICE_URL=${{ vars.AUTH_SERVICE_URL }}
+          ORDERS_SERVICE_URL=${{ vars.ORDERS_SERVICE_URL }}
+          INVENTORY_SERVICE_URL=${{ vars.INVENTORY_SERVICE_URL }}
+          EOF
+
+      - name: Build api-gateway image
+        working-directory: api-gateway
+        run: |
+          docker buildx build --platform linux/amd64 -t api-gateway:latest --load .
+
+      - name: Start api-gateway with Docker Compose
+        run: |
+          cd api-gateway
+          docker compose up -d
+          sleep 10
+
+      - name: Run api-gateway tests
+        run: |
+          cd api-gateway
+          docker compose run --rm app npm test
+
+      - name: Tear down api-gateway services
+        if: always()
+        run: |
+          cd api-gateway
+          docker compose down
+
+  front-project:
+    name: Frontend Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout frontend code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build frontend image
+        run: |
+          cd front-project
+          docker build -t front-project:latest .
+
+      - name: Verify frontend container health
+        run: |
+          docker run -d -p 8080:80 --name frontend-test front-project:latest
+          sleep 5
+          curl -f http://localhost:8080/ || (echo "Unhealthy frontend container" && exit 1)
+
+      - name: Clean up frontend container
+        run: |
+          docker stop frontend-test && docker rm frontend-test
