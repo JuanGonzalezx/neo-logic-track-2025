@@ -1,0 +1,121 @@
+// prisma/schema.prisma
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"] // Opcional para features adicionales
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+
+}
+
+enum Status {
+  ACTIVO
+  MANTENIMIENTO
+  INACTIVO
+}
+
+enum Type {
+  INPUT
+  OUTPUT
+}
+
+model Proveedor {
+  id                String              @id
+  name              String
+  ProveedorProducto ProveedorProducto[]
+}
+
+model Producto {
+  id_producto            String               @id
+  nombre_producto        String
+  categoria              Category             @relation(fields: [category_id], references: [id])
+  category_id            String
+  descripcion            String
+  sku                    String
+  codigo_barras          String
+  precio_unitario        Float
+  peso_kg                Float
+  dimensiones_cm         Float
+  es_fragil              Boolean
+  requiere_refrigeracion Boolean
+  status                 Boolean
+  ProveedorProducto      ProveedorProducto[]
+  AlmacenProducto        AlmacenProducto[]
+  Movement_Inventory     Movement_Inventory[]
+}
+
+model Category {
+  id          String     @id
+  name        String
+  description String
+  Producto    Producto[]
+
+  @@map("categories")
+}
+
+model ProveedorProducto {
+  id           String @id @default(uuid())
+  id_producto  String
+  id_proveedor String
+
+  producto  Producto  @relation(fields: [id_producto], references: [id_producto])
+  proveedor Proveedor @relation(fields: [id_proveedor], references: [id])
+}
+
+model Almacen {
+  id_almacen         String               @id
+  nombre_almacen     String
+  direccion          String
+  ciudad             String
+  departamento       String
+  codigo_postal      String
+  latitud            Float
+  longitud           Float
+  gerente            String
+  capacidad_m3       Int
+  capacidad_usada_m3 Int
+  status             Status
+  AlmacenProducto    AlmacenProducto[]
+  Movement_Inventory Movement_Inventory[]
+}
+
+model AlmacenProducto {
+  id                String   @id
+  product_id        String
+  id_almacen        String
+  cantidad_stock    Int
+  nivel_reorden     Int
+  ultima_reposicion DateTime
+  fecha_vencimiento DateTime
+
+  producto Producto @relation(fields: [product_id], references: [id_producto])
+  almacen  Almacen  @relation(fields: [id_almacen], references: [id_almacen])
+}
+
+model Movement_Inventory {
+  id         String   @id
+  product_id String
+  id_almacen String
+  type       Type
+  cantidad   Int
+  date       DateTime
+
+  producto Producto @relation(fields: [product_id], references: [id_producto])
+  almacen  Almacen  @relation(fields: [id_almacen], references: [id_almacen])
+}
+
+model Ciudad {
+  id             String @id
+  nombre         String
+  departamentoId String
+
+  departamento Departamento @relation(fields: [departamentoId], references: [id])
+}
+
+model Departamento {
+  id       String   @id
+  nombre   String
+  ciudades Ciudad[]
+}
