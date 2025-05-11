@@ -9,11 +9,16 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon ./src/index.js"
   },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "keywords": [],
   "description": "",
   "dependencies": {
     "@prisma/adapter-pg": "^6.7.0",
     "@prisma/client": "^6.7.0",
+    "axios": "^1.9.0",
+    "cors": "^2.8.5",
     "express": "^5.1.0",
     "express-validator": "^7.2.1",
     "inventory": "file:",

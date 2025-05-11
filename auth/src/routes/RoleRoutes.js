@@ -19,11 +19,11 @@ router.post(
   RoleController.createRole
 );
 
-router.get(
-  '/',
-  checkPermission(GET_ALL.url, GET_ALL.method),
-  RoleController.getRoles
-);
+// router.get(
+//   '/',
+//   checkPermission(GET_ALL.url, GET_ALL.method),
+//   RoleController.getRoles
+// );
 
 router.get(
   '/:id',
@@ -55,7 +55,7 @@ router.delete(
   RoleController.removePermissionsFromRole
 );
 // router.post('/', createRole);
-// router.get('/', getRoles);
+router.get('/', RoleController.getRoles);
 // router.get('/:id', getRoleById);
 // router.put('/:id', updateRole);
 // router.delete('/:id', deleteRole);

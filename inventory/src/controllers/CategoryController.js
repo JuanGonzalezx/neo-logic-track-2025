@@ -9,7 +9,7 @@ const getAllCategories = async (req, res) => {
         // Opción 1: Usando el modelo con @@map
         const categories = await prisma.category.findMany({
             include: {
-                productos: true // Incluye relaciones si es necesario
+                Producto: true // Incluye relaciones si es necesario
             }
         });
 

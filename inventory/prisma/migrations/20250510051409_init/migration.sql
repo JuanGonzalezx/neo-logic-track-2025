@@ -1,9 +1,29 @@
 -- CreateEnum
-CREATE TYPE "Status" AS ENUM ('ACTIVO', 'MANTENIMIENTO', 'INACTIVO');
+CREATE TYPE "EstadoAlmacen" AS ENUM ('ACTIVO', 'MANTENIMIENTO', 'INACTIVO');
 
 -- CreateEnum
 CREATE TYPE "Type" AS ENUM ('INPUT', 'OUTPUT');
 
+-- Crear Tabla Departamento
+CREATE TABLE "Departamento" (
+    "id" TEXT NOT NULL,
+    "nombre" TEXT NOT NULL,
+    "pais" TEXT NOT NULL,
+
+    CONSTRAINT "Departamento_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "Departamento_nombre_key" UNIQUE ("nombre")
+);
+
+-- Crear Tabla Ciudad
+CREATE TABLE "Ciudad" (
+    "id" TEXT NOT NULL,
+    "nombre" TEXT NOT NULL,
+    "departamentoId" TEXT NOT NULL,
+    "codigo_postal" TEXT NOT NULL,
+
+    CONSTRAINT "Ciudad_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "Ciudad_nombre_departamentoId_key" UNIQUE ("nombre", "departamentoId") -- Restricción de unicidad
+);
 -- CreateTable
 CREATE TABLE "Proveedor" (
     "id" TEXT NOT NULL,
@@ -47,23 +67,37 @@ CREATE TABLE "ProveedorProducto" (
 
     CONSTRAINT "ProveedorProducto_pkey" PRIMARY KEY ("id")
 );
+-- Crear Tabla Direccion
+CREATE TABLE "Direccion" (
+    "id" TEXT NOT NULL, 
+    "calle" TEXT NOT NULL,
+    "ciudadId" TEXT NOT NULL,
+    "latitud" DOUBLE PRECISION NOT NULL,
+    "longitud" DOUBLE PRECISION NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Direccion_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "Direccion_ciudadId_fkey" FOREIGN KEY ("ciudadId") REFERENCES "Ciudad"("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
 
 -- CreateTable
 CREATE TABLE "Almacen" (
     "id_almacen" TEXT NOT NULL,
     "nombre_almacen" TEXT NOT NULL,
-    "direccion" TEXT NOT NULL,
-    "ciudad" TEXT NOT NULL,
-    "departamento" TEXT NOT NULL,
-    "codigo_postal" TEXT NOT NULL,
-    "latitud" DOUBLE PRECISION NOT NULL,
-    "longitud" DOUBLE PRECISION NOT NULL,
+    "direccionId" TEXT NOT NULL,
     "gerente" TEXT NOT NULL,
+    "gerenteId" TEXT DEFAULT NULL,
     "capacidad_m3" INTEGER NOT NULL,
     "capacidad_usada_m3" INTEGER NOT NULL,
-    "status" "Status" NOT NULL,
+    "estado" "EstadoAlmacen" NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "Almacen_pkey" PRIMARY KEY ("id_almacen")
+    CONSTRAINT "Almacen_pkey" PRIMARY KEY ("id_almacen"),
+    CONSTRAINT "Almacen_direccionId_key" UNIQUE ("direccionId"),
+    CONSTRAINT "Almacen_direccionId_fkey" FOREIGN KEY ("direccionId") REFERENCES "Direccion"("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -89,23 +123,6 @@ CREATE TABLE "Movement_Inventory" (
     "date" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Movement_Inventory_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Ciudad" (
-    "id" TEXT NOT NULL,
-    "nombre" TEXT NOT NULL,
-    "departamentoId" TEXT NOT NULL,
-
-    CONSTRAINT "Ciudad_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Departamento" (
-    "id" TEXT NOT NULL,
-    "nombre" TEXT NOT NULL,
-
-    CONSTRAINT "Departamento_pkey" PRIMARY KEY ("id")
 );
 
 -- AddForeignKey

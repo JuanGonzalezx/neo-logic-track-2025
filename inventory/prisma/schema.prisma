@@ -5,12 +5,11 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-enum Status {
+enum EstadoAlmacen {
   ACTIVO
   MANTENIMIENTO
   INACTIVO
@@ -67,18 +66,44 @@ model ProveedorProducto {
 model Almacen {
   id_almacen         String               @id
   nombre_almacen     String
-  direccion          String
-  ciudad             String
-  departamento       String
-  codigo_postal      String
-  latitud            Float
-  longitud           Float
+  direccionId        String               @unique // Clave foránea para Address
+  direccion          Direccion            @relation(fields: [direccionId], references: [id])
   gerente            String
+  gerenteId  String? // Opcional: si quieres almacenar el ID del usuario del microservicio de usuarios
   capacidad_m3       Int
   capacidad_usada_m3 Int
-  status             Status
+  estado             EstadoAlmacen
   AlmacenProducto    AlmacenProducto[]
   Movement_Inventory Movement_Inventory[]
+}
+
+model Direccion {
+  id           String     @id @default(uuid())
+  calle       String     // calle, avenida, etc.
+  ciudadId     String
+  ciudad       Ciudad     @relation(fields: [ciudadId], references: [id])
+  latitud      Float
+  longitud     Float
+  almacen      Almacen?   // Relación uno a uno con Almacen
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model Ciudad {
+  id             String @default(uuid())  @unique @id
+  nombre         String
+  codigo_postal  String    // Código postal específico de esta dirección
+  departamentoId String
+  departamento Departamento @relation(fields: [departamentoId], references: [id])
+  direcciones    Direccion[]
+  @@unique([nombre, departamentoId])
+}
+
+model Departamento {
+  id       String   @default(uuid()) @unique @id
+  nombre   String
+  pais     String
+  ciudades Ciudad[]
 }
 
 model AlmacenProducto {
@@ -106,16 +131,5 @@ model Movement_Inventory {
   almacen  Almacen  @relation(fields: [id_almacen], references: [id_almacen])
 }
 
-model Ciudad {
-  id             String @id
-  nombre         String
-  departamentoId String
 
-  departamento Departamento @relation(fields: [departamentoId], references: [id])
-}
 
-model Departamento {
-  id       String   @id
-  nombre   String
-  ciudades Ciudad[]
-}
