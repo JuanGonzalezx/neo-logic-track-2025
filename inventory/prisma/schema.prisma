@@ -7,31 +7,31 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-
+  directUrl = env("DIRECT_URL")
 }
 
-enum Status {
+enum EstadoAlmacen {
   ACTIVO
   MANTENIMIENTO
   INACTIVO
 }
 
-enum Type {
-  INPUT
-  OUTPUT
+enum Tipo {
+  ENTRADA
+  SALIDA
 }
 
 model Proveedor {
   id                String              @id
-  name              String
+  name              String?
   ProveedorProducto ProveedorProducto[]
 }
 
 model Producto {
   id_producto            String               @id
   nombre_producto        String
-  categoria              Category             @relation(fields: [category_id], references: [id])
-  category_id            String
+  categoria              Categoria            @relation(fields: [categoria_id], references: [id])
+  categoria_id           String
   descripcion            String
   sku                    String
   codigo_barras          String
@@ -46,13 +46,11 @@ model Producto {
   Movement_Inventory     Movement_Inventory[]
 }
 
-model Category {
-  id          String     @id
+model Categoria {
+  id          String     @id @unique @default(uuid())
   name        String
-  description String
+  description String?
   Producto    Producto[]
-
-  @@map("categories")
 }
 
 model ProveedorProducto {
@@ -62,60 +60,79 @@ model ProveedorProducto {
 
   producto  Producto  @relation(fields: [id_producto], references: [id_producto])
   proveedor Proveedor @relation(fields: [id_proveedor], references: [id])
+
+  @@unique([id_producto, id_proveedor])
 }
 
 model Almacen {
   id_almacen         String               @id
   nombre_almacen     String
-  direccion          String
-  ciudad             String
-  departamento       String
-  codigo_postal      String
-  latitud            Float
-  longitud           Float
+  direccionId        String               @unique // Clave foránea para Address
+  direccion          Direccion            @relation(fields: [direccionId], references: [id])
   gerente            String
+  gerenteId          String? // Opcional: si quieres almacenar el ID del usuario del microservicio de usuarios
   capacidad_m3       Int
   capacidad_usada_m3 Int
-  status             Status
+  estado             EstadoAlmacen
   AlmacenProducto    AlmacenProducto[]
   Movement_Inventory Movement_Inventory[]
 }
 
+model Direccion {
+  id        String   @id @default(uuid())
+  calle     String // calle, avenida, etc.
+  ciudadId  String
+  ciudad    Ciudad   @relation(fields: [ciudadId], references: [id])
+  latitud   Float
+  longitud  Float
+  almacen   Almacen? // Relación uno a uno con Almacen
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Ciudad {
+  id             String       @id @unique @default(uuid())
+  nombre         String
+  codigo_postal  String // Código postal específico de esta dirección
+  departamentoId String
+  departamento   Departamento @relation(fields: [departamentoId], references: [id])
+  direcciones    Direccion[]
+
+  @@unique([nombre, departamentoId])
+}
+
+model Departamento {
+  id       String   @id @unique @default(uuid())
+  nombre   String
+  pais     String
+  ciudades Ciudad[]
+}
+
 model AlmacenProducto {
   id                String   @id
-  product_id        String
+  id_producto       String
   id_almacen        String
   cantidad_stock    Int
   nivel_reorden     Int
   ultima_reposicion DateTime
   fecha_vencimiento DateTime
 
-  producto Producto @relation(fields: [product_id], references: [id_producto])
+  producto Producto @relation(fields: [id_producto], references: [id_producto])
   almacen  Almacen  @relation(fields: [id_almacen], references: [id_almacen])
+
+  @@unique([id_producto, id_almacen])
 }
 
 model Movement_Inventory {
-  id         String   @id
-  product_id String
-  id_almacen String
-  type       Type
-  cantidad   Int
-  date       DateTime
+  id          String   @id
+  id_producto String
+  id_almacen  String
+  tipo        Tipo     @default(ENTRADA)
+  cantidad    Int
+  fecha       DateTime
 
-  producto Producto @relation(fields: [product_id], references: [id_producto])
+  producto Producto @relation(fields: [id_producto], references: [id_producto])
   almacen  Almacen  @relation(fields: [id_almacen], references: [id_almacen])
-}
 
-model Ciudad {
-  id             String @id
-  nombre         String
-  departamentoId String
-
-  departamento Departamento @relation(fields: [departamentoId], references: [id])
-}
-
-model Departamento {
-  id       String   @id
-  nombre   String
-  ciudades Ciudad[]
+  @@unique([id_producto, id_almacen, fecha])
 }
