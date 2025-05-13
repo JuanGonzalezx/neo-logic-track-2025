@@ -387,6 +387,7 @@ const verifyCode = async (req, res) => {
       message: "Account verified successfully",
       token,
       role: role.name,
+      permissions: permissionsRole.map(permission => permission.id)
     });
 
   } catch (error) {
@@ -510,6 +511,7 @@ const secondFactorAuthentication = async (req, res) => {
       message: "Login successfull",
       token,
       role: role.name,
+      permissions: permissionsRole.map(permission => permission.id)
     });
 
   } catch (error) {

@@ -14,7 +14,6 @@ import RoleForm from "./components/Dashboard/Roles/RoleForm";
 import Profile from "./components/Dashboard/Profile/Profile";
 import RequestReset from "./components/Auth/RequestReset";
 import NewPassword from "./components/Auth/NewPassword";
-import RedirectByRole from "./components/Auth/RedirectByRole";
 
 function App() {
   const navigate = useNavigate();
@@ -33,10 +32,8 @@ function App() {
   };
 
   return (
-    <BrowserRouter>
       <Routes>
-        <Route path="/" element={isAuthenticated ? <Navigate to="/redirect" /> : <Login />} />
-        <Route path="/redirect" element={<RedirectByRole />} />
+        <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} />
         <Route path="/signup" element={<Register />} />
         <Route path="/reset-password" element={<RequestReset />} />
         <Route path="/reset-password/new" element={<NewPassword />} />
@@ -67,7 +64,6 @@ function App() {
           <Route path="profile" element={<Profile />} />
         </Route>
       </Routes>
-    </BrowserRouter>
   );
 }
 

@@ -10,9 +10,7 @@ import ProtectedRoute from "./ProtectedRoute";
   <Route path="/" element={isAuthenticated ? <Navigate to="/redirect" /> : <Login />} />
 
   <Route path="/admin" element={
-    <ProtectedRoute allowedRoles={["admin"]}>
       <AdminDashboard />
-    </ProtectedRoute>
   } />
 
   <Route path="/gerente" element={

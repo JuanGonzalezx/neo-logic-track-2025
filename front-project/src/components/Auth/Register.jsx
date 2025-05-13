@@ -9,7 +9,6 @@ import VerificationModal from "./VerificationModal";
 import "./Register.css";
 import { X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import RedirectByRole from "../../utils/redirectedByRole";
 
 const { Title } = Typography;
 
@@ -92,9 +91,6 @@ const Register = ({ isOpen, onClose }) => {
             else if (response.status === 201 && response.data?.token) {
                 dispatch(setUser({ token: response.data.token, isVerified: true }));
                 localStorage.setItem("token", response.data.token);
-                localStorage.setItem("role", response.data.role);
-                RedirectByRole();
-
             }
         } catch (err) {
             console.error("Error en el registro:", err);
@@ -117,6 +113,8 @@ const Register = ({ isOpen, onClose }) => {
             if (response.token) {
                 dispatch(setUser({ token: response.token, isVerified: true }));
                 localStorage.setItem("token", response.token);
+                localStorage.setItem("role", response.role);
+                localStorage.setItem("permissions", JSON.stringify(response.permissions));
                 setShowModal(false);
                 navigate("/dashboard");
             } else {

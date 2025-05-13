@@ -10,7 +10,6 @@ import "./Login.css";
 
 import { useNavigate } from "react-router-dom";
 import SecondFA from "./SecondFA";
-import RedirectByRole from "../../utils/redirectedByRole";
 
 const { Title } = Typography;
 
@@ -72,6 +71,7 @@ const Login = () => {
       console.log("Respuesta del servidor:", response);
 
       if (response.status === 200) {
+
         // alerta verde
         setApiResponse({ type: "success", message: response.message });
 
@@ -84,8 +84,7 @@ const Login = () => {
         else if (response.token) {
           dispatch(setUser({ token: response.token, isAuthenticated: true }));
           localStorage.setItem("token", response.token);
-          localStorage.setItem("role", response.role);
-          RedirectByRole();
+          navigate("/dashboard");
         }
       } else if (response.status === 400) {
         // alerta roja
@@ -110,6 +109,8 @@ const Login = () => {
       if (response.token) {
         dispatch(setUser({ token: response.token, isAuthenticated: true }));
         localStorage.setItem("token", response.token);
+        localStorage.setItem("role", response.role);
+        localStorage.setItem("permissions", JSON.stringify(response.permissions));
         setShowModal(false);
         navigate("/dashboard");
       } else {
@@ -135,82 +136,84 @@ const Login = () => {
   };
 
   return (
-    <div
-      className="login-container"
-      style={{ maxWith: 400, margin: "0 auto", marginTop: 50 }}
-    >
-      <Title level={2} style={{ textAlign: "center" }}>
-        Login
-      </Title>
-      <form onSubmit={handleSubmit}>
-        {/* Input de email */}
-        <div className="form-group">
-          <label htmlFor="email">Email</label>
-          <input
-            name="email"
-            value={formData.email}
-            placeholder="Enter your email"
-            onChange={handleChange}
-          />
-          {errors.email && <span className="field-error">{errors.email}</span>}
-        </div>
-        {/* input de password */}
-        <div className="form-group">
-          <label htmlFor="current_password">Password</label>
-          <input
-            type="password"
-            name="current_password"
-            value={formData.current_password}
-            placeholder="Enter your password"
-            onChange={handleChange}
-          />
-          {errors.current_password && (
-            <span className="field-error">{errors.current_password}</span>
-          )}
-        </div>
-        <div className="form-group">
-          <label htmlFor="methodContact">Método de envío</label>
-          <select
-            name="methodContact"
-            className="input-field"
-            value={formData.methodContact}
-            onChange={handleChange}
-          >
-            <option value="sms">SMS</option>
-            <option value="email">Email</option>
-          </select>
-          {errors.methodContact && (
-            <span className="field-error">{errors.methodContact}</span>
-          )}
+    <>
+      <div
+        className="login-container"
+        style={{ maxWith: 400, margin: "0 auto", marginTop: 50 }}
+      >
+        <Title level={2} style={{ textAlign: "center" }}>
+          Login
+        </Title>
+        <form onSubmit={handleSubmit}>
+          {/* Input de email */}
+          <div className="form-group">
+            <label htmlFor="email">Email</label>
+            <input
+              name="email"
+              value={formData.email}
+              placeholder="Enter your email"
+              onChange={handleChange}
+            />
+            {errors.email && <span className="field-error">{errors.email}</span>}
+          </div>
+          {/* input de password */}
+          <div className="form-group">
+            <label htmlFor="current_password">Password</label>
+            <input
+              type="password"
+              name="current_password"
+              value={formData.current_password}
+              placeholder="Enter your password"
+              onChange={handleChange}
+            />
+            {errors.current_password && (
+              <span className="field-error">{errors.current_password}</span>
+            )}
+          </div>
+          <div className="form-group">
+            <label htmlFor="methodContact">Método de envío</label>
+            <select
+              name="methodContact"
+              className="input-field"
+              value={formData.methodContact}
+              onChange={handleChange}
+            >
+              <option value="sms">SMS</option>
+              <option value="email">Email</option>
+            </select>
+            {errors.methodContact && (
+              <span className="field-error">{errors.methodContact}</span>
+            )}
+          </div>
+
+          <button type="submit" className="login-button" disabled={loading}>
+            {loading ? <Spin /> : "Login"}
+          </button>
+        </form>
+
+        {/* Forgot Password Button */}
+        <div style={{ marginTop: 16, textAlign: "center" }}>
+          <button onClick={handleForgot} className="verification-resend-link">
+            Forgot Password?
+          </button>
         </div>
 
-        <button type="submit" className="login-button" disabled={loading}>
-          {loading ? <Spin /> : "Login"}
-        </button>
-      </form>
+        <SecondFA
+          isOpen={showModal}
+          onClose={() => setShowModal(false)}
+          contactMethod={formData.methodContact}
+          onVerificationSuccess={handleVerificationSuccess}
+          id={0}
+        />
 
-      {/* Forgot Password Button */}
-      <div style={{ marginTop: 16, textAlign: "center" }}>
-        <button onClick={handleForgot} className="verification-resend-link">
-          Forgot Password?
-        </button>
+        <div className="verification-resend-text">
+          ¿Not registered?{' '}
+          <button onClick={handleSignUp} className="verification-resend-link">
+            Sign Up
+          </button>
+        </div>
       </div>
-
-      <SecondFA
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        contactMethod={formData.methodContact}
-        onVerificationSuccess={handleVerificationSuccess}
-        id={0}
-      />
-
-      <div className="verification-resend-text">
-        ¿Not registered?{' '}
-        <button onClick={handleSignUp} className="verification-resend-link">
-          Sign Up
-        </button>
-      </div>
-    </div>
+    </>
   );
 };
 
