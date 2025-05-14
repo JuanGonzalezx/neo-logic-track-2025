@@ -16,6 +16,8 @@ import PermissionForm from "./components/Dashboard/Permissions/PermissionForm";
 import Profile from "./components/Dashboard/Profile/Profile";
 import RequestReset from "./components/Auth/RequestReset";
 import NewPassword from "./components/Auth/NewPassword";
+import ProductList from './components/Dashboard/Products/ProductList'; // Ajusta la ruta
+import ProductForm from './components/Dashboard/Products/ProductForm'; // Ajusta la ruta
 function App() {
   let { isAuthenticated } = useSelector((state) => state.auth);
 
@@ -64,6 +66,8 @@ function App() {
           <Route path="permissions/create" element={<PermissionForm />} />
           <Route path="permissions/edit/:id" element={<PermissionForm editMode={true} />} />
           <Route path="inventory" element={<div>Inventory Management Coming Soon</div>} />
+          <Route path="/dashboard/inventory" element={<ProductList />} /> {/* Lista de productos */}
+          <Route path="/dashboard/inventory/add" element={<ProductForm />} /> {/* Formulario para añadir */}
           <Route path="profile" element={<Profile />} />
 
         </Route>
