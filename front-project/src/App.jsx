@@ -11,6 +11,8 @@ import UserList from "./components/Dashboard/Users/UserList";
 import UserForm from "./components/Dashboard/Users/UserForm";
 import RoleList from "./components/Dashboard/Roles/RoleList";
 import RoleForm from "./components/Dashboard/Roles/RoleForm";
+import PermissionList from "./components/Dashboard/Permissions/PermissionList";
+import PermissionForm from "./components/Dashboard/Permissions/PermissionForm";
 import Profile from "./components/Dashboard/Profile/Profile";
 import RequestReset from "./components/Auth/RequestReset";
 import NewPassword from "./components/Auth/NewPassword";
@@ -58,6 +60,9 @@ function App() {
           <Route path="roles" element={<RoleList />} />
           <Route path="roles/create" element={<RoleForm />} />
           <Route path="roles/edit/:id" element={<RoleForm editMode={true} />} />
+          <Route path="permissions" element={<PermissionList />} />
+          <Route path="permissions/create" element={<PermissionForm />} />
+          <Route path="permissions/edit/:id" element={<PermissionForm editMode={true} />} />
           <Route path="inventory" element={<div>Inventory Management Coming Soon</div>} />
           <Route path="profile" element={<Profile />} />
 

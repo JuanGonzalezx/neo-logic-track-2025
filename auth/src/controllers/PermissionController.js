@@ -8,10 +8,21 @@ const jwt = require("jsonwebtoken");
 const createPermission = async (req, res) => {
   const { name, url, method, description, category } = req.body;
   try {
-    const permission = await prisma.permission.create({
-      data: { name, url, method, description, category },
-    });
-    res.status(201).json(permission);
+
+    const find = await prisma.permission.findFirst({
+      where: { name, url, method }
+    })
+
+    if (find) {
+      res.status(400).json({ message: "Ya existe el permiso" });
+    }
+    else {
+      const permission = await prisma.permission.create({
+        data: { name, url, method, description, category },
+      });
+      res.status(201).json(permission);
+    }
+
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

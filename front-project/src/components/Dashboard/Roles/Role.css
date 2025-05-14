@@ -278,6 +278,26 @@ textarea:focus {
   box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
 }
 
+/* Add to both Role.css and Permission.css */
+.search-field {
+  position: relative;
+  width: 250px;
+}
+
+.search-field input {
+  padding-left: 32px;
+  width: 100%;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  pointer-events: none;
+}
+
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .role-cards {

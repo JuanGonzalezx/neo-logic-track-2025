@@ -7,7 +7,10 @@ export class Permission {
     async createPermission(data) {
         const res = await fetch(`${ENV.BASE_API}${API_ROUTES.PERMISSIONS}`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
             body: JSON.stringify(data),
         });
         const json = await res.json();
@@ -21,6 +24,10 @@ export class Permission {
     async getAllPermissions() {
         const res = await fetch(`${ENV.BASE_API}${API_ROUTES.PERMISSIONS}`, {
             method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
         });
         const json = await res.json();
         return { status: res.status, data: json };
@@ -29,7 +36,10 @@ export class Permission {
     async updatePermission(id, data) {
         const res = await fetch(`${ENV.BASE_API}${API_ROUTES.PERMISSIONS}/${id}`, {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
             body: JSON.stringify(data),
         });
         const json = await res.json();
@@ -39,6 +49,10 @@ export class Permission {
     async deletePermission(id) {
         const res = await fetch(`${ENV.BASE_API}${API_ROUTES.PERMISSIONS}/${id}`, {
             method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
         });
         const json = await res.json();
         return { status: res.status, message: json.message };

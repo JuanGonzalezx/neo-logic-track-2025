@@ -45,6 +45,7 @@ model Permission {
   url         String // ejemplo: "/api/users"
   method      String // ejemplo: "GET", "POST", etc.
   description String? @default("no description available")
+  category    String
 }
 
 enum Status {
