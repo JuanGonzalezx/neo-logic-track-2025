@@ -10,22 +10,22 @@ datasource db {
 
 // Modelo Order
 model Order {
-  id                String          @id @default(uuid())
-  delivery_id       String
-  location_id       String
-  creation_date     DateTime
-  delivery_address  String
-  status            Status
-  orderProducts     OrderProducts[]
+  id               String          @id @default(uuid())
+  delivery_id      String
+  location_id      String
+  creation_date    DateTime
+  delivery_address String
+  status           Status
+  orderProducts    OrderProducts[]
 }
 
 // Modelo OrderProducts
 model OrderProducts {
-  id         String   @id @default(uuid())
+  id         String @id @default(uuid())
   order_id   String
   product_id String
   amount     Float
-  order      Order    @relation(fields: [order_id], references: [id])
+  order      Order  @relation(fields: [order_id], references: [id])
 }
 
 // Enum para el estado del pedido
