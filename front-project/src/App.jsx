@@ -65,7 +65,6 @@ function App() {
           <Route path="permissions" element={<PermissionList />} />
           <Route path="permissions/create" element={<PermissionForm />} />
           <Route path="permissions/edit/:id" element={<PermissionForm editMode={true} />} />
-          <Route path="inventory" element={<div>Inventory Management Coming Soon</div>} />
           <Route path="/dashboard/inventory" element={<ProductList />} /> {/* Lista de productos */}
           <Route path="/dashboard/inventory/add" element={<ProductForm />} /> {/* Formulario para añadir */}
           <Route path="profile" element={<Profile />} />

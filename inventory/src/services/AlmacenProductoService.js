@@ -12,29 +12,22 @@ class AlmacenProductoService {
             throw new Error("id_producto e id_almacen son requeridos.");
         }
 
-        const producto = await ProductoService.getById(id_producto);
-        if (!producto) throw new Error(`El producto '${id_producto}' no existe`);
-
-        const almacen = await AlmacenService.getById(id_almacen);
-        if (!almacen) throw new Error(`El almacén '${id_almacen}' no existe`);
-
         const existing = await prisma.almacenProducto.findFirst({
             where: { id_producto, id_almacen },
         });
 
         if (existing) {
-            throw new Error(`El registro AlmacenProducto ya existe para producto '${id_producto}' y almacén '${id_almacen}'`);
+            return existing
         }
 
         return prisma.almacenProducto.create({
             data: {
-                id: `${id_producto}-${id_almacen}`,
                 id_producto,
                 id_almacen,
                 cantidad_stock,
                 nivel_reorden,
-                ultima_reposicion: new Date(ultima_reposicion),
-                fecha_vencimiento: new Date(fecha_vencimiento)
+                ultima_reposicion,
+                fecha_vencimiento
             }
         });
     }
@@ -46,6 +39,12 @@ class AlmacenProductoService {
     async getById(id) {
         const found = await prisma.almacenProducto.findFirst({ where: { id } });
         if (!found) throw new Error("AlmacenProducto no encontrado.");
+        return found;
+    }
+
+    async getByProductoAlmacen(id_almacen, id_producto) {
+        const found = await prisma.almacenProducto.findFirst({ where: { id_almacen, id_producto } });
+        if (!found) return false
         return found;
     }
 
@@ -67,10 +66,7 @@ class AlmacenProductoService {
 
     async update(id, data) {
         try {
-            if (data.id_producto || data.id_almacen || data.id) {
-                throw new Error('No se pueden actualizar los id');
-            }
-
+            
             return prisma.almacenProducto.update({
                 where: { id },
                 data,

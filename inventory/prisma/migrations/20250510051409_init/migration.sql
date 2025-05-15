@@ -1,9 +1,6 @@
 -- CreateEnum
 CREATE TYPE "EstadoAlmacen" AS ENUM ('ACTIVO', 'MANTENIMIENTO', 'INACTIVO');
 
--- CreateEnum
-CREATE TYPE "Type" AS ENUM ('INPUT', 'OUTPUT');
-
 -- Crear Tabla Departamento
 CREATE TABLE "Departamento" (
     "id" TEXT NOT NULL,
@@ -108,7 +105,7 @@ CREATE TABLE "AlmacenProducto" (
     "cantidad_stock" INTEGER NOT NULL,
     "nivel_reorden" INTEGER NOT NULL,
     "ultima_reposicion" TIMESTAMP(3) NOT NULL,
-    "fecha_vencimiento" TIMESTAMP(3) NOT NULL,
+    "fecha_vencimiento" TIMESTAMP(3) NULL,
 
     CONSTRAINT "AlmacenProducto_pkey" PRIMARY KEY ("id")
 );
@@ -118,9 +115,9 @@ CREATE TABLE "Movement_Inventory" (
     "id" TEXT NOT NULL,
     "product_id" TEXT NOT NULL,
     "id_almacen" TEXT NOT NULL,
-    "type" "Type" NOT NULL,
+    "type" BOOLEAN NOT NULL,
     "cantidad" INTEGER NOT NULL,
-    "date" TIMESTAMP(3) NOT NULL,
+    "fecha" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Movement_Inventory_pkey" PRIMARY KEY ("id")
 );

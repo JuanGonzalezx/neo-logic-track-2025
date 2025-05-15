@@ -16,11 +16,6 @@ enum EstadoAlmacen {
   INACTIVO
 }
 
-enum Tipo {
-  ENTRADA
-  SALIDA
-}
-
 model Proveedor {
   id                String              @id
   name              String?
@@ -34,7 +29,7 @@ model Producto {
   categoria_id           String
   descripcion            String
   sku                    String
-  codigo_barras          String
+  codigo_barras          Int
   precio_unitario        Float
   peso_kg                Float
   dimensiones_cm         Float
@@ -109,13 +104,13 @@ model Departamento {
 }
 
 model AlmacenProducto {
-  id                String   @id
+  id                String    @id @default(uuid())
   id_producto       String
   id_almacen        String
   cantidad_stock    Int
   nivel_reorden     Int
   ultima_reposicion DateTime
-  fecha_vencimiento DateTime
+  fecha_vencimiento DateTime?
 
   producto Producto @relation(fields: [id_producto], references: [id_producto])
   almacen  Almacen  @relation(fields: [id_almacen], references: [id_almacen])
@@ -124,10 +119,10 @@ model AlmacenProducto {
 }
 
 model Movement_Inventory {
-  id          String   @id
+  id          String   @id @unique @default(uuid())
   id_producto String
   id_almacen  String
-  tipo        Tipo     @default(ENTRADA)
+  tipo        Boolean
   cantidad    Int
   fecha       DateTime
 

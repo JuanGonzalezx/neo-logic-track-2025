@@ -5,7 +5,7 @@ const handleServiceError = require('../utils/errorHandler').handleServiceError;
 class ProductoController {
     async create(req, res, next) {      
         try {
-            const producto = await ProductoService.findOrCreateProducto(req.body);
+            const producto = await ProductoService.create(req.body);
             res.status(201).json(producto);
         } catch (error) { 
             handleServiceError(error, res, next);

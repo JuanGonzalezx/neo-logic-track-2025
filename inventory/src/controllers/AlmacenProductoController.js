@@ -67,3 +67,5 @@ class AlmacenProductoController {
 }
 
 module.exports = new AlmacenProductoController();
+
+

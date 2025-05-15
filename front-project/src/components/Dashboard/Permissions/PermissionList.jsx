@@ -78,8 +78,6 @@ const PermissionList = () => {
 
     const handleUpdatePermission = async () => {
         try {
-            console.log(permission);
-            
             if (editingPermission) {
                 navigate(`edit/${permission.id}`, { state: { editMode: true, permissionData: permission } })
             }

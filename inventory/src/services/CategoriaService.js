@@ -20,7 +20,7 @@ class CategoriaService {
             return categoria;
         }
         else {
-            throw new Error(`La categoria '${name}' ya está en uso.`);
+            return categoria;
         }
 
     }
@@ -42,7 +42,6 @@ class CategoriaService {
         const categoria = await prisma.categoria.findFirst({
             where: { name }
         });
-        if (!categoria) throw new Error('categoria no encontrado');
         return categoria;
     }
 

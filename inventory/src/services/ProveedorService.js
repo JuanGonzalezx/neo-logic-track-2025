@@ -19,7 +19,7 @@ class ProveedorService {
             return proveedor;
         }
         else {
-            throw new Error(`El proveedor '${id}' ya está en uso.`);
+            return proveedor;
         }
 
     }
