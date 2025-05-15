@@ -26,6 +26,8 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
       setActiveSection('users');
     } else if (location.pathname.startsWith('/dashboard/roles')) {
       setActiveSection('roles');
+    } else if (location.pathname.startsWith('/dashboard/inventory')) {
+      setActiveSection('inventory');
     } else {
       setActiveSection(null);
     }
@@ -163,12 +165,52 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
                   </ul>
                 )}
               </li>
-            )}
+            <li className="sidebar-nav-item">
+              <div
+                className={`sidebar-nav-section ${activeSection === 'inventory' ? 'expanded' : ''}`}
+                onClick={() => toggleSection('inventory')}
+              >
+                <div className="section-content">
+                  <Package2 size={20} className="sidebar-icon" />
+                  {!collapsed && <span>Inventory</span>}
+                </div>
+                {!collapsed && (
+                  <ChevronDown
+                    size={16}
+                    className={`section-arrow ${activeSection === 'inventory' ? 'expanded' : ''}`}
+                  />
+                )}
+              </div>
+              {(activeSection === 'inventory' || collapsed) && (
+                <ul className="sidebar-subnav">
+                  <li className="sidebar-subnav-item">
+                    <NavLink
+                      to="/dashboard/inventory"
+                      end
+                      className={linkClass}
+                      onClick={handleNavLinkClick}
+                    >
+                      {collapsed ? <Package2 size={20} /> : <span>All Products</span>}
+                    </NavLink>
+                  </li>
+                  <li className="sidebar-subnav-item">
+                    <NavLink
+                      to="/dashboard/inventory/add"
+                      end
+                      className={linkClass}
+                      onClick={handleNavLinkClick}
+                    >
+                      {collapsed ? <Plus size={20} /> : <span>Add Product</span>}
+                    </NavLink>
+                  </li>
+                </ul>
+              )}
+            </li>            )}
 
             {hasPermission('681bead67a2c0df928b8b232') && (
               <li className="sidebar-nav-item">
                 <NavLink
-                  to="/dashboard/inventory"
+                  to="/dashboard/inventor"
                   end
                   className={linkClass}
                   onClick={handleNavLinkClick}
