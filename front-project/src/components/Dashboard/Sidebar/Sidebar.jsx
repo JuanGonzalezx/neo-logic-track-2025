@@ -165,6 +165,8 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
                   </ul>
                 )}
               </li>
+            )}
+
             <li className="sidebar-nav-item">
               <div
                 className={`sidebar-nav-section ${activeSection === 'inventory' ? 'expanded' : ''}`}
@@ -205,7 +207,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
                   </li>
                 </ul>
               )}
-            </li>            )}
+            </li>
 
             {hasPermission('681bead67a2c0df928b8b232') && (
               <li className="sidebar-nav-item">
