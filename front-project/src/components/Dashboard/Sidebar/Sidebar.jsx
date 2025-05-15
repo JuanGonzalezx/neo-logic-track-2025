@@ -13,8 +13,14 @@ import './Sidebar.css';
 const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
   const location = useLocation();
   const [activeSection, setActiveSection] = useState(null);
+  const [permissions, setPermissions] = useState([]);
 
-  // Expand section on load based on current path
+  useEffect(() => {
+    // Load permissions from local storage
+    const storedPermissions = JSON.parse(localStorage.getItem('permissions')) || [];
+    setPermissions(storedPermissions);
+  }, []);
+
   useEffect(() => {
     if (location.pathname.startsWith('/dashboard/users')) {
       setActiveSection('users');
@@ -42,6 +48,8 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
   const linkClass = ({ isActive }) =>
     isActive ? 'sidebar-nav-link active' : 'sidebar-nav-link';
 
+  const hasPermission = (permissionId) => permissions.includes(permissionId);
+
   return (
     <>
       <aside className={`sidebar ${collapsed ? 'collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`}>
@@ -65,89 +73,103 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
               </NavLink>
             </li>
 
-            <li className="sidebar-nav-item">
-              <div
-                className={`sidebar-nav-section ${activeSection === 'users' ? 'expanded' : ''}`}
-                onClick={() => toggleSection('users')}
-              >
-                <div className="section-content">
-                  <Users size={20} className="sidebar-icon" />
-                  {!collapsed && <span>Users</span>}
+            {hasPermission('6814375bfbaec847ba2ecc01') && (
+              <li className="sidebar-nav-item">
+                <div
+                  className={`sidebar-nav-section ${activeSection === 'users' ? 'expanded' : ''}`}
+                  onClick={() => toggleSection('users')}
+                >
+                  <div className="section-content">
+                    <Users size={20} className="sidebar-icon" />
+                    {!collapsed && <span>Users</span>}
+                  </div>
+                  {!collapsed && (
+                    <ChevronDown
+                      size={16}
+                      className={`section-arrow ${activeSection === 'users' ? 'expanded' : ''}`}
+                    />
+                  )}
                 </div>
-                {!collapsed && (
-                  <ChevronDown
-                    size={16}
-                    className={`section-arrow ${activeSection === 'users' ? 'expanded' : ''}`}
-                  />
+                {(activeSection === 'users' || collapsed) && (
+                  <ul className="sidebar-subnav">
+                    {hasPermission('6814375bfbaec847ba2ecc01') && (
+                      <li className="sidebar-subnav-item">
+                        <NavLink
+                          to="/dashboard/users"
+                          end
+                          className={linkClass}
+                          onClick={handleNavLinkClick}
+                        >
+                          {collapsed ? <Users size={20} /> : <span>All Users</span>}
+                        </NavLink>
+                      </li>
+                    )}
+                    {hasPermission('681437a9fbaec847ba2ecc03') && (
+                      <li className="sidebar-subnav-item">
+                        <NavLink
+                          to="/dashboard/users/create"
+                          end
+                          className={linkClass}
+                          onClick={handleNavLinkClick}
+                        >
+                          {collapsed ? <Plus size={20} /> : <span>Add User</span>}
+                        </NavLink>
+                      </li>
+                    )}
+                  </ul>
                 )}
-              </div>
-              {(activeSection === 'users' || collapsed) && (
-                <ul className="sidebar-subnav">
-                  <li className="sidebar-subnav-item">
-                    <NavLink
-                      to="/dashboard/users"
-                      end
-                      className={linkClass}
-                      onClick={handleNavLinkClick}
-                    >
-                      {collapsed ? <Users size={20} /> : <span>All Users</span>}
-                    </NavLink>
-                  </li>
-                  <li className="sidebar-subnav-item">
-                    <NavLink
-                      to="/dashboard/users/create"
-                      end
-                      className={linkClass}
-                      onClick={handleNavLinkClick}
-                    >
-                      {collapsed ? <Plus size={20} /> : <span>Add User</span>}
-                    </NavLink>
-                  </li>
-                </ul>
-              )}
-            </li>
+              </li>
+            )}
 
-            <li className="sidebar-nav-item">
-              <div
-                className={`sidebar-nav-section ${activeSection === 'roles' ? 'expanded' : ''}`}
-                onClick={() => toggleSection('roles')}
-              >
-                <div className="section-content">
-                  <Shield size={20} className="sidebar-icon" />
-                  {!collapsed && <span>Roles</span>}
+            {hasPermission('68153b80a860e5411c9f9ae3') && (
+              <li className="sidebar-nav-item">
+                <div
+                  className={`sidebar-nav-section ${activeSection === 'roles' ? 'expanded' : ''}`}
+                  onClick={() => toggleSection('roles')}
+                >
+                  <div className="section-content">
+                    <Shield size={20} className="sidebar-icon" />
+                    {!collapsed && <span>Roles</span>}
+                  </div>
+                  {!collapsed && (
+                    <ChevronDown
+                      size={16}
+                      className={`section-arrow ${activeSection === 'roles' ? 'expanded' : ''}`}
+                    />
+                  )}
                 </div>
-                {!collapsed && (
-                  <ChevronDown
-                    size={16}
-                    className={`section-arrow ${activeSection === 'roles' ? 'expanded' : ''}`}
-                  />
+                {(activeSection === 'roles' || collapsed) && (
+                  <ul className="sidebar-subnav">
+                    {hasPermission('68153b80a860e5411c9f9ae3') && (
+                      <li className="sidebar-subnav-item">
+                        <NavLink
+                          to="/dashboard/roles"
+                          end
+                          className={linkClass}
+                          onClick={handleNavLinkClick}
+                        >
+                          {collapsed ? <Shield size={20} /> : <span>All Roles</span>}
+                        </NavLink>
+                      </li>
+                    )}
+                    {hasPermission('68143816fbaec847ba2ecc06') && (
+                      <li className="sidebar-subnav-item">
+                        <NavLink
+                          to="/dashboard/roles/create"
+                          end
+                          className={linkClass}
+                          onClick={handleNavLinkClick}
+                        >
+                          {collapsed ? <Plus size={20} /> : <span>Add Role</span>}
+                        </NavLink>
+                      </li>
+                    )}
+                  </ul>
                 )}
-              </div>
-              {(activeSection === 'roles' || collapsed) && (
-                <ul className="sidebar-subnav">
-                  <li className="sidebar-subnav-item">
-                    <NavLink
-                      to="/dashboard/roles"
-                      end
-                      className={linkClass}
-                      onClick={handleNavLinkClick}
-                    >
-                      {collapsed ? <Shield size={20} /> : <span>All Roles</span>}
-                    </NavLink>
-                  </li>
-                  <li className="sidebar-subnav-item">
-                    <NavLink
-                      to="/dashboard/roles/create"
-                      end
-                      className={linkClass}
-                      onClick={handleNavLinkClick}
-                    >
-                      {collapsed ? <Plus size={20} /> : <span>Add Role</span>}
-                    </NavLink>
-                  </li>
-                </ul>
-              )}
-            </li>
+              </li>
+            )}
+
+            {/* Inventory Section */}
             <li className="sidebar-nav-item">
               <div
                 className={`sidebar-nav-section ${activeSection === 'inventory' ? 'expanded' : ''}`}
@@ -190,6 +212,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
               )}
             </li>
 
+<<<<<<< HEAD
 
             <li className="sidebar-nav-item">
               <div
@@ -245,6 +268,35 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
                 {!collapsed && <span>Inventory</span>}
               </NavLink>
             </li>
+=======
+            {hasPermission('681bead67a2c0df928b8b232') && (
+              <li className="sidebar-nav-item">
+                <NavLink
+                  to="/dashboard/inventor"
+                  end
+                  className={linkClass}
+                  onClick={handleNavLinkClick}
+                >
+                  <Package2 size={20} className="sidebar-icon" />
+                  {!collapsed && <span>Inventory</span>}
+                </NavLink>
+              </li>
+            )}
+
+            {hasPermission('681bead67a2c0df928b8b232') && (
+              <li className="sidebar-nav-item">
+                <NavLink
+                  to="/dashboard/inventor"
+                  end
+                  className={linkClass}
+                  onClick={handleNavLinkClick}
+                >
+                  <Package2 size={20} className="sidebar-icon" />
+                  {!collapsed && <span>Inventory</span>}
+                </NavLink>
+              </li>
+            )}
+>>>>>>> 812a1efb9c054e75a6f1f61c2f235177cf368dae
           </ul>
         </nav>
 

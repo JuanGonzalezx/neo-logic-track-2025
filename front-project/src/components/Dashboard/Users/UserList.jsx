@@ -21,6 +21,7 @@ const UserList = () => {
   const [apiResponse, setApiResponse] = useState(null);
   const [roles, setRoles] = useState([]);
   const [loadingRoles, setLoadingRoles] = useState(true);
+  const [permissions, setPermissions] = useState([]);
 
   // Estados para filtros y paginación
   const [searchTerm, setSearchTerm] = useState("");
@@ -55,7 +56,13 @@ const UserList = () => {
         // Obtener usuarios
         const usersResponse = await getAllUsers();
         if (usersResponse.status === 200) {
-          setUsers(processUsers(usersResponse.data, rolesResponse.data));
+          const processedUsers = usersResponse.data.map(u => ({
+            ...u,
+            name: u.fullname || 'Nombre no disponible',
+            role: getRoleName(u.roleId, rolesResponse.data),
+            status: u.status,
+          }));
+          setUsers(processedUsers);
         } else {
           setApiResponse({ type: "error", message: "Error cargando usuarios" });
         }
@@ -68,6 +75,10 @@ const UserList = () => {
     };
 
     fetchData();
+
+    // Load permissions from local storage
+    const storedPermissions = JSON.parse(localStorage.getItem('permissions')) || [];
+    setPermissions(storedPermissions);
   }, []);
 
   const processUsers = (users, roles) => {
@@ -83,6 +94,8 @@ const UserList = () => {
     const role = roles.find(r => r.id === roleId);
     return role ? role.name : 'Sin rol';
   };
+
+  const hasPermission = (permissionId) => permissions.includes(permissionId);
 
   const handleDeleteUser = async () => {
     setDeleting(true);
@@ -201,7 +214,11 @@ const UserList = () => {
 
       <div className="page-header">
         <h1>Administración de Usuarios</h1>
-        <Link to="/dashboard/users/create" className="button button-primary">
+        <Link
+          to="/dashboard/users/create"
+          className={`button button-primary ${!hasPermission('681437a9fbaec847ba2ecc03') ? 'disabled' : ''}`}
+          style={{ pointerEvents: hasPermission('681437a9fbaec847ba2ecc03') ? 'auto' : 'none' }}
+        >
           <span className="button-icon add" /> Nuevo Usuario
         </Link>
       </div>
@@ -274,6 +291,8 @@ const UserList = () => {
                     <Button
                       icon={<EditOutlined />}
                       onClick={() => openEditModal(user)}
+                      disabled={!hasPermission('68143793fbaec847ba2ecc02')}
+                      className={!hasPermission('68143793fbaec847ba2ecc02') ? 'disabled' : ''}
                     />
                     <Button
                       danger
@@ -282,6 +301,8 @@ const UserList = () => {
                         setDeletingUserId(user.id);
                         setDeleteModalVisible(true);
                       }}
+                      disabled={!hasPermission('681437c0fbaec847ba2ecc04')}
+                      className={!hasPermission('681437c0fbaec847ba2ecc04') ? 'disabled' : ''}
                     />
                   </div>
                 </td>

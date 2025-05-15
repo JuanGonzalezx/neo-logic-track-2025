@@ -22,9 +22,9 @@ const SecondFA = ({ isOpen, onClose, contactMethod, onVerificationSuccess, id })
   return (
     <div className="authentication-modal-overlay">
       <div className="authentication-modal-container">
-         <button onClick={onClose} className="authentication-close-button">
-                  <X size={24} />
-                </button>
+        <button onClick={onClose} className="authentication-close-button">
+          <X size={24} />
+        </button>
 
         <h2 className="authentication-title">
           Code Authentication

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import './App.css';
 
@@ -19,11 +19,13 @@ import NewPassword from "./components/Auth/NewPassword";
 import ProductList from './components/Dashboard/Products/ProductList'; // Ajusta la ruta
 import ProductForm from './components/Dashboard/Products/ProductForm'; // Ajusta la ruta
 function App() {
+  const navigate = useNavigate();
   let { isAuthenticated } = useSelector((state) => state.auth);
 
-  if(localStorage.getItem("token")){
+  if (localStorage.getItem("token")) {
     isAuthenticated = true;
   }
+
   // Component to protect routes
   const ProtectedRoute = ({ children }) => {
     if (!isAuthenticated) {
@@ -33,9 +35,8 @@ function App() {
   };
 
   return (
-    <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} />
         <Route path="/signup" element={<Register />} />
         <Route path="/reset-password" element={<RequestReset />} />
         <Route path="/reset-password/new" element={<NewPassword />} />
@@ -50,9 +51,9 @@ function App() {
         <Route
           path="/dashboard"
           element={
-             <ProtectedRoute>
+            <ProtectedRoute>
               <Dashboard />
-             </ProtectedRoute>
+            </ProtectedRoute>
           }
         >
           <Route index element={<DashboardHome />} />
@@ -68,10 +69,8 @@ function App() {
           <Route path="/dashboard/inventory" element={<ProductList />} /> {/* Lista de productos */}
           <Route path="/dashboard/inventory/add" element={<ProductForm />} /> {/* Formulario para añadir */}
           <Route path="profile" element={<Profile />} />
-
         </Route>
       </Routes>
-    </BrowserRouter>
   );
 }
 
