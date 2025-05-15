@@ -223,6 +223,20 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
                 </NavLink>
               </li>
             )}
+
+            {hasPermission('681bead67a2c0df928b8b232') && (
+              <li className="sidebar-nav-item">
+                <NavLink
+                  to="/dashboard/inventor"
+                  end
+                  className={linkClass}
+                  onClick={handleNavLinkClick}
+                >
+                  <Package2 size={20} className="sidebar-icon" />
+                  {!collapsed && <span>Inventory</span>}
+                </NavLink>
+              </li>
+            )}
           </ul>
         </nav>
 

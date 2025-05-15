@@ -14,7 +14,6 @@ import RoleForm from "./components/Dashboard/Roles/RoleForm";
 import Profile from "./components/Dashboard/Profile/Profile";
 import RequestReset from "./components/Auth/RequestReset";
 import NewPassword from "./components/Auth/NewPassword";
-
 import ProductList from './components/Dashboard/Products/ProductList'; // Ajusta la ruta
 import ProductForm from './components/Dashboard/Products/ProductForm'; // Ajusta la ruta
 function App() {
