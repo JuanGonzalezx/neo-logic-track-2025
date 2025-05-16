@@ -212,7 +212,6 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
               )}
             </li>
 
-<<<<<<< HEAD
 
             <li className="sidebar-nav-item">
               <div
@@ -268,35 +267,6 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
                 {!collapsed && <span>Inventory</span>}
               </NavLink>
             </li>
-=======
-            {hasPermission('681bead67a2c0df928b8b232') && (
-              <li className="sidebar-nav-item">
-                <NavLink
-                  to="/dashboard/inventor"
-                  end
-                  className={linkClass}
-                  onClick={handleNavLinkClick}
-                >
-                  <Package2 size={20} className="sidebar-icon" />
-                  {!collapsed && <span>Inventory</span>}
-                </NavLink>
-              </li>
-            )}
-
-            {hasPermission('681bead67a2c0df928b8b232') && (
-              <li className="sidebar-nav-item">
-                <NavLink
-                  to="/dashboard/inventor"
-                  end
-                  className={linkClass}
-                  onClick={handleNavLinkClick}
-                >
-                  <Package2 size={20} className="sidebar-icon" />
-                  {!collapsed && <span>Inventory</span>}
-                </NavLink>
-              </li>
-            )}
->>>>>>> 812a1efb9c054e75a6f1f61c2f235177cf368dae
           </ul>
         </nav>
 
