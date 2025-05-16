@@ -200,7 +200,7 @@ class ProductoService {
                 fecha: fecha_movimiento
             };
 
-             Promise.all([
+            Promise.all([
                 ProveedorProductoService.findOrCreateProveedorProducto({
                     id_producto: id_producto,
                     id_proveedor: proveedorData
@@ -212,7 +212,7 @@ class ProductoService {
             return { success: true, id_producto_procesado: id_producto };
 
         }, {
-            timeout: 60000, // Aumentado por si acaso
+            timeout: 60000,
             maxWait: 60000
         });
     }
@@ -255,21 +255,22 @@ class ProductoService {
     }
 
     async delete(id_producto) {
-        const producto = await this.getById(id_producto);
+        return prisma.$transaction(async (tx) => {
+            const producto = await tx.producto.findUnique({ where: { id_producto } });
+            if (!producto) throw new Error('Producto no encontrado para eliminar.');
 
-        // if (producto.AlmacenProducto.length > 0) {
-        //     throw new Error('No se puede eliminar el producto, tiene almacenes asociados.');
-        // }
-        // if (producto.Movement_Inventory.length > 0) {
-        //     throw new Error('No se puede eliminar el producto, tiene movimientos asociados.');
-        // }
+            const deletedProductoProveedor = await tx.proveedorProducto.deleteMany({ where: { id_producto } });
+            const deletedProductoAlmacen = await tx.almacenProducto.deleteMany({ where: { id_producto } });
+            const inactivedProducto = await tx.producto.update({
+                where: { id_producto },
+                data: {
+                status: false
+            }
+            });
 
-        try {
-            return prisma.producto.delete({ where: { id_producto } });
-        } catch (error) {
-            if (error.code === 'P2025') throw new Error('producto no encontrado para eliminar.');
-            throw error;
-        }
+            return { message: "Producto eliminado correctamente", producto: inactivedProducto };
+        });
+
     }
 
 }

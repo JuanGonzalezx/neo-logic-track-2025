@@ -77,7 +77,6 @@ class ProveedorProductoService {
     }
 
     async delete(id) {
-        const proveedorProducto = await this.getById(id); // Valida existencia y obtiene info
         try {
             return prisma.proveedorProducto.delete({ where: { id } });
         } catch (error) {
@@ -85,6 +84,16 @@ class ProveedorProductoService {
             throw error;
         }
     }
+
+    async deleteProductos(id) {
+        try {
+            return prisma.proveedorProducto.deleteMany({ where: { id_producto: id } });
+        } catch (error) {
+            if (error.code === 'P2025') throw new Error('proveedor no encontrado para eliminar.');
+            throw error;
+        }
+    }
+
 }
 
 module.exports = new ProveedorProductoService();

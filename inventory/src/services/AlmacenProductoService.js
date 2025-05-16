@@ -66,7 +66,7 @@ class AlmacenProductoService {
 
     async update(id, data) {
         try {
-            
+
             return prisma.almacenProducto.update({
                 where: { id },
                 data,
@@ -78,11 +78,19 @@ class AlmacenProductoService {
     }
 
     async delete(id) {
-        const found = await this.getById(id); // valida existencia
         try {
             return prisma.almacenProducto.delete({ where: { id } });
         } catch (error) {
             if (error.code === 'P2025') throw new Error('AlmacenProducto no encontrado para eliminar.');
+            throw error;
+        }
+    }
+
+    async deleteProductos(id) {
+        try {
+            return prisma.almacenProducto.deleteMany({ where: { id_producto: id } });
+        } catch (error) {
+            if (error.code === 'P2025') throw new Error('Producto no encontrado para eliminar.');
             throw error;
         }
     }

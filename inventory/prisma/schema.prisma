@@ -53,7 +53,7 @@ model ProveedorProducto {
   id_producto  String
   id_proveedor String
 
-  producto  Producto  @relation(fields: [id_producto], references: [id_producto])
+  producto  Producto  @relation(fields: [id_producto], references: [id_producto], onDelete: Cascade)
   proveedor Proveedor @relation(fields: [id_proveedor], references: [id])
 
   @@unique([id_producto, id_proveedor])
@@ -112,7 +112,7 @@ model AlmacenProducto {
   ultima_reposicion DateTime
   fecha_vencimiento DateTime?
 
-  producto Producto @relation(fields: [id_producto], references: [id_producto])
+  producto Producto @relation(fields: [id_producto], references: [id_producto], onDelete: Cascade)
   almacen  Almacen  @relation(fields: [id_almacen], references: [id_almacen])
 
   @@unique([id_producto, id_almacen])
