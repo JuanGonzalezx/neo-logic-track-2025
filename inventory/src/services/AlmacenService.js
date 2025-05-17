@@ -80,7 +80,7 @@ class AlmacenService {
         }
         // Opcional: Validar si el 'codigo_postal' del CSV coincide con ciudadEntity.codigo_postal
         if (ciudadEntity.codigo_postal !== codigo_postal) {
-             console.warn(`Advertencia: El código postal '${codigo_postal}' del CSV no coincide con el código postal '${ciudadEntity.codigo_postal}' de la ciudad '${nombre_ciudad}' encontrada en la BD.`);
+            console.warn(`Advertencia: El código postal '${codigo_postal}' del CSV no coincide con el código postal '${ciudadEntity.codigo_postal}' de la ciudad '${nombre_ciudad}' encontrada en la BD.`);
             // Podrías decidir lanzar un error aquí si la consistencia del código postal es crítica:
             // throw new Error(`El código postal '${codigo_postal}' proporcionado para la ciudad '${nombre_ciudad}' no coincide con el registrado ('${ciudadEntity.codigo_postal}').`);
         }
@@ -100,7 +100,7 @@ class AlmacenService {
             console.log(`Buscando gerente por email: ${email_gerente}`);
             console.log(await findUser({ email: email_gerente }));
             gerenteEntity = await findUserByEmail(email_gerente);
-            console.log('Gerente encontrado por email:', gerenteEntity);    
+            console.log('Gerente encontrado por email:', gerenteEntity);
         }
 
         if (!gerenteEntity) {
@@ -169,8 +169,8 @@ class AlmacenService {
 
     async update(id_almacen, updateData) {
         const almacenActual = await prisma.almacen.findUnique({
-             where: {id_almacen},
-             include: {direccion: {include: {ciudad: { include: {departamento: true}}}}}
+            where: { id_almacen },
+            include: { direccion: { include: { ciudad: { include: { departamento: true } } } } }
         });
         if (!almacenActual) throw new Error(`Almacén con ID '${id_almacen}' no encontrado para actualizar.`);
 
@@ -202,7 +202,7 @@ class AlmacenService {
             if (calle_direccion !== undefined ||
                 (ciudadIdToUse !== almacenActual.direccion.ciudadId) ||
                 (latitud !== undefined && parseFloat(latitud) !== almacenActual.direccion.latitud) ||
-                (longitud !== undefined && parseFloat(longitud) !== almacenActual.direccion.longitud) ) {
+                (longitud !== undefined && parseFloat(longitud) !== almacenActual.direccion.longitud)) {
 
                 const updatedDireccion = await tx.direccion.update({
                     where: { id: almacenActual.direccionId },
@@ -255,6 +255,13 @@ class AlmacenService {
         });
     }
 
+    async updateCapacidadm3(id_almacen, capacidad_usada_m3) {
+        return await prisma.almacen.update({
+            where: { id_almacen: id_almacen },
+            data: { capacidad_usada_m3: capacidad_usada_m3 }
+        });
+    }
+
 
     async delete(id_almacen) {
         // Validar que no tenga stock asociado (AlmacenProducto)
@@ -263,8 +270,8 @@ class AlmacenService {
             throw new Error('No se puede eliminar el almacén, tiene stock de productos asociado.');
         }
         // Validar que no tenga movimientos de inventario (Movement_Inventory)
-        const movementCount = await prisma.movement_Inventory.count({where: {id_almacen}});
-        if(movementCount > 0) {
+        const movementCount = await prisma.movement_Inventory.count({ where: { id_almacen } });
+        if (movementCount > 0) {
             throw new Error('No se puede eliminar el almacén, tiene movimientos de inventario registrados.');
         }
 

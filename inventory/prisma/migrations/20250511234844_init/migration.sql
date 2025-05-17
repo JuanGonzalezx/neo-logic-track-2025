@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE "Categoria" ALTER COLUMN "description" DROP NOT NULL;
+ALTER TABLE "Categoria" ALTER COLUMN "descripcion" DROP NOT NULL;

@@ -13,8 +13,8 @@ DROP TABLE "categories";
 -- CreateTable
 CREATE TABLE "Categoria" (
     "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
+    "nombre" TEXT NOT NULL,
+    "descripcion" TEXT NOT NULL,
 
     CONSTRAINT "Categoria_pkey" PRIMARY KEY ("id")
 );
