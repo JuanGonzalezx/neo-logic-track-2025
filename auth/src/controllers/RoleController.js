@@ -9,7 +9,6 @@ const createRole = async (req, res) => {
   let { name, description, permissionIds } = req.body;
 
   try {
-    name = name.toUpperCase();
 
     // Verificar si ya existe un rol con ese nombre (en mayúsculas siempre)
     const exists = await prisma.role.findUnique({

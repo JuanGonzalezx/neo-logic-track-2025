@@ -1,0 +1,14 @@
+/* Category Management Styles */
+@import '../shared/common.css';
+
+/* Category List Container */
+.category-list-container {
+  padding: 24px;
+}
+
+/* Category Form Container */
+.category-form-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 24px;
+}

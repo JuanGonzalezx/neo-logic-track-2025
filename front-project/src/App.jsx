@@ -18,6 +18,13 @@ import RequestReset from "./components/Auth/RequestReset";
 import NewPassword from "./components/Auth/NewPassword";
 import ProductList from './components/Dashboard/Products/ProductList'; // Ajusta la ruta
 import ProductForm from './components/Dashboard/Products/ProductForm'; // Ajusta la ruta
+import ProductDetail from './components/Dashboard/Products/ProductDetail'; // Ajusta la ruta
+// import ProductEdit from './components/Dashboard/Products/ProductEdit'; // Ajusta la ruta
+import ProductImport from './components/Dashboard/Products/ProductImport'; // Ajusta la ruta
+import CategoryList from './components/Dashboard/Categories/CategoryList'; // Ajusta la ruta
+import CategoryForm from './components/Dashboard/Categories/CategoryForm'; // Ajusta la ruta
+import WarehouseList from "./components/Dashboard/Warehouses/WarehouseList"; // Ajusta la ruta
+
 function App() {
   const navigate = useNavigate();
   let { isAuthenticated } = useSelector((state) => state.auth);
@@ -68,6 +75,12 @@ function App() {
           <Route path="permissions/edit/:id" element={<PermissionForm editMode={true} />} />
           <Route path="/dashboard/inventory" element={<ProductList />} /> {/* Lista de productos */}
           <Route path="/dashboard/inventory/add" element={<ProductForm />} /> {/* Formulario para añadir */}
+          <Route path="/dashboard/products/view/:id" element={<ProductDetail />} />
+          <Route path="/dashboard/products/import" element={<ProductImport />} /> {/* Importación masiva */}
+          {/* <Route path="/dashboard/products/edit/:id" element={<ProductForm editMode={true} />} /> Formulario para editar */}
+          <Route path="/dashboard/inventory/categories" element={<CategoryList />} /> {/* Lista de categorías */}
+          <Route path="/dashboard/inventory/categories/add" element={<CategoryForm />} /> {/* Formulario para añadir categoría */}
+          <Route path="/dashboard/inventory/warehouses" element={<WarehouseList />} /> {/* Lista de almacenes */}
           <Route path="profile" element={<Profile />} />
         </Route>
       </Routes>

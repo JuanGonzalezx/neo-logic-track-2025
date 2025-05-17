@@ -9,6 +9,7 @@ const P_PERM = PERM_MAP.PRODUCTOS;
 
 
 router.post('/', ProductoController.create);
+router.post('/createSimple', ProductoController.createSimple);
 router.get('/', ProductoController.getAll);
 router.get('/:id_producto', ProductoController.getById);
 router.put('/:id_producto', ProductoController.update);

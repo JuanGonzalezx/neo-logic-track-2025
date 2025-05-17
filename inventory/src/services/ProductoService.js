@@ -224,6 +224,64 @@ class ProductoService {
         });
     }
 
+    async createProductoSimple(productoData) {
+        const {
+            id_producto,
+            nombre_producto,
+            categoria_id, // se usa directamente
+            descripcion,
+            sku,
+            codigo_barras,
+            precio_unitario,
+            peso_kg,
+            dimensiones_cm,
+            es_fragil,
+            requiere_refrigeracion,
+            status
+        } = productoData;
+
+        return await prisma.$transaction(async (tx) => {
+            // Validar si ya existe el producto
+            const existingProducto = await tx.producto.findUnique({
+            where: { id_producto }
+            });
+
+            if (existingProducto) {
+            throw new Error(`El producto con ID '${id_producto}' ya existe.`);
+            }
+
+            // Validar que la categoría exista
+            const categoria = await CategoriaService.getById(categoria_id);
+            if (!categoria) {
+            throw new Error(`Categoría con ID '${categoria_id}' no encontrada.`);
+            }
+
+            // Crear el producto
+            const producto = await tx.producto.create({
+            data: {
+                id_producto,
+                nombre_producto,
+                categoria_id,
+                descripcion,
+                sku,
+                codigo_barras,
+                precio_unitario,
+                peso_kg,
+                dimensiones_cm,
+                es_fragil,
+                requiere_refrigeracion,
+                estado: status // usa status en vez de estado si tu esquema lo requiere así
+            }
+            });
+
+            return {
+            success: true,
+            message: "Producto creado exitosamente.",
+            producto
+            };
+        });
+        }
+
     async calcularVolumen(dimensiones) {     
         const parts = dimensiones.split('x').map(Number);
         const [largo, ancho, alto] = parts;
