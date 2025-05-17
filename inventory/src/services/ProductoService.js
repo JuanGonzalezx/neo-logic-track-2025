@@ -47,9 +47,8 @@ class ProductoService {
         // No reasigno aquí, usaré parsedPrecio directamente para la validación y el retorno.
         const parsedCantidadStock = parseInt(cantidad_stock, 10);
         const parsedNivelReorden = parseInt(nivel_reorden, 10);
-        const parsedDimensiones = parseInt(dimensiones_cm, 10); // Asumo que dimensiones_cm es un solo número. Si es "LxWxH", necesita un parseo diferente.
 
-        if (isNaN(parsedPrecio) || isNaN(parsedCantidadStock) || isNaN(parsedNivelReorden) || isNaN(parsedDimensiones)) {
+        if (isNaN(parsedPrecio) || isNaN(parsedCantidadStock) || isNaN(parsedNivelReorden)) {
             throw new Error("Precio unitario, cantidad stock, nivel reorden y dimension deben ser números válidos.");
         }
 
@@ -70,7 +69,7 @@ class ProductoService {
             ultima_reposicion, fecha_vencimiento, // Estos se parsearán en `create`
             id_proveedor,
             peso_kg, // Asumo que peso_kg ya es numérico o se parseará después si es string. Si es string, parsear aquí.
-            dimensiones_cm: parsedDimensiones, // Usar valor parseado
+            dimensiones_cm, // Usar valor parseado
             es_fragil, requiere_refrigeracion, estado // Estos son booleanos/estado, se usan como vienen del CSV
         };
         // Si necesitas mantener la reasignación a las variables con let:
@@ -150,9 +149,17 @@ class ProductoService {
             if (!almacenEntity) {
                 throw new Error(`El almacen '${id_almacen}' no existe. Por favor, créelo primero.`);
             }
+            
+            let capacidad_usada_m3 = await this.calcularVolumen(dimensiones_cm);
+            capacidad_usada_m3 = capacidad_usada_m3+almacenEntity.capacidad_usada_m3
+            await AlmacenService.updateCapacidadm3(id_almacen, capacidad_usada_m3);
+
 
             // 5. Crear producto (si no existe) - Esta operación debe ser await y completarse ANTES de las dependientes
             if (!existingProducto) {
+
+                console.log("Dimensionesssss: ",dimensiones_cm);
+                
                 await tx.producto.create({
                     data: {
                         id_producto,
@@ -217,6 +224,11 @@ class ProductoService {
         });
     }
 
+    async calcularVolumen(dimensiones) {     
+        const parts = dimensiones.split('x').map(Number);
+        const [largo, ancho, alto] = parts;
+        return (largo * ancho * alto) / 10000;
+    }
 
     async getAll() {
         return prisma.producto.findMany();
@@ -264,8 +276,8 @@ class ProductoService {
             const inactivedProducto = await tx.producto.update({
                 where: { id_producto },
                 data: {
-                status: false
-            }
+                    status: false
+                }
             });
 
             return { message: "Producto eliminado correctamente", producto: inactivedProducto };

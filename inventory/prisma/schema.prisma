@@ -32,7 +32,7 @@ model Producto {
   codigo_barras          Int
   precio_unitario        Float
   peso_kg                Float
-  dimensiones_cm         Float
+  dimensiones_cm         String
   es_fragil              Boolean
   requiere_refrigeracion Boolean
   estado                 Boolean
