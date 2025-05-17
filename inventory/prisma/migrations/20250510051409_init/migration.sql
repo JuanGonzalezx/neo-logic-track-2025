@@ -24,7 +24,7 @@ CREATE TABLE "Ciudad" (
 -- CreateTable
 CREATE TABLE "Proveedor" (
     "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
+    "nombre" TEXT NOT NULL,
 
     CONSTRAINT "Proveedor_pkey" PRIMARY KEY ("id")
 );
@@ -42,7 +42,7 @@ CREATE TABLE "Producto" (
     "dimensiones_cm" DOUBLE PRECISION NOT NULL,
     "es_fragil" BOOLEAN NOT NULL,
     "requiere_refrigeracion" BOOLEAN NOT NULL,
-    "status" BOOLEAN NOT NULL,
+    "estado" BOOLEAN NOT NULL,
 
     CONSTRAINT "Producto_pkey" PRIMARY KEY ("id_producto")
 );
@@ -115,7 +115,7 @@ CREATE TABLE "Movement_Inventory" (
     "id" TEXT NOT NULL,
     "product_id" TEXT NOT NULL,
     "id_almacen" TEXT NOT NULL,
-    "type" BOOLEAN NOT NULL,
+    "tipo" BOOLEAN NOT NULL,
     "cantidad" INTEGER NOT NULL,
     "fecha" TIMESTAMP(3) NOT NULL,
 

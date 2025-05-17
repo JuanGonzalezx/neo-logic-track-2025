@@ -128,7 +128,7 @@ class ProductoService {
         return await prisma.$transaction(async (tx) => {
             // Iniciar operaciones independientes en paralelo
             const existingProductoPromise = tx.producto.findUnique({ where: { id_producto } });
-            const categoriaEntityPromise = CategoriaService.findOrCreateCategoria({ name: categoria }, tx);
+            const categoriaEntityPromise = CategoriaService.findOrCreateCategoria({ nombre: categoria }, tx);
             const proveedorEntityPromise = ProveedorService.findOrCreateProveedor({ id: id_proveedor }, tx);
             const almacenEntityPromise = AlmacenService.getById(id_almacen, tx);
 
@@ -166,7 +166,7 @@ class ProductoService {
                         dimensiones_cm,
                         es_fragil,
                         requiere_refrigeracion,
-                        status: estado
+                        estado
                     }
                 });
             }

@@ -18,7 +18,7 @@ enum EstadoAlmacen {
 
 model Proveedor {
   id                String              @id
-  name              String?
+  nombre            String?
   ProveedorProducto ProveedorProducto[]
 }
 
@@ -35,7 +35,7 @@ model Producto {
   dimensiones_cm         Float
   es_fragil              Boolean
   requiere_refrigeracion Boolean
-  status                 Boolean
+  estado                 Boolean
   ProveedorProducto      ProveedorProducto[]
   AlmacenProducto        AlmacenProducto[]
   Movement_Inventory     Movement_Inventory[]
@@ -43,8 +43,8 @@ model Producto {
 
 model Categoria {
   id          String     @id @unique @default(uuid())
-  name        String
-  description String?
+  nombre      String
+  descripcion String?
   Producto    Producto[]
 }
 

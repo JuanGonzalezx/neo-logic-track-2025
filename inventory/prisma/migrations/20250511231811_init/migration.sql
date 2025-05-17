@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE "Proveedor" ALTER COLUMN "name" DROP NOT NULL;
+ALTER TABLE "Proveedor" ALTER COLUMN "nombre" DROP NOT NULL;
