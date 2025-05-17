@@ -28,5 +28,6 @@ export const ENV ={
         CATEGORIES: "/categorias",
         PROVIDERS: "/proveedores",
         ALMACENES: "/almacenes",
+        INVENTARIO: "/inventario",
     }
 }
