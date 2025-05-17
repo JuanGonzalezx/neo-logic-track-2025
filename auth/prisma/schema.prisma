@@ -27,6 +27,7 @@ model Users {
   email                           String         @unique
   number                          String?        @unique
   current_password                String
+  ciudadId                        String? // ID de la ciudad en el microservicio de inventory
   createdAt                       DateTime       @default(now())
   updatedAt                       DateTime       @updatedAt
 }
