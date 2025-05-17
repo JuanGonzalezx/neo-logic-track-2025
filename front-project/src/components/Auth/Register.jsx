@@ -1,9 +1,10 @@
 // src/components/Auth/Register.jsx
 
-import { Card, Spin, Typography, Alert } from "antd";
+import { Card, Spin, Typography, Alert, Select } from "antd";
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { auth } from "../../api/auth";
+import { getAllCiudades } from "../../api/ciudad";
 import { setLoading, setUser } from "../../redux/authSlice";
 import VerificationModal from "./VerificationModal";
 import "./Register.css";
@@ -18,12 +19,15 @@ const Register = ({ isOpen, onClose }) => {
         email: "",
         current_password: "",
         number: "",
+        ciudadId: "", // <-- nuevo campo
     });
 
     const [showModal, setShowModal] = useState(false);
     const [emailToVerify, setEmailToVerify] = useState("");
     const [errors, setErrors] = useState({});
     const [apiResponse, setApiResponse] = useState(null); // { type: "success"|"error", message: string }
+    const [ciudades, setCiudades] = useState([]);
+    const [loadingCiudades, setLoadingCiudades] = useState(true);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -33,6 +37,22 @@ const Register = ({ isOpen, onClose }) => {
         if (isVerified) {
             navigate("/");
         }
+
+        // Obtener ciudades
+        const fetchCiudades = async () => {
+            try {
+                setLoadingCiudades(true);
+                const res = await getAllCiudades();
+                if (res.status === 200) {
+                    setCiudades(res.data);
+                }
+            } catch (err) {
+                setApiResponse({ type: "error", message: "Error cargando ciudades" });
+            } finally {
+                setLoadingCiudades(false);
+            }
+        };
+        fetchCiudades();
     }, [isVerified, navigate]);
 
     const validateForm = () => {
@@ -52,6 +72,8 @@ const Register = ({ isOpen, onClose }) => {
         if (!formData.number) newErrors.number = "Number is required";
         else if (formData.number.length < 10)
             newErrors.number = "Number must be at least 10 characters";
+
+        if (!formData.ciudadId) newErrors.ciudadId = "Debes seleccionar una ciudad";
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -137,6 +159,12 @@ const Register = ({ isOpen, onClose }) => {
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
+    // Manejar cambio de ciudad
+    const handleCiudadChange = (value) => {
+        setFormData((prev) => ({ ...prev, ciudadId: value }));
+        if (errors.ciudadId) setErrors((prev) => ({ ...prev, ciudadId: "" }));
+    };
+
     const handleLogin = () => {
         navigate("/");
     };
@@ -216,6 +244,30 @@ const Register = ({ isOpen, onClose }) => {
                         onChange={handleChange}
                     />
                     {errors.number && <span className="field-error">{errors.number}</span>}
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="ciudadId">Ciudad</label>
+                    <Select
+                        showSearch
+                        id="ciudadId"
+                        value={formData.ciudadId || undefined}
+                        placeholder={loadingCiudades ? "Cargando ciudades..." : "Selecciona una ciudad"}
+                        loading={loadingCiudades}
+                        onChange={handleCiudadChange}
+                        filterOption={(input, option) =>
+                            String(option?.children || "").toLowerCase().includes(input.toLowerCase())
+                        }
+                        style={{ width: "100%" }}
+                        optionFilterProp="children"
+                    >
+                        {ciudades.map((ciudad) => (
+                            <Select.Option key={ciudad.id} value={ciudad.id}>
+                                {ciudad.nombre}
+                            </Select.Option>
+                        ))}
+                    </Select>
+                    {errors.ciudadId && <span className="field-error">{errors.ciudadId}</span>}
                 </div>
 
                 <button type="submit" className="login-button" disabled={loading}>
