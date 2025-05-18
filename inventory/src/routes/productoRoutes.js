@@ -4,11 +4,14 @@ const router = express.Router();
 const ProductoController = require('../controllers/ProductoController');
 const { checkPermission } = require('../middlewares/authMiddleware'); // Ajusta la ruta real
 const PERM_MAP = require('../config/permissions-map');
+const multer = require('multer');
 
 const P_PERM = PERM_MAP.PRODUCTOS;
+const upload = multer({ dest: 'uploads/' }); // Carpeta temporal
 
 
 router.post('/', ProductoController.create);
+router.post('/productos/bulk', upload.single('file'), ProductoController.bulkCreate);
 router.post('/createSimple', ProductoController.createSimple);
 router.get('/', ProductoController.getAll);
 router.get('/:id_producto', ProductoController.getById);

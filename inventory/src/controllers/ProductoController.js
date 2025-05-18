@@ -3,6 +3,17 @@ const ProductoService = require('../services/ProductoService');
 const handleServiceError = require('../utils/errorHandler').handleServiceError;
 
 class ProductoController {
+    async bulkCreate(req, res, next) {
+            try {
+            if (!req.file || !req.file.path) {
+                return res.status(400).json({ error: "Archivo CSV requerido para la carga masiva." });
+            }
+            const result = await ProductoService.bulkCreateProductsFromCSV(req.file.path);
+            res.status(201).json({ message: "Carga masiva completada.", resumen: result });
+            } catch (error) {
+            handleServiceError(error, res, next);
+            }
+        }
     async create(req, res, next) {      
         try {
             const producto = await ProductoService.create(req.body);
