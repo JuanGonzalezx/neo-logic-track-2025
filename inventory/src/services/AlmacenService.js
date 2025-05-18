@@ -1,6 +1,7 @@
 // src/services/AlmacenService.js
 const fs = require("fs");
 const path = require("path");
+const { v4: uuidv4 } = require("uuid");
 const csv = require("csv-parser");
 const pLimit = require('p-limit').default;
 const { PrismaClient, EstadoAlmacen } = require('@prisma/client');
@@ -72,7 +73,9 @@ class AlmacenService {
     };
   }
 
-   async bulkCreateFromCSV(filePath) {
+   
+async bulkCreateFromCSV(filePath) {
+  const startTime = Date.now(); // <- MARCAR INICIO
   const results = [];
   const logStream = createLogStream();
 
@@ -81,13 +84,12 @@ class AlmacenService {
     console.log(timestamp + msg);
     logStream.write(timestamp + msg + "\n");
   };
-
   const appendLog = (msg) => {
     console.log(msg);
     logStream.write(msg + "\n");
   };
 
-  // Leer CSV completo
+  // Leer CSV
   await new Promise((resolve, reject) => {
     fs.createReadStream(filePath, { encoding: "utf8" })
       .pipe(csv({ separator: "," }))
@@ -102,21 +104,18 @@ class AlmacenService {
       });
   });
 
-  // Normalización texto (minusculas, trim, sin acentos)
   const normalizeString = (str) => {
     if (!str) return "";
     return str.toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
   };
 
-  // Cargar ciudades + departamentos para validaciones
   log("Cargando ciudades y departamentos...");
   const allCities = await prisma.ciudad.findMany({ include: { departamento: true } });
   log(`  → ${allCities.length} ciudades cargadas.`);
 
-  // Crear mapas para búsquedas rápidas
+  // Mapas para búsqueda rápida
   const cityMapFullKey = new Map();
   const cityMapByName = new Map();
-
   allCities.forEach((c) => {
     const cityKeyFull = `${normalizeString(c.nombre)}|${normalizeString(c.departamento?.nombre)}`;
     cityMapFullKey.set(cityKeyFull, c);
@@ -126,158 +125,206 @@ class AlmacenService {
     cityMapByName.get(cityKeyName).push(c);
   });
 
-  // Parámetros para control de concurrencia y reintentos
-  const concurrencyLimit = 10; // Reducido para evitar saturación de DB
-  const maxRetries = 3; // Intentos para crear almacén si falla transacción
-  const retryDelayMs = 500; // Delay antes de reintentar
-
-  const limit = pLimit(concurrencyLimit);
+  // --- Paso 1: Preparar usuarios (gerentes) ---
   const nuevosGerentesCache = new Map();
+  const emailsToCreate = new Map();
 
-  const batches = chunk(results, 300);
-
-  // Función para esperar tiempo (delay)
-  const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
-
-  // Función para crear almacén con reintentos
-  const createAlmacenWithRetry = async (payload, filaNum) => {
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        await this.create(payload);
-        appendLog(`Fila ${filaNum}: Almacén '${payload.id_almacen}' creado correctamente.`);
-        return true;
-      } catch (error) {
-        appendLog(`Fila ${filaNum}: Error al crear almacén '${payload.id_almacen}', intento ${attempt}: ${error.message}`);
-        if (attempt < maxRetries) {
-          await sleep(retryDelayMs * attempt); // backoff progresivo
-        } else {
-          throw error; // re-lanzar error tras último intento
-        }
-      }
+  for (const row of results) {
+    const emailKey = row.email?.toLowerCase();
+    if (emailKey && !nuevosGerentesCache.has(emailKey)) {
+      nuevosGerentesCache.set(emailKey, null); // marcar para buscar
     }
-  };
-
-  const errors = [];
-  let totalCreated = 0;
-  let totalSkippedExist = 0;
-
-  for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
-    const batch = batches[batchIndex];
-    log(`Procesando batch ${batchIndex + 1} de ${batches.length} (${batch.length} filas)`);
-
-    const promises = batch.map((row, i) =>
-      limit(async () => {
-        const filaNum = batchIndex * 300 + i + 1;
-        try {
-          const normalizedCiudad = normalizeString(row.ciudad);
-          const normalizedDepartamento = normalizeString(row.departamento);
-
-          if (!normalizedCiudad || !normalizedDepartamento) {
-            const msg = `Fila ${filaNum}: Ciudad o departamento inválidos`;
-            appendLog(msg);
-            errors.push({ fila: filaNum, mensaje: msg });
-            return;
-          }
-
-          // Buscar ciudad validando el caso especial de Bogotá (ignorar departamento)
-          let ciudadEntity = null;
-          if (normalizedCiudad === "bogota" || normalizedCiudad === "bogotá") {
-            const posiblesCiudades = cityMapByName.get(normalizedCiudad);
-            if (posiblesCiudades && posiblesCiudades.length > 0) {
-              ciudadEntity = posiblesCiudades[0];
-              appendLog(`Fila ${filaNum}: Ciudad Bogotá detectada, se ignora departamento en validación.`);
-            }
-          } else {
-            const ciudadKey = `${normalizedCiudad}|${normalizedDepartamento}`;
-            ciudadEntity = cityMapFullKey.get(ciudadKey);
-          }
-
-          if (!ciudadEntity) {
-            const msg = `Fila ${filaNum}: Ciudad "${row.ciudad}" con departamento "${row.departamento}" no existe en base de datos`;
-            appendLog(msg);
-            errors.push({ fila: filaNum, mensaje: msg });
-            return;
-          }
-
-          // Validar si almacén ya existe
-          const exists = await prisma.almacen.findUnique({ where: { id_almacen: row.id_almacen } });
-          if (exists) {
-            totalSkippedExist++;
-            appendLog(`Fila ${filaNum}: Almacén con ID '${row.id_almacen}' ya existe. Se omite.`);
-            return;
-          }
-
-          // Validar datos del gerente
-          if (!row.gerente || !row.email || !row.telefono) {
-            const msg = `Fila ${filaNum}: Faltan datos obligatorios para crear gerente (nombre, email o teléfono)`;
-            appendLog(msg);
-            errors.push({ fila: filaNum, mensaje: msg });
-            return;
-          }
-
-          const emailKey = row.email.toLowerCase();
-          let gerenteEntity = nuevosGerentesCache.get(emailKey);
-
-          if (!gerenteEntity) {
-            gerenteEntity = await findUserByEmail(row.email);
-
-            if (!gerenteEntity) {
-              const payloadUser = {
-                fullname: row.gerente.trim(),
-                email: row.email.trim(),
-                number: row.telefono.trim(),
-                roleId: process.env.ROL_GERENTE_ID,
-                current_password: process.env.CONTRASENA_GENERICA,
-              };
-              gerenteEntity = await createUser(payloadUser);
-              nuevosGerentesCache.set(emailKey, gerenteEntity);
-              log(`Fila ${filaNum}: Gerente creado con ID ${gerenteEntity?.id || "N/A"}`);
-            } else {
-              log(`Fila ${filaNum}: Gerente existente encontrado con ID ${gerenteEntity.id}`);
-            }
-          }
-
-          // Preparar payload para almacén
-          const almacenPayload = {
-            id_almacen: row.id_almacen,
-            nombre_almacen: row.nombre_almacen,
-            direccion: row.direccion,
-            ciudad: ciudadEntity.nombre,
-            departamento: ciudadEntity.departamento.nombre,
-            pais: row.pais,
-            codigo_postal: row.codigo_postal,
-            latitud: row.latitud,
-            longitud: row.longitud,
-            gerente: row.gerente,
-            telefono: row.telefono,
-            email: row.email,
-            capacidad_m2: row.capacidad_m2,
-            estado: row.estado,
-          };
-
-          await createAlmacenWithRetry(almacenPayload, filaNum);
-          totalCreated++;
-        } catch (error) {
-          const msg = `Fila ${filaNum}: Error al procesar almacén '${row.id_almacen}': ${error.message}`;
-          appendLog(msg);
-          errors.push({ fila: filaNum, mensaje: msg });
-        }
-      })
-    );
-
-    await Promise.all(promises);
-    log(`Batch ${batchIndex + 1} completado`);
   }
 
-  log(`Carga masiva terminada. Total creados: ${totalCreated}, existentes omitidos: ${totalSkippedExist}, errores: ${errors.length}`);
-  logStream.end();
+  // Buscar usuarios existentes en paralelo con límite para no saturar
+  const limitUsuarios = pLimit(300);
+  await Promise.all(
+    [...nuevosGerentesCache.keys()].map(email =>
+      limitUsuarios(async () => {
+        try {
+          const user = await findUserByEmail(email);
+          if (user) {
+            nuevosGerentesCache.set(email, user);
+            log(`Usuario encontrado en cache: ${email} con ID: ${user.id || "N/A"}`);
+          } else {
+            emailsToCreate.set(email, true);
+            log(`Usuario NO encontrado, marcar para creación: ${email}`);
+          }
+        } catch (error) {
+          appendLog(`Error buscando usuario ${email}: ${error.message}`);
+          emailsToCreate.set(email, true); // intentar crear por si acaso
+        }
+      })
+    )
+  );
 
+  // Crear usuarios nuevos en paralelo con límite
+  const createUserLimit = pLimit(300);
+  await Promise.all(
+    results.map(row => createUserLimit(async () => {
+      const emailKey = row.email?.toLowerCase();
+      if (emailKey && emailsToCreate.has(emailKey)) {
+        const payloadUser = {
+          fullname: row.gerente.trim(),
+          email: row.email.trim(),
+          number: row.telefono.trim(),
+          roleId: process.env.ROL_GERENTE_ID,
+          current_password: process.env.CONTRASENA_GENERICA,
+        };
+        try {
+          const createdUser = await createUser(payloadUser);
+          // Mapea userId a id para mantener uniformidad
+          const userWithId = {
+            ...createdUser,
+            id: createdUser.userId || createdUser.id
+          };
+          nuevosGerentesCache.set(emailKey, userWithId);
+          emailsToCreate.delete(emailKey);
+          log(`Usuario creado: ${emailKey} con ID ${userWithId.id || "N/A"}`);
+        } catch (error) {
+          appendLog(`Error creando usuario ${emailKey}: ${error.message}`);
+        }
+      }
+    }))
+  );
+
+  // --- Paso 2: Validar almacenes ya existentes en batch para evitar múltiples consultas
+  const allAlmacenIds = results.map(r => r.id_almacen);
+  const existingAlmacenes = await prisma.almacen.findMany({
+    where: { id_almacen: { in: allAlmacenIds } },
+    select: { id_almacen: true }
+  });
+  const existingAlmacenesSet = new Set(existingAlmacenes.map(a => a.id_almacen));
+  log(`Almacenes existentes detectados: ${existingAlmacenesSet.size}`);
+
+  // --- Paso 3: Preparar direcciones y almacenes para bulk insert ---
+  const direccionesToInsert = [];
+  const almacenesToInsert = [];
+  const direccionIdMap = new Map();
+  const errors = [];
+
+  for (const [idx, row] of results.entries()) {
+    const filaNum = idx + 1;
+    const normalizedCiudad = normalizeString(row.ciudad);
+    const normalizedDepartamento = normalizeString(row.departamento);
+
+    if (!normalizedCiudad || !normalizedDepartamento) {
+      const errorMsg = `Fila ${filaNum}: Ciudad o departamento inválidos`;
+      appendLog(errorMsg);
+      errors.push({ fila: filaNum, error: "Ciudad o departamento inválidos" });
+      continue;
+    }
+
+    // Ciudad especial Bogotá
+    let ciudadEntity = null;
+    if (normalizedCiudad === "bogota" || normalizedCiudad === "bogotá") {
+      const posiblesCiudades = cityMapByName.get(normalizedCiudad);
+      ciudadEntity = posiblesCiudades?.[0] || null;
+      appendLog(`Fila ${filaNum}: Ciudad Bogotá detectada, se ignora departamento.`);
+    } else {
+      const ciudadKey = `${normalizedCiudad}|${normalizedDepartamento}`;
+      ciudadEntity = cityMapFullKey.get(ciudadKey);
+    }
+
+    if (!ciudadEntity) {
+      const errorMsg = `Fila ${filaNum}: Ciudad "${row.ciudad}" con departamento "${row.departamento}" no existe`;
+      appendLog(errorMsg);
+      errors.push({ fila: filaNum, error: "Ciudad no existe en BD" });
+      continue;
+    }
+
+    const emailKey = row.email?.toLowerCase();
+    const gerenteObj = nuevosGerentesCache.get(emailKey);
+    if (!emailKey || !gerenteObj) {
+      const errorMsg = `Fila ${filaNum}: Gerente no encontrado o inválido para email ${emailKey}`;
+      appendLog(errorMsg);
+      errors.push({ fila: filaNum, error: "Gerente no válido" });
+      continue;
+    }
+
+    if (existingAlmacenesSet.has(row.id_almacen)) {
+      appendLog(`Fila ${filaNum}: Almacén '${row.id_almacen}' ya existe. Omitido.`);
+      continue;
+    }
+
+    // Generar ID único para dirección si no es UUID (usa hash o UUID)
+    let direccionId = row.direccion;
+    if (!direccionIdMap.has(direccionId)) {
+      direccionId = uuidv4();
+      direccionIdMap.set(row.direccion, direccionId);
+
+      direccionesToInsert.push({
+        id: direccionId,
+        calle: row.direccion,
+        ciudadId: ciudadEntity.id,
+        latitud: parseFloat(row.latitud),
+        longitud: parseFloat(row.longitud),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+    } else {
+      direccionId = direccionIdMap.get(row.direccion);
+    }
+
+    const almacenObj = {
+      id_almacen: row.id_almacen,
+      nombre_almacen: row.nombre_almacen,
+      direccionId,
+      gerente: row.gerente,
+      capacidad_m3: parseInt(row.capacidad_m2 || 0),
+      capacidad_usada_m3: 0,
+      estado: row.estado.toUpperCase()
+    };
+
+    const gerenteId = gerenteObj?.id;
+    log(`Fila ${filaNum}: email=${emailKey}, gerenteId=${gerenteId || "NO ASIGNADO"}`);
+
+    if (gerenteId) {
+      almacenObj.gerenteId = gerenteId;
+    } else {
+      appendLog(`Fila ${filaNum}: gerenteId NO encontrado para email ${emailKey}`);
+      errors.push({ fila: filaNum, error: "gerenteId no asignado" });
+    }
+
+    almacenesToInsert.push(almacenObj);
+  }
+
+  // --- Paso 4: Bulk insert direcciones ---
+  try {
+    const insertDirecciones = await prisma.direccion.createMany({
+      data: direccionesToInsert,
+      skipDuplicates: true,
+    });
+    log(`Direcciones insertadas: ${insertDirecciones.count}`);
+  } catch (error) {
+    appendLog(`Error insertando direcciones: ${error.message}`);
+    errors.push({ error: `Insertar direcciones: ${error.message}` });
+  }
+
+  // --- Paso 5: Bulk insert almacenes ---
+  try {
+    const insertAlmacenes = await prisma.almacen.createMany({
+      data: almacenesToInsert,
+      skipDuplicates: true,
+    });
+    log(`Almacenes insertados: ${insertAlmacenes.count}`);
+  } catch (error) {
+    appendLog(`Error insertando almacenes: ${error.message}`);
+    errors.push({ error: `Insertar almacenes: ${error.message}` });
+  }
+
+
+  const endTime = Date.now();
+  const durationSeconds = ((endTime - startTime) / 1000).toFixed(2);
+  log(`Tiempo total de carga masiva: ${durationSeconds} segundos`);
+
+  logStream.end();
   return {
-    totalCreados: totalCreated,
-    totalOmitidos: totalSkippedExist,
+    totalCreados: almacenesToInsert.length,
     errores: errors,
   };
 }
+
 
 
 
