@@ -19,6 +19,11 @@ import NewPassword from "./components/Auth/NewPassword";
 import ProductList from './components/Dashboard/Products/ProductList'; // Ajusta la ruta
 import ProductForm from './components/Dashboard/Products/ProductForm'; // Ajusta la ruta
 import ChangeResetPassword from "./components/Auth/ChangeResetPassword";
+import ProductDetail from './components/Dashboard/Products/ProductDetail'; // Ajusta la ruta
+import ProductImport from "./components/Dashboard/Products/ProductImport";
+import CategoryList from "./components/Dashboard/Categories/CategoryList";
+import CategoryForm from "./components/Dashboard/Categories/CategoryForm";
+import WarehouseList from "./components/Dashboard/Warehouses/WarehouseList";
 function App() {
   const navigate = useNavigate();
   let { isAuthenticated } = useSelector((state) => state.auth);
