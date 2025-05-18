@@ -137,7 +137,7 @@ const CategoryList = () => {
               <th>ID</th>
               <th>Name</th>
               <th>Description</th>
-              <th>Products Count</th>
+              {/* <th>Products Count</th> */}
               <th>Actions</th>
             </tr>
           </thead>
@@ -148,7 +148,7 @@ const CategoryList = () => {
                   <td>{category.id}</td>
                   <td>{category.nombre}</td>
                   <td>{category.descripcion || "—"}</td>
-                  <td>{category.productCount || 0}</td>
+                  {/* <td>{category.productCount || 0}</td> */}
                   <td>
                     <div className="table-actions">
                       <Link to={`/dashboard/categories/edit/${category.id}`}>

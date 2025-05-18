@@ -142,7 +142,7 @@ const ProductImport = () => {
         <div className="import-actions" style={{ marginTop: 24 }}>
           <Button
             type="default"
-            onClick={() => navigate("/dashboard/products")}
+            onClick={() => navigate("/dashboard/inventory")}
             style={{ marginRight: 8 }}
           >
             Cancel

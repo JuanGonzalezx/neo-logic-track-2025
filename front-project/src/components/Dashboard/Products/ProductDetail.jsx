@@ -93,7 +93,7 @@ const ProductDetail = () => {
           <h1>Product Details</h1>
         </div>
         <Link 
-          to={`/dashboard/products/edit/${id}`} 
+          to={`/dashboard/inventory/edit/${id}`} 
           className="button button-primary"
         >
           <EditOutlined /> Edit Product
