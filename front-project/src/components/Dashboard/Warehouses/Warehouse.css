@@ -1,0 +1,93 @@
+/* Warehouse Management Styles */
+@import '../shared/common.css';
+
+/* Warehouse List Container */
+.warehouse-list-container {
+  padding: 24px;
+}
+
+/* Warehouse Item */
+.warehouse-item {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.warehouse-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background-color 0.2s ease;
+}
+
+.warehouse-header:hover {
+  background-color: #f5f5f5;
+}
+
+.warehouse-info {
+  display: flex;
+  align-items: center;
+}
+
+.warehouse-info h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  margin-left: 12px;
+}
+
+.warehouse-location {
+  color: #666;
+  margin-left: 16px;
+  font-size: 14px;
+}
+
+.expand-icon {
+  font-size: 12px;
+  color: #666;
+}
+
+.warehouse-stock {
+  padding: 0 24px 24px;
+}
+
+.loading-stock {
+  padding: 24px 0;
+  text-align: center;
+  color: #666;
+}
+
+.low-stock {
+  color: #f44336;
+  font-weight: 600;
+}
+
+/* Stock Form */
+.stock-form {
+  margin-top: 8px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .warehouse-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .warehouse-info {
+    width: 100%;
+  }
+  
+  .warehouse-location {
+    margin-left: 0;
+    display: block;
+    margin-top: 4px;
+    margin-left: 24px;
+  }
+}

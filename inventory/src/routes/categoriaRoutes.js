@@ -17,7 +17,7 @@ const C_PERM = PERM_MAP.CATEGORIAS;
 
 router.post('/', CategoriaController.create);
 router.get('/', CategoriaController.getAll);
-// router.get('/:id_categoria', CategoriaController.getById);
+router.get('/:id_categoria', CategoriaController.getById);
 router.get('/:name_categoria', CategoriaController.getByName);
 router.put('/:id_categoria', CategoriaController.update);
 router.delete('/:id_categoria', CategoriaController.delete);

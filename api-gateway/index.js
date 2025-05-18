@@ -81,6 +81,8 @@ const protectedAuthServicePrefixes = [
     '/api/v1/upload'
 ];
 
+
+
 protectedAuthServicePrefixes.forEach(prefix => {
     app.use(prefix, authenticateToken, createProxyMiddleware(commonProxyOptions(SERVICE_URLS.auth)));
 });

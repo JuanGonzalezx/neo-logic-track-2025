@@ -12,6 +12,15 @@ class ProductoController {
         }
     }
     
+    async createSimple(req, res, next) {
+        try {
+            const producto = await ProductoService.createProductoSimple(req.body);
+            res.status(201).json(producto);
+        } catch (error) { 
+            handleServiceError(error, res, next);
+        }
+    }
+    
     // GET ALL, GET BY ID, UPDATE, DELETE
     async getAll(req, res, next) {
         try {

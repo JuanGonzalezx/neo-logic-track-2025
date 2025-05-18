@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 class CategoriaService {
 
-    async findOrCreateCategoria({ nombre }) {
+    async findOrCreateCategoria({ nombre, descripcion }) {
         
         if (!nombre) {
             throw new Error("El nombre es requerido para crear una categoria.");
@@ -15,7 +15,7 @@ class CategoriaService {
 
         if (!categoria) {
             categoria = await prisma.categoria.create({
-                data: { nombre },
+                data: { nombre, descripcion },
             });
             return categoria;
         }
