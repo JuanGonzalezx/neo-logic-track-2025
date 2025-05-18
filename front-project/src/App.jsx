@@ -18,6 +18,7 @@ import RequestReset from "./components/Auth/RequestReset";
 import NewPassword from "./components/Auth/NewPassword";
 import ProductList from './components/Dashboard/Products/ProductList'; // Ajusta la ruta
 import ProductForm from './components/Dashboard/Products/ProductForm'; // Ajusta la ruta
+import ChangeResetPassword from "./components/Auth/ChangeResetPassword";
 function App() {
   const navigate = useNavigate();
   let { isAuthenticated } = useSelector((state) => state.auth);
@@ -39,7 +40,7 @@ function App() {
         <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} />
         <Route path="/signup" element={<Register />} />
         <Route path="/reset-password" element={<RequestReset />} />
-        <Route path="/reset-password/new" element={<NewPassword />} />
+        <Route path="/changeResetPassword/:token" element={<ChangeResetPassword />} />
         <Route
           path="/file"
           element={
