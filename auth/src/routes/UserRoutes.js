@@ -8,7 +8,8 @@ const { checkPermission } = require('../controllers/AuthController');
 // router.get('/', checkPermission(PERM_MAP.USERS.GET_ALL.url, PERM_MAP.USERS.GET_ALL.method), UserController.getAllUsers);
 router.get('/:id', checkPermission(PERM_MAP.USERS.GET_BY_ID.url, PERM_MAP.USERS.GET_BY_ID.method), UserController.getUserById);
 router.put('/:id', checkPermission(PERM_MAP.USERS.UPDATE_USER.url, PERM_MAP.USERS.UPDATE_USER.method), UserController.updateUser); 
-router.delete('/:id', checkPermission(PERM_MAP.USERS.DELETE_USER.url, PERM_MAP.USERS.DELETE_USER.method), UserController.deleteUser);
+// router.delete('/:id', checkPermission(PERM_MAP.USERS.DELETE_USER.url, PERM_MAP.USERS.DELETE_USER.method), UserController.deleteUser);
+router.delete('/:id', UserController.deleteData);
 router.post('/', UserController.createUser);
 router.get('/email/:email', UserController.getUserByEmail);
 

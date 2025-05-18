@@ -3,6 +3,18 @@ const AlmacenService = require('../services/AlmacenService');
 const handleServiceError = require('../utils/errorHandler').handleServiceError;
 
 class AlmacenController {
+    async bulkCreate(req, res, next) {
+        try {
+        if (!req.file || !req.file.path) {
+            return res.status(400).json({ error: "Archivo CSV requerido para la carga masiva." });
+        }
+        const result = await AlmacenService.bulkCreateFromCSV(req.file.path);
+        res.status(201).json({ message: "Carga masiva completada.", resumen: result });
+        } catch (error) {
+        handleServiceError(error, res, next);
+        }
+    }
+
     async create(req, res, next) {
         try {
             // El servicio se encargará de la validación más profunda de los campos del body (que viene del CSV)

@@ -112,9 +112,10 @@ const signUp = async (req, res) => {
       message: "All required fields: fullname, email, password, number y ciudad",
     });
   }
-
+  console.log(ciudadId)
   // Validar ciudad
   const city = await findCityById(ciudadId);
+  console.log(city)
   if (!city) {
     return res.status(400).json({
       message: "La ciudad especificada no existe.",

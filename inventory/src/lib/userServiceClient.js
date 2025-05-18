@@ -33,8 +33,6 @@ async function findUserByEmail(email) {
     if (!email) return null;
     try {
         const response = await axios.get(`${USERS_API_BASE_URL}/email/${email}`);
-        console.log('findUserByEmail', response.data);
-        console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
         return response.data; // Asumimos que este endpoint devuelve el objeto usuario directamente o null/404 si no existe
     } catch (error) {
         if (error.response && error.response.status === 404) {
@@ -51,12 +49,26 @@ async function findUserByEmail(email) {
  */
 async function createUser(userData) {
     try {
-        // Asume que el endpoint para crear usuarios es POST a la URL base
+        // Asegurarse de que la URL base esté configurada correctamente
         const response = await axios.post(USERS_API_BASE_URL, userData);
-        return response.data; // Devuelve el usuario creado
+
+        // Verificar que la respuesta sea exitosa
+        if (response.status === 201) {
+            console.log('Usuario creado con éxito:', response.data);
+            return response.data; // Devuelve el usuario creado
+        } else {
+            throw new Error('Error al crear usuario: ' + (response.data.message || 'Desconocido'));
+        }
     } catch (error) {
-        console.error('Error creating user in user service:', error.response ? error.response.data : error.message);
-        throw new Error(`Failed to create gerente in user service: ${error.response?.data?.message || error.message}`);
+        // Mejor manejo de errores para ver la causa exacta
+        console.error('Error creando gerente en el servicio de usuarios:', error.response ? error.response.data : error.message);
+
+        // Manejo de errores personalizados
+        if (error.response && error.response.data) {
+            throw new Error(`Fallo al crear gerente: ${error.response.data.message}`);
+        } else {
+            throw new Error('Error desconocido al crear gerente');
+        }
     }
 }
 
