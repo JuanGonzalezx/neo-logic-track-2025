@@ -381,7 +381,7 @@ const ProductForm = () => {
             });
           } else {
             setApiResponse({ type: "error", message: "Product not found" });
-            navigate("/dashboard/products");
+            navigate("/dashboard/inventory");
           }
         } catch (error) {
           setApiResponse({ type: "error", message: "Connection error" });
@@ -461,6 +461,7 @@ const ProductForm = () => {
 
       let response;
       if (isEditing) {
+        delete payload.id_producto; // Remove ID from payload
         response = await productAPI.updateProduct(id, payload);
       } else {
         response = await productAPI.createProduct(payload);
@@ -474,7 +475,7 @@ const ProductForm = () => {
         
         // Redirect after a short delay
         setTimeout(() => {
-          navigate("/dashboard/products");
+          navigate("/dashboard/inventory");
         }, 1500);
       } else {
         setApiResponse({
@@ -689,7 +690,7 @@ const ProductForm = () => {
           <button
             type="button"
             className="button button-secondary"
-            onClick={() => navigate("/dashboard/products")}
+            onClick={() => navigate("/dashboard/inventory")}
           >
             Cancel
           </button>

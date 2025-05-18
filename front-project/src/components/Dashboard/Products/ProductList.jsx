@@ -144,7 +144,7 @@ const ProductList = () => {
             <span className="button-icon add" /> New Product
           </Link>
           <Link
-            to="/dashboard/products/import"
+            to="/dashboard/inventory/import"
             className="button button-secondary"
             style={{ marginLeft: 8 }}
           >
@@ -221,12 +221,12 @@ const ProductList = () => {
                   </td>
                   <td>
                     <div className="table-actions">
-                      <Link to={`/dashboard/products/view/${product.id_producto}`}>
+                      <Link to={`/dashboard/inventory/${product.id_producto}`}>
                         <button className="action-button view">
                           <span className="view-icon"></span>
                         </button>
                       </Link>
-                      <Link to={`/dashboard/products/edit/${product.id_producto}`}>
+                      <Link to={`/dashboard/inventory/edit/${product.id_producto}`}>
                         <button className="action-button edit">
                           <span className="edit-icon"></span>
                         </button>

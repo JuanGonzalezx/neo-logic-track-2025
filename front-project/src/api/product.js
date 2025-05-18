@@ -40,6 +40,19 @@ export class Product {
     return { status: res.status, data: json, message: json.message };
   }
 
+  async asignProductToWarehouse(data) {
+    const res = await fetch(`${INVENTORY_API}${API_ROUTES.PRODUCTS}/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify(data),
+    });
+    const json = await res.json();
+    return { status: res.status, data: json, message: json.message };
+  }
+
   async updateProduct(id, data) {
     const res = await fetch(`${INVENTORY_API}${API_ROUTES.PRODUCTS}/${id}`, {
       method: "PUT",

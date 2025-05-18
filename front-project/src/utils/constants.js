@@ -28,6 +28,7 @@ export const ENV ={
         CATEGORIES: "/categorias",
         PROVIDERS: "/proveedores",
         ALMACENES: "/almacenes",
-        INVENTARIO: "/inventario",
+        ALMACEN_PRODUCTO: "/almacenproductos",
+        MOVEMENTS: "/movements",
     }
 }

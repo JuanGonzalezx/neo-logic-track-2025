@@ -220,7 +220,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
                   </li>
                   <li className="sidebar-subnav-item">
                     <NavLink
-                      to="/dashboard/inventory/categories/create"
+                      to="/dashboard/inventory/categories/add"
                       end
                       className={linkClass}
                       onClick={handleNavLinkClick}

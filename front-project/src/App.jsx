@@ -75,9 +75,9 @@ function App() {
           <Route path="permissions/edit/:id" element={<PermissionForm editMode={true} />} />
           <Route path="/dashboard/inventory" element={<ProductList />} /> {/* Lista de productos */}
           <Route path="/dashboard/inventory/add" element={<ProductForm />} /> {/* Formulario para añadir */}
-          <Route path="/dashboard/products/view/:id" element={<ProductDetail />} />
-          <Route path="/dashboard/products/import" element={<ProductImport />} /> {/* Importación masiva */}
-          {/* <Route path="/dashboard/products/edit/:id" element={<ProductForm editMode={true} />} /> Formulario para editar */}
+          <Route path="/dashboard/inventory/:id" element={<ProductDetail />} />
+          <Route path="/dashboard/inventory/import" element={<ProductImport />} /> {/* Importación masiva */}
+          <Route path="/dashboard/inventory/edit/:id" element={<ProductForm editMode={true} />} />  {/* Formulario para editar */}
           <Route path="/dashboard/inventory/categories" element={<CategoryList />} /> {/* Lista de categorías */}
           <Route path="/dashboard/inventory/categories/add" element={<CategoryForm />} /> {/* Formulario para añadir categoría */}
           <Route path="/dashboard/inventory/warehouses" element={<WarehouseList />} /> {/* Lista de almacenes */}

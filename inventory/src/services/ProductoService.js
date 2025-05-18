@@ -303,15 +303,16 @@ class ProductoService {
     async update(id_producto, data) {
 
         try {
+            // 🚫 No se puede actualizar el ID
             if (data.id_producto) {
-                throw new Error('No se puede actualizar los id');
+                throw new Error('No se puede actualizar el id del producto.');
             }
 
-            let categoria = await CategoriaService.getByName(data.categoria_id)
-            data.categoria_id = categoria.id
-
-            if (!categoria) {
-                throw new Error('La categoria noo existe');
+            // ✅ Si viene nombre de categoría, buscar o crear y reemplazar en el objeto `data`
+            if (data.categoria_nombre) {
+                const categoria = await CategoriaService.findOrCreateCategoria(data.categoria_nombre);
+                data.categoria_id = categoria.id;
+                delete data.categoria_nombre; // Eliminamos el nombre porque Prisma no lo necesita
             }
 
             return prisma.producto.update({
