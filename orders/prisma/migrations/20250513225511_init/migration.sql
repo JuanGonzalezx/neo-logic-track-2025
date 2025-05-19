@@ -8,6 +8,7 @@ CREATE TABLE "Order" (
     "location_id" TEXT NOT NULL,
     "creation_date" TIMESTAMP(3) NOT NULL,
     "delivery_address" TEXT NOT NULL,
+    "id_almacen" TEXT NOT NULL,
     "status" "Status" NOT NULL,
 
     CONSTRAINT "Order_pkey" PRIMARY KEY ("id")

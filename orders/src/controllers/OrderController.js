@@ -34,7 +34,7 @@ async function validateOrderProducts(orderProducts) {
 const getAllOrders = async (req, res) => {
   try {
     const orders = await prisma.order.findMany({
-      include: { orderProducts: true },
+      include: { OrderProducts: true },
     });
     res.status(200).json(orders);
   } catch (error) {
@@ -63,10 +63,24 @@ const getOrderById = async (req, res) => {
     res.status(500).json({ message: 'Error fetching order', error: error.message });
   }
 };
+// Obtener órdenes por almacenId
+const getOrdersByAlmacen = async (req, res) => {
+  const { id_almacen } = req.params;
+  try {
+    const orders = await prisma.order.findMany({
+      where: { id_almacen },        // filtro por almacenId
+      include: { OrderProducts: true },
+    });
+    res.status(200).json(orders);
+  } catch (error) {
+    console.error('Error fetching orders by almacenId:', error);
+    res.status(500).json({ message: 'Error fetching orders by almacenId', error: error.message });
+  }
+};
 
 // Crear una nueva orden con validaciones
 const createOrder = async (req, res) => {
-  const { delivery_id, location_id, delivery_address, status, orderProducts } = req.body;
+  const { delivery_id, location_id, delivery_address, status, orderProducts, id_almacen } = req.body;
   try {
     // Validar que delivery_id exista
     // const user = await findUser(delivery_id);
@@ -77,7 +91,7 @@ const createOrder = async (req, res) => {
     // Validar todos los productos, llama a dos funciones
     //1. Para actualizar stock y mandar email si es el caso
     //2. Crea el movimiento con tipo salida
-    const validate = await validateOrderProducts(orderProducts);
+    // const validate = await validateOrderProducts(orderProducts);
 
     // Crear la orden
     const order = await prisma.order.create({
@@ -86,6 +100,7 @@ const createOrder = async (req, res) => {
         location_id,
         delivery_address,
         status,
+        id_almacen,
         creation_date: new Date()
       },
     });
@@ -161,6 +176,7 @@ const deleteOrder = async (req, res) => {
 module.exports = {
   getAllOrders,
   getOrderById,
+  getOrdersByAlmacen,
   createOrder,
   updateOrder,
   deleteOrder,
