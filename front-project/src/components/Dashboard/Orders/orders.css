@@ -1,0 +1,266 @@
+/* Order Management Styles */
+@import '../shared/common.css';
+
+/* Order List Container */
+.order-list-container {
+  padding: 24px;
+}
+
+/* Warehouse Item for Orders */
+.warehouse-order-item {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.warehouse-order-header {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 24px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background-color 0.2s ease;
+}
+
+.warehouse-order-header:hover {
+  background-color: #f5f5f5;
+}
+
+.warehouse-order-info {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.warehouse-order-info h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  margin-left: 12px;
+}
+
+.warehouse-order-location {
+  color: #666;
+  margin-left: 16px;
+  font-size: 14px;
+}
+
+.warehouse-order-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.orders-list {
+  margin-top: 16px;
+}
+
+/* Order Item */
+.order-item {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.order-item:hover {
+  background-color: #f9f9f9;
+}
+
+.order-primary-info {
+  flex: 2;
+}
+
+.order-id {
+  font-weight: 600;
+  color: #333;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.order-date {
+  color: #666;
+  font-size: 13px;
+}
+
+.order-details {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.order-address {
+  font-size: 14px;
+}
+
+.order-status {
+  margin-right: 16px;
+}
+
+/* Order Products */
+.order-products {
+  padding: 0 24px 24px;
+}
+
+.product-list-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.product-quantity {
+  width: 80px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.product-info {
+  flex: 1;
+}
+
+.product-name {
+  font-weight: 500;
+}
+
+.product-id {
+  color: #666;
+  font-size: 13px;
+}
+
+.product-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Order Form */
+.order-form {
+  margin-top: 16px;
+}
+
+.selected-products-list {
+  margin-top: 16px;
+  border: 1px solid #f0f0f0;
+  border-radius: 4px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.form-divider {
+  margin: 24px 0;
+  border-top: 1px solid #f0f0f0;
+}
+
+.product-selector {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  margin-bottom: 16px;
+}
+
+.product-selector .form-group {
+  margin-bottom: 0;
+}
+
+/* Status Badges */
+.status-badge.PENDING {
+  background-color: #fff3e0;
+  color: #ff9800;
+}
+
+.status-badge.ASSIGNED {
+  background-color: #e3f2fd;
+  color: #2196f3;
+}
+
+.status-badge.ON_ROUTE {
+  background-color: #e8f5e9;
+  color: #4caf50;
+}
+
+.status-badge.DELIVERED {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+.status-badge.CANCELLED {
+  background-color: #ffebee;
+  color: #f44336;
+}
+
+/* Filter controls */
+.order-filter-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.tabs-container {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 16px;
+}
+
+.tab {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.tab.active {
+  border-bottom-color: #3498db;
+  color: #3498db;
+  font-weight: 500;
+}
+
+.tab:hover:not(.active) {
+  border-bottom-color: #f0f0f0;
+  background-color: #f9f9f9;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .order-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .order-primary-info {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  
+  .order-details {
+    width: 100%;
+    margin-bottom: 12px;
+  }
+  
+  .order-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  
+  .order-filter-controls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .product-selector {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .product-selector .form-group {
+    width: 100%;
+  }
+}

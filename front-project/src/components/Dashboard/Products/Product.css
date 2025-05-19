@@ -154,18 +154,141 @@
 .header-actions {
   display: flex;
   gap: 8px;
+  align-items: center;
 }
 
-/* Additional responsive styles */
+/* All buttons with same primary color */
+.header-actions .button-primary,
+.header-actions .button-secondary {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  transition: background-color 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-weight: 500;
+  border-radius: 4px;
+}
+
+.header-actions .button-primary:hover,
+.header-actions .button-secondary:hover {
+  background-color: #2980b9;
+  color: white;
+}
+
+/* Different icons for the buttons */
+
+/* Nuevo Producto button: plus icon (reuse existing) */
+/* Bulk Import button: use upload icon (adjusted here with ::before) */
+.header-actions .button-primary .button-icon.add::before,
+.header-actions .button-primary .button-icon.add::after {
+  background-color: white;
+}
+
+.header-actions .button-secondary .button-icon.add::before,
+.header-actions .button-secondary .button-icon.add::after {
+  background-color: white;
+  /* We'll override with a small upload arrow shape */
+  content: '';
+  position: relative;
+  width: 10px;
+  height: 10px;
+  background: transparent;
+  border: none;
+}
+
+.header-actions .button-secondary .button-icon.add {
+  position: relative;
+  width: 16px;
+  height: 16px;
+}
+
+.header-actions .button-secondary .button-icon.add::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 4px;
+  width: 4px;
+  height: 8px;
+  background-color: white;
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+
+.header-actions .button-secondary .button-icon.add::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 0;
+  width: 12px;
+  height: 2px;
+  background-color: white;
+}
+
+/* Remove the default + shape for .button-secondary */
+.header-actions .button-secondary .button-icon.add::before,
+.header-actions .button-secondary .button-icon.add::after {
+  /* overridden above */
+}
+
+/* Spacing between buttons */
+.header-actions .button-primary {
+  margin-right: 8px;
+}
+
+/* Responsive styles */
 @media (max-width: 768px) {
+  .button-text {
+    display: none;
+  }
   .header-actions {
     flex-direction: column;
     gap: 8px;
+    align-items: center;
+  }
+
+  .header-actions .button-primary,
+  .header-actions .button-secondary {
+    width: 48px;
+    padding: 8px;
+    justify-content: center;
+  }
+
+  /* Hide button text, keep icons centered */
+  .header-actions .button-primary span:not(.button-icon),
+  .header-actions .button-secondary span:not(.button-icon) {
+    display: none;
+  }
+
+  .header-actions .button-primary .button-icon,
+  .header-actions .button-secondary .button-icon {
+    margin-right: 0;
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Stack the filter bar vertically, including All Statuses select */
+  .filter-bar {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .filter-group {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .filter-select {
+    width: 100%;
   }
   
+  /* Center the page header */
   .product-header {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+    align-items: center;
+    gap: 12px;
   }
 }

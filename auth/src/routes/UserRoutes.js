@@ -9,7 +9,7 @@ const { checkPermission } = require('../controllers/AuthController');
 router.get('/:id', checkPermission(PERM_MAP.USERS.GET_BY_ID.url, PERM_MAP.USERS.GET_BY_ID.method), UserController.getUserById);
 router.put('/:id', checkPermission(PERM_MAP.USERS.UPDATE_USER.url, PERM_MAP.USERS.UPDATE_USER.method), UserController.updateUser); 
 // router.delete('/:id', checkPermission(PERM_MAP.USERS.DELETE_USER.url, PERM_MAP.USERS.DELETE_USER.method), UserController.deleteUser);
-router.delete('/:id', UserController.deleteData);
+router.delete('/:id', UserController.deleteUser);
 router.post('/', UserController.createUser);
 router.get('/email/:email', UserController.getUserByEmail);
 
@@ -20,8 +20,7 @@ router.post('/repartidores', UserController.createRepartidores);
 router.get('/repartidores/:id', UserController.getRepartidorByCity);
 
 router.post('/repartidor/:id', UserController.createRepartidor);
-
-
+router.delete('/deleteAllUsers', UserController.deleteData);
 
 // router.get('/',checkPermission('/api/v1/users', 'GET'), getAllUsers);
 router.get('/', UserController.getAllUsers);

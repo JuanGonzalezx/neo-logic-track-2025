@@ -87,8 +87,11 @@
   color: #666;
 }
 
+/* Warehouse Stock Table and Container */
 .warehouse-stock {
   padding: 0 24px 24px;
+  overflow-x: auto; /* Scroll horizontal para tablas largas */
+  -webkit-overflow-scrolling: touch; /* Suave en iOS */
 }
 
 .loading-stock {
@@ -153,6 +156,52 @@
   color: #ff9800;
 }
 
+/* Table styles */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px; /* Para que haya scroll horizontal en móviles */
+}
+
+.data-table th,
+.data-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.data-table th {
+  font-weight: 600;
+  color: #555;
+  background-color: #f9f9f9;
+}
+
+.data-table tr:hover {
+  background-color: #f5f5f5;
+}
+
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Buttons (actions) */
+.action-button {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.action-button.edit:hover {
+  background-color: #e8f5e9;
+}
+
 /* Responsive styles */
 @media (max-width: 768px) {
   .warehouse-header {
@@ -184,6 +233,28 @@
   }
 
   .warehouse-stock {
-    padding: 0 16px 16px;
+    padding: 0 12px 16px;
+  }
+
+  /* Inputs y botones más pequeños en móvil */
+  .edit-input {
+    width: 60px;
+    padding: 4px 6px;
+  }
+
+  .button-small {
+    padding: 4px 6px;
+    font-size: 12px;
+  }
+
+  /* Apilar botones de acción en edición verticalmente */
+  .edit-actions {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  /* La tabla mantendrá scroll horizontal */
+  .data-table {
+    min-width: 700px;
   }
 }

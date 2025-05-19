@@ -12,18 +12,15 @@ const ProductList = () => {
   const [loading, setLoading] = useState(true);
   const [apiResponse, setApiResponse] = useState(null);
   const [categories, setCategories] = useState([]);
-  // Get permissions from Redux store using useSelector at the top level
   const userPermissions = useSelector(state => state.auth.user?.permissions || []);
   const permissions = useSelector(state => state.auth?.permissions || []);
 
-  // States for filters and pagination
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
 
-  // States for deletion
   const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
   const [deletingProductId, setDeletingProductId] = useState(null);
   const [deleting, setDeleting] = useState(false);
@@ -31,34 +28,31 @@ const ProductList = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-  const fetchData = async () => {
-    try {
-      // Fetch categories
-      const categoriesResponse = await productAPI.getAllCategories();
-      if (categoriesResponse.status === 200) {
-        setCategories(categoriesResponse.data);
+    const fetchData = async () => {
+      try {
+        const categoriesResponse = await productAPI.getAllCategories();
+        if (categoriesResponse.status === 200) {
+          setCategories(categoriesResponse.data);
+        }
+        const productsResponse = await productAPI.getAllProducts();
+        if (productsResponse.status === 200) {
+          const processedProducts = productsResponse.data.map(p => ({
+            ...p,
+            categoryName: getCategoryName(p.categoria_id, categoriesResponse.data),
+          }));
+          setProducts(processedProducts);
+        } else {
+          setApiResponse({ type: "error", message: "Error loading products" });
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setApiResponse({ type: "error", message: "Connection error" });
+      } finally {
+        setLoading(false);
       }
-      // Fetch products
-      const productsResponse = await productAPI.getAllProducts();
-      if (productsResponse.status === 200) {
-        const processedProducts = productsResponse.data.map(p => ({
-          ...p,
-          categoryName: getCategoryName(p.categoria_id, categoriesResponse.data),
-        }));
-        setProducts(processedProducts);
-      } else {
-        setApiResponse({ type: "error", message: "Error loading products" });
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      setApiResponse({ type: "error", message: "Connection error" });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchData();
-}, []); // Solo ejecuta una vez al montar el componente
+    };
+    fetchData();
+  }, []);
 
   const getCategoryName = (categoryId, categories) => {
     const category = categories.find(c => c.id === categoryId);
@@ -70,20 +64,12 @@ const ProductList = () => {
   const handleDeleteProduct = async () => {
     setDeleting(true);
     try {
-      console.log("a");
       const response = await productAPI.deleteProduct(deletingProductId);
-      console.log(response);
       if (response.status === 200) {
-        setApiResponse({
-          type: "success",
-          message: "Product deleted successfully"
-        });
+        setApiResponse({ type: "success", message: "Product deleted successfully" });
         setProducts(products.filter(p => p.id_producto !== deletingProductId));
       } else {
-        setApiResponse({
-          type: "error",
-          message: response.message || "Error deleting product"
-        });
+        setApiResponse({ type: "error", message: response.message || "Error deleting product" });
       }
     } catch (error) {
       console.error("Error deleting product:", error);
@@ -94,14 +80,12 @@ const ProductList = () => {
     }
   };
 
-  // Filtering and pagination
   const filteredProducts = products.filter(p => {
     const searchMatch = [p.nombre_producto, p.descripcion, p.sku].some(field =>
       field && field.toLowerCase().includes(searchTerm.toLowerCase())
     );
     const categoryMatch = !filterCategory || p.categoria_id === filterCategory;
-    const statusMatch = !filterStatus || (filterStatus === "true" ? p.status : !p.status);
-
+    const statusMatch = !filterStatus || (filterStatus === "true" ? p.estado : !p.estado);
     return searchMatch && categoryMatch && statusMatch;
   });
 
@@ -111,7 +95,6 @@ const ProductList = () => {
     currentPage * pageSize
   );
 
-  // Block access if user lacks view permission
   if (!hasPermission('682a321b98d5434a57e769d0')) {
     return (
       <div className="product-list-container">
@@ -143,21 +126,25 @@ const ProductList = () => {
 
       <div className="page-header">
         <h1>Productos</h1>
-        {hasPermission('682a67071c1036d90c0b923a') && (
-          <Link to="/dashboard/inventory/add" className="button button-primary">
-            <span className="button-icon add" /> Nuevo Producto
-          </Link>
-        )}
+        <div className="header-actions">
+          {hasPermission('682a67071c1036d90c0b923a') && (
+            <Link to="/dashboard/inventory/add" className="button button-primary">
+              <span className="button-icon add" /> 
+              <span className="button-text">Add product</span>
+            </Link>
+          )}
 
-        {hasPermission('682a90983da0f9eaae2c53a8') && (
-          <Link
-            to="/dashboard/inventory/import"
-            className="button button-secondary"
-            style={{ marginLeft: 8 }}
-          >
-            <span className="button-icon add" /> Bulk Import
-          </Link>
-        )}
+          {hasPermission('682a90983da0f9eaae2c53a8') && (
+            <Link
+              to="/dashboard/inventory/import"
+              className="button button-secondary"
+              style={{ marginLeft: 0 }}
+            >
+              <span className="button-icon add" /> 
+              <span className="button-text">Bulk Import</span>
+            </Link>
+          )}
+        </div>
       </div>
 
       <div className="filter-bar">
@@ -191,10 +178,10 @@ const ProductList = () => {
             className="filter-select"
             onChange={(e) => {
               setFilterStatus(e.target.value);
-                setCurrentPage(1);
-              }}
-              >
-              <option value="">All Statuses</option>
+              setCurrentPage(1);
+            }}
+          >
+            <option value="">All Statuses</option>
             <option value="true">Active</option>
             <option value="false">Inactive</option>
           </select>
@@ -222,8 +209,8 @@ const ProductList = () => {
                   <td>{product.categoryName}</td>
                   <td>${product.precio_unitario.toLocaleString()}</td>
                   <td>
-                    <span className={`status-badge ${product.status ? 'active' : 'inactive'}`}>
-                      {product.status ? 'Active' : 'Inactive'}
+                    <span className={`status-badge ${product.estado ? 'active' : 'inactive'}`}>
+                      {product.estado ? 'Active' : 'Inactive'}
                     </span>
                   </td>
                   <td>
@@ -240,7 +227,6 @@ const ProductList = () => {
                         className={!hasPermission('682a67231c1036d90c0b923b') ? 'disabled' : ''}
                         style={{ marginRight: 8 }}
                       />
-                      
                       <Button
                         danger
                         icon={<DeleteOutlined />}
@@ -296,7 +282,6 @@ const ProductList = () => {
         </div>
       )}
 
-      {/* Deletion Confirmation Modal */}
       <Modal
         title="Confirm Deletion"
         open={isDeleteModalVisible}

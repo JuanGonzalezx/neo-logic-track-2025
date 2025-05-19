@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-// import { getAllCategories, deleteCategory } from "../../api/category";}
 import { categoryApi } from "../../../api/category";
 import { Alert, Spin, Modal, Button } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
@@ -23,32 +22,35 @@ const CategoryList = () => {
   const [deletingCategoryId, setDeletingCategoryId] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
-  // States for editing
+  // States for editing (sin cambios)
   const [isEditModalVisible, setEditModalVisible] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await categoryApi.getAllCategories();
-        if (response.status === 200) {
-          setCategories(response.data);
-        } else {
-          setApiResponse({ type: "error", message: "Error loading categories" });
-        }
-      } catch (error) {
-        setApiResponse({ type: "error", message: "Connection error" });
-      } finally {
-        setLoading(false);
+  // Función para cargar categorías (puede ser llamada desde cualquier sitio)
+  const fetchCategories = async () => {
+    setLoading(true);
+    try {
+      const response = await categoryApi.getAllCategories();
+      if (response.status === 200) {
+        setCategories(response.data);
+        setApiResponse(null); // Limpia mensajes previos
+      } else {
+        setApiResponse({ type: "error", message: "Error loading categories" });
       }
-    };
+    } catch (error) {
+      setApiResponse({ type: "error", message: "Connection error" });
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  // Carga inicial
+  useEffect(() => {
     fetchCategories();
   }, []);
 
   const hasPermission = (permissionId) => permissions.includes(permissionId);
 
-  // Block access if user lacks view permission
   if (!hasPermission('682a67a21c1036d90c0b923d')) {
     return (
       <div className="category-list-container">
@@ -57,16 +59,17 @@ const CategoryList = () => {
     );
   }
 
+  // Manejo de eliminación con refresco
   const handleDeleteCategory = async () => {
     setDeleting(true);
     try {
       const response = await categoryApi.deleteCategory(deletingCategoryId);
-      if (response.status === 200) {
+      if (response.status === 204 || response.status === 200) {
         setApiResponse({
           type: "success",
-          message: "Category deleted successfully"
+          message: response.message || "Category deleted successfully"
         });
-        setCategories(categories.filter(c => c.id !== deletingCategoryId));
+        await fetchCategories(); // Recarga la lista actualizada
       } else {
         setApiResponse({
           type: "error",
@@ -84,7 +87,7 @@ const CategoryList = () => {
     }
   };
 
-  // Filtering and pagination
+  // Filtrado y paginación
   const filteredCategories = categories.filter(category =>
     category.nombre.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -119,7 +122,7 @@ const CategoryList = () => {
       <div className="page-header">
         <h1>Categorías</h1>
         {hasPermission('682a68421c1036d90c0b923e') && (
-          <Link to="/dashboard/categories/create" className="button button-primary">
+          <Link to="/dashboard/inventory/categories/add" className="button button-primary">
             <span className="button-icon add" /> Nueva Categoría
           </Link>
         )}
@@ -149,7 +152,7 @@ const CategoryList = () => {
             </tr>
           </thead>
           <tbody>
-            {paginatedCategories && paginatedCategories.length > 0 ? (
+            {paginatedCategories.length > 0 ? (
               paginatedCategories.map(category => (
                 <tr key={category.id}>
                   <td>{category.nombre}</td>

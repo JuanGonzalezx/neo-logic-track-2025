@@ -15,7 +15,7 @@ export class Product {
     return { status: res.status, data: json };
   }
 
-  async getProductById(id) { 
+  async getProductById(id) {
     const res = await fetch(`${INVENTORY_API}${API_ROUTES.PRODUCTS}/${id}`, {
       method: "GET",
       headers: {
@@ -74,7 +74,20 @@ export class Product {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
-    const json = await res.json();
+
+    // Si el status es 204 No Content, no intentes parsear JSON
+    if (res.status === 204) {
+      return { status: res.status, message: "Product Inactive" };
+    }
+
+    // Para otros status, intenta parsear JSON si hay contenido
+    let json = {};
+    try {
+      json = await res.json();
+    } catch (error) {
+      // No hay JSON, puedes ignorar o manejar el error
+    }
+
     return { status: res.status, message: json.message };
   }
 
