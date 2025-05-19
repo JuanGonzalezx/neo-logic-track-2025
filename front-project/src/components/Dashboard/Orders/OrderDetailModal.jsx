@@ -16,16 +16,14 @@ const OrderDetailModal = ({ visible, order, onCancel }) => {
 
   const fetchOrderDetails = async () => {
     if (!order) return;
-    
+
     setLoading(true);
     try {
-      // Fetch detailed order information
       const response = await orderAPI.getOrderById(order.id);
-      
+
       if (response.status === 200) {
         setOrderDetails(response.data);
-        
-        // Fetch product details for each product in the order
+
         const productPromises = response.data.OrderProducts.map(async (product) => {
           try {
             const productResponse = await productAPI.getProductById(product.product_id);
@@ -41,7 +39,7 @@ const OrderDetailModal = ({ visible, order, onCancel }) => {
             };
           }
         });
-        
+
         const productsWithDetails = await Promise.all(productPromises);
         setProductsDetails(productsWithDetails);
       }
@@ -77,77 +75,71 @@ const OrderDetailModal = ({ visible, order, onCancel }) => {
         </Button>
       ]}
       width={700}
+      // bodyStyle={{ padding: '24px 16px' }}
     >
       {loading ? (
-        <div className="loading-container">
+        <div className="loading-container" style={{ textAlign: 'center', padding: 20 }}>
           <Spin tip="Loading order details..." />
         </div>
       ) : (
         <div className="order-details-container">
-          <div className="order-details-section">
+          <div className="order-details-section" style={{ marginBottom: 24 }}>
             <h3>Order Information</h3>
-            <div className="details-grid">
+            <div className="details-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
               <div className="detail-item">
-                <span className="detail-label">Order ID:</span>
-                <span className="detail-value">{order.id}</span>
+                <strong>Order ID:</strong> <br /> <span>{order.id}</span>
               </div>
               <div className="detail-item">
-                <span className="detail-label">Creation Date:</span>
-                <span className="detail-value">{formatDateTime(order.creation_date)}</span>
+                <strong>Creation Date:</strong> <br /> <span>{formatDateTime(order.creation_date)}</span>
               </div>
               <div className="detail-item">
-                <span className="detail-label">Status:</span>
-                <span className="detail-value">
-                  <span className={`status-badge ${order.status}`}>
-                    {order.status}
-                  </span>
+                <strong>Status:</strong> <br />
+                <span className={`status-badge ${order.status}`}>
+                  {order.status}
                 </span>
               </div>
               <div className="detail-item">
-                <span className="detail-label">Warehouse:</span>
-                <span className="detail-value">{order.id_almacen}</span>
+                <strong>Warehouse:</strong> <br /> <span>{order.id_almacen}</span>
               </div>
               <div className="detail-item">
-                <span className="detail-label">Location ID:</span>
-                <span className="detail-value">{order.location_id}</span>
+                <strong>Location ID:</strong> <br /> <span>{order.location_id}</span>
               </div>
               <div className="detail-item">
-                <span className="detail-label">Delivery Address:</span>
-                <span className="detail-value">{order.delivery_address}</span>
+                <strong>Delivery Address:</strong> <br /> <span>{order.delivery_address}</span>
               </div>
               {orderDetails?.deliveryUser && (
                 <div className="detail-item">
-                  <span className="detail-label">Delivery Person:</span>
-                  <span className="detail-value">{orderDetails.deliveryUser.fullname}</span>
+                  <strong>Delivery Person:</strong> <br /> <span>{orderDetails.deliveryUser.fullname}</span>
                 </div>
               )}
             </div>
           </div>
-          
+
           <div className="order-products-section">
             <h3>Order Products</h3>
             {order.OrderProducts && order.OrderProducts.length > 0 ? (
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th>Product ID</th>
-                    <th>Product Name</th>
-                    <th>Quantity</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {order.OrderProducts.map((product) => (
-                    <tr key={product.id}>
-                      <td>{product.product_id}</td>
-                      <td>
-                        {productsDetails.find(p => p.id === product.id)?.details?.nombre_producto || 
-                         'Product name not available'}
-                      </td>
-                      <td>{product.amount}</td>
+              <div style={{ overflowX: 'auto' }}>
+                <table className="data-table" style={{ minWidth: 500 }}>
+                  <thead>
+                    <tr>
+                      <th style={{ maxWidth: 100, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Product ID</th>
+                      <th style={{ maxWidth: 250, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Product Name</th>
+                      <th style={{ maxWidth: 100 }}>Quantity</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {order.OrderProducts.map((product) => (
+                      <tr key={product.id}>
+                        <td style={{ maxWidth: 100, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{product.product_id}</td>
+                        <td style={{ maxWidth: 250, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {productsDetails.find(p => p.id === product.id)?.details?.nombre_producto || 'Product name not available'}
+                        </td>
+                        <td style={{ maxWidth: 100 }}>{product.amount}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             ) : (
               <div className="no-results">No products in this order</div>
             )}

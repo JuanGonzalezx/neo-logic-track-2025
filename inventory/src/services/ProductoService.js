@@ -290,7 +290,6 @@ class ProductoService {
   const proveedoresSet = new Set();
   const productosSet = new Map();
   const almacenProductoMap = new Map();
-  // Ya no existe proveedorProductoSet
   const movimientosToInsert = [];
 
   // NUEVO: Mapa para acumular volumen total por almacen (m3)
@@ -410,6 +409,18 @@ class ProductoService {
         continue;
       }
 
+      // Convertir estado a booleano
+      const estadoStr = (row.estado || '').toString().toLowerCase();
+      const estadoBool = estadoStr === 'activo' || estadoStr === 'true' || estadoStr === '1';
+
+      // Convertir es_fragil a booleano
+      const esFragilStr = (row.es_fragil || '').toString().toLowerCase();
+      const esFragilBool = esFragilStr === 'true' || esFragilStr === '1';
+
+      // Convertir requiere_refrigeracion a booleano
+      const requiereRefrigeracionStr = (row.requiere_refrigeracion || '').toString().toLowerCase();
+      const requiereRefrigeracionBool = requiereRefrigeracionStr === 'true' || requiereRefrigeracionStr === '1';
+
       productosToCreate.push({
         id_producto,
         nombre_producto: row.nombre_producto,
@@ -420,9 +431,9 @@ class ProductoService {
         precio_unitario: precioUnitarioNum,
         peso_kg: pesoKgNum,
         dimensiones_cm: row.dimensiones_cm,
-        es_fragil: row.es_fragil === "true" || row.es_fragil === true,
-        requiere_refrigeracion: row.requiere_refrigeracion === "true" || row.requiere_refrigeracion === true,
-        estado: row.estado === "true" || row.estado === true
+        es_fragil: esFragilBool,
+        requiere_refrigeracion: requiereRefrigeracionBool,
+        estado: estadoBool
       });
     }
   }
@@ -571,7 +582,6 @@ class ProductoService {
     return isNaN(d.getTime()) ? null : d;
   }
 }
-
 
 
 
