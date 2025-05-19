@@ -330,7 +330,7 @@ const ProductForm = () => {
     dimensiones_cm: "",
     es_fragil: false,
     requiere_refrigeracion: false,
-    status: true
+    estado: true
   });
 
   const [errors, setErrors] = useState({});
@@ -377,7 +377,7 @@ const ProductForm = () => {
               dimensiones_cm: product.dimensiones_cm,
               es_fragil: product.es_fragil,
               requiere_refrigeracion: product.requiere_refrigeracion,
-              status: product.status
+              estado: product.estado
             });
           } else {
             setApiResponse({ type: "error", message: "Product not found" });
@@ -665,8 +665,8 @@ const ProductForm = () => {
             <label className="checkbox-label">
               <input
                 type="checkbox"
-                name="status"
-                checked={formData.status}
+                name="estado"
+                checked={formData.estado}
                 onChange={handleChange}
               />
               Active

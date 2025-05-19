@@ -4,8 +4,8 @@ const prisma = new PrismaClient();
 
 class CategoriaService {
 
-    async findOrCreateCategoria({nombre}) {
-        
+    async findOrCreateCategoria({ nombre }) {
+
         if (!nombre) {
             throw new Error("El nombre es requerido para crear una categoria.");
         }
@@ -32,7 +32,8 @@ class CategoriaService {
 
     async getById(id) {
         const categoria = await prisma.categoria.findUnique({
-            where: { id }
+            where: { id },
+            include: { Producto: true }
         });
         if (!categoria) throw new Error('categoria no encontrado');
         return categoria;
@@ -50,7 +51,7 @@ class CategoriaService {
         // Prevenir cambiar el nombre a uno que ya existe
         if (data.name) {
             const existing = await prisma.categoria.findFirst({
-                where: { name: data.name},
+                where: { name: data.name },
             });
             if (existing) throw new Error(`El nombre de categoria '${data.name}' ya está en uso.`);
         }
@@ -66,8 +67,8 @@ class CategoriaService {
     }
 
     async delete(id) {
-        const categoria = await this.getById(id); // Valida existencia y obtiene info
-        if (categoria.categoriaProducto && categoria.categoriaProducto.length > 0) {
+        const categoria = await this.getById(id);
+        if (categoria.Producto && categoria.Producto.length > 0) {
             throw new Error('No se puede eliminar la categoria, tiene productos asociados.');
         }
 
@@ -78,6 +79,7 @@ class CategoriaService {
             throw error;
         }
     }
+
 }
 
 module.exports = new CategoriaService();

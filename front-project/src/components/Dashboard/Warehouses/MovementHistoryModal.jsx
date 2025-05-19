@@ -119,6 +119,7 @@ const MovementHistoryModal = ({ visible, onCancel, warehouse, availableProducts 
                     <th>Product</th>
                     <th>Type</th>
                     <th>Quantity</th>
+                    <th>Provider</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -132,6 +133,7 @@ const MovementHistoryModal = ({ visible, onCancel, warehouse, availableProducts 
                         </span>
                       </td>
                       <td>{movement.cantidad}</td>
+                      <td>{movement.id_proveedor || 'N/A'}</td>
                     </tr>
                   ))}
                 </tbody>

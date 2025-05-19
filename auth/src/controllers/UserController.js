@@ -305,7 +305,7 @@ const createRepartidor = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const { id } = req.params;
-  const { email, number, current_password, fullname, rolId, status, ciudadId } = req.body;
+  const { email, number, current_password, fullname, roleId, status, ciudadId } = req.body;
   const updateData = {};
 
   if (email) {
@@ -340,7 +340,7 @@ const updateUser = async (req, res) => {
   }
 
   if (fullname) updateData.fullname = fullname;
-  if (rolId) updateData.rolId = rolId;
+  if (roleId) updateData.roleId = roleId;
   if (status) updateData.status = status;
   if (ciudadId) updateData.ciudadId = ciudadId;
 

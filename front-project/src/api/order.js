@@ -1,9 +1,9 @@
 import { ENV } from "../utils";
-const { INVENTORY_API, API_ROUTES } = ENV;
+const { ORDER_API, API_ROUTES } = ENV;
 
-export class Category {
-  async getAllCategories() {
-    const res = await fetch(`${INVENTORY_API}${API_ROUTES.CATEGORIES}`, {
+export class Order {
+  async getAllOrders() {
+    const res = await fetch(`${ORDER_API}${API_ROUTES.ORDERS}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -14,8 +14,8 @@ export class Category {
     return { status: res.status, data: json };
   }
 
-  async getCategoryById(id) {
-    const res = await fetch(`${INVENTORY_API}${API_ROUTES.CATEGORIES}/${id}`, {
+  async getOrderById(id) {
+    const res = await fetch(`${ORDER_API}${API_ROUTES.ORDERS}/${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -26,8 +26,20 @@ export class Category {
     return { status: res.status, data: json };
   }
 
-  async createCategory(data) {
-    const res = await fetch(`${INVENTORY_API}${API_ROUTES.CATEGORIES}`, {
+  async getOrdersByAlmacen(almacenId) {
+    const res = await fetch(`${ORDER_API}${API_ROUTES.ORDERS}/almacen/${almacenId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    const json = await res.json();
+    return { status: res.status, data: json };
+  }
+
+  async createOrder(data) {
+    const res = await fetch(`${ORDER_API}${API_ROUTES.ORDERS}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -39,8 +51,8 @@ export class Category {
     return { status: res.status, data: json, message: json.message };
   }
 
-  async updateCategory(id, data) {
-    const res = await fetch(`${INVENTORY_API}${API_ROUTES.CATEGORIES}/${id}`, {
+  async updateOrder(id, data) {
+    const res = await fetch(`${ORDER_API}${API_ROUTES.ORDERS}/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -52,30 +64,17 @@ export class Category {
     return { status: res.status, data: json, message: json.message };
   }
 
-  async deleteCategory(id) {
-    const res = await fetch(`${INVENTORY_API}${API_ROUTES.CATEGORIES}/${id}`, {
+  async deleteOrder(id) {
+    const res = await fetch(`${ORDER_API}${API_ROUTES.ORDERS}/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
-
-    if (res.status === 204) {
-      // No content, sin cuerpo
-      return { status: res.status, data: null, message: "Deleted successfully" };
-    }
-
-    let json = null;
-    try {
-      json = await res.json();
-    } catch (error) {
-      // No hay JSON o error al parsear, lo ignoramos
-    }
-
-    return { status: res.status, data: json, message: json?.message || "" };
+    const json = await res.json();
+    return { status: res.status, message: json.message };
   }
-
 }
 
-export const categoryApi = new Category();
+export const orderAPI = new Order();
