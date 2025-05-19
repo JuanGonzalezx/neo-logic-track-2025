@@ -158,7 +158,7 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
     setLoading(true);
     try {
       const payload = {
-        delivery_id: formData.delivery_id,
+        id_almacen: order.id_almacen,
         location_id: formData.location_id,
         delivery_address: formData.delivery_address,
         status: formData.status,
