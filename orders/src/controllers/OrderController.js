@@ -6,6 +6,7 @@ const { findProductById, reduceStock, createMovements } = require('../lib/produc
 const { createOrderProduct } = require('./OrderProductsController');
 const { findCityByAlmacen } = require('../lib/almacenServiceClient');
 const { findRepartidorByCity } = require('../lib/userServiceClient');
+const orderService = require('../services/orderService');
 
 
 // Función para validar todos los productos en orderProducts
@@ -125,7 +126,7 @@ const createOrder = async (req, res) => {
 // Actualizar orden con validaciones
 const updateOrder = async (req, res) => {
   const { id } = req.params;
-  const { delivery_id, location_id, delivery_address, status, orderProducts } = req.body;
+  const { delivery_id, location_id, delivery_address, status, orderProducts, id_almacen } = req.body;
   try {
     // Validar delivery_id si viene
     if (delivery_id) {
@@ -136,7 +137,7 @@ const updateOrder = async (req, res) => {
     }
 
     // Validar todos los productos
-    await validateOrderProducts(orderProducts);
+    await validateOrderProducts(orderProducts, id_almacen);
 
     // Actualizar orden y productos (borramos los anteriores y creamos los nuevos)
     const order = await prisma.order.update({
@@ -146,10 +147,6 @@ const updateOrder = async (req, res) => {
         location_id,
         delivery_address,
         status,
-        orderProducts: {
-          deleteMany: {},
-          create: orderProducts,
-        },
       },
     });
     res.status(200).json(order);
@@ -163,10 +160,11 @@ const updateOrder = async (req, res) => {
 const deleteOrder = async (req, res) => {
   const { id } = req.params;
   try {
-    await prisma.order.delete({
-      where: { id },
-    });
-    res.status(200).json({ message: 'Order deleted successfully' });
+    const deletedOrder = orderService.deleteOrder(id);
+    if (!deleteOrder) {
+      throw new Error("Don´t found the order");
+    }
+    res.status(204).json({ message: 'Order deleted successfully' });
   } catch (error) {
     console.error('Error deleting order:', error);
     res.status(500).json({ message: 'Error deleting order', error: error.message });

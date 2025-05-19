@@ -52,6 +52,17 @@ class AlmacenController {
         }
     }
 
+      async updateCapacidadm3(req, res, next) { // :id_almacen en la ruta
+        try {
+            console.log(req.params.capacity);
+            
+            const almacen = await AlmacenService.updateCapacidadm3(req.params.id_almacen,req.params.capacity);
+            res.status(200).json(almacen);
+        } catch (error) {
+            handleServiceError(error, res, next);
+        }
+    }
+
     async delete(req, res, next) { // :id_almacen en la ruta
         try {
             await AlmacenService.delete(req.params.id_almacen);

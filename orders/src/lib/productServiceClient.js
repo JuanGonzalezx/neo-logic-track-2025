@@ -23,11 +23,34 @@ async function findProductById(id) {
   }
 }
 
+function calcularVolumen(dimensiones) {
+  const parts = dimensiones.split('x').map(Number);
+  const [largo, ancho, alto] = parts;
+  return ((largo * ancho * alto) / 10000);
+}
+
+async function returnStockAndCapacity(id_almacen, id_producto, amount) {
+  let almacenProducto = (await axios.get(`${ALMACENPRODUCTS_API_BASE_URL}/producto/${id_producto}/almacen/${id_almacen}`)).data
+  let almacen = (await axios.get(`${ALMACENES_API_BASE_URL}/${id_almacen}`)).data ///si daaaaaaaaaaaa
+  let producto = (await axios.get(`${PRODUCTS_API_BASE_URL}/${id_producto}`)).data ///si daaaaaaaaaaaa
+
+  const stockNuevo = almacenProducto.cantidad_stock + amount
+  const capacidadNueva = almacen.capacidad_usada_m3 + calcularVolumen(producto.dimensiones_cm)*amount
+
+  const updateStock = {
+    cantidad_stock: stockNuevo
+  }
+  let updateAlmPro = (await axios.put(`${ALMACENPRODUCTS_API_BASE_URL}/${almacenProducto.id}`, updateStock)).data
+
+
+  let updateAlm = (await axios.put(`${ALMACENES_API_BASE_URL}/${almacen.id_almacen}/capacidad/${capacidadNueva}`)).data
+}
+
 async function reduceStock(product_id, almacen_id, amount) {
   try {
 
     let responseAlmacen = (await axios.get(`${ALMACENPRODUCTS_API_BASE_URL}/producto/${product_id}/almacen/${almacen_id}`)).data
-    
+
 
     if (amount > responseAlmacen.cantidad_stock) {
       throw new Error("La cantidad del producto es mayor al disponible en el stock");
@@ -66,7 +89,7 @@ async function createMovements(id_producto, id_almacen, amount, id_proveedor) {
     let data = {
       id_producto: id_producto,
       id_almacen: id_almacen,
-      id_proveedor:null,
+      id_proveedor: null,
       tipo: false,
       cantidad: amount,
       fecha
@@ -82,4 +105,4 @@ async function createMovements(id_producto, id_almacen, amount, id_proveedor) {
 }
 
 
-module.exports = { findProductById, reduceStock, createMovements };
+module.exports = { findProductById, reduceStock, createMovements, returnStockAndCapacity };

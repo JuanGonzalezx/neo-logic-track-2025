@@ -19,6 +19,7 @@ router.post('/', AlmacenController.create);
 router.post('/almacenes/bulk', upload.single('file'), AlmacenController.bulkCreate);
 router.get('/', AlmacenController.getAll);
 router.get('/:id_almacen', AlmacenController.getById);
+router.put('/:id_almacen/capacidad/:capacity', AlmacenController.updateCapacidadm3)
 router.put('/:id_almacen', AlmacenController.update);
 router.delete('/:id_almacen', AlmacenController.delete);
 

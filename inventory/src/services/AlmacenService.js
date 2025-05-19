@@ -12,6 +12,7 @@ const prisma = new PrismaClient();
 const DepartamentoService = require('./DepartamentoSerice');
 const CiudadService = require('./CiudadSerice');
 const { findUser, createUser, findUserByEmail, findDespachadorByCity } = require('../lib/userServiceClient'); // Ajusta la ruta
+const { log } = require("console");
 
 const logDir = path.join(__dirname, "../../logs");
 if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
@@ -588,9 +589,11 @@ class AlmacenService {
   }
 
   async updateCapacidadm3(id_almacen, capacidad_usada_m3) {
+    const cap = parseInt(capacidad_usada_m3)
+    
     return await prisma.almacen.update({
       where: { id_almacen: id_almacen },
-      data: { capacidad_usada_m3: capacidad_usada_m3 }
+      data: { capacidad_usada_m3: cap }
     });
   }
 
