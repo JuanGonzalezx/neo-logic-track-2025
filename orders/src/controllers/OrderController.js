@@ -153,9 +153,10 @@ const deleteOrder = async (req, res) => {
     res.status(204).json({ message: 'Order deleted successfully' });
   } catch (error) {
     console.error('Error deleting order:', error);
-    res.status(500).json({ message: 'Error deleting order', error: error.message });
+    return res.status(500).json({ message: 'Error deleting order', error: error.message });
   }
 };
+
 
 module.exports = {
   getAllOrders,

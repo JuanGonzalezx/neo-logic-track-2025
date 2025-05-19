@@ -65,16 +65,20 @@ export class Order {
   }
 
   async deleteOrder(id) {
-    const res = await fetch(`${ORDER_API}${API_ROUTES.ORDERS}/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-    const json = await res.json();
-    return { status: res.status, message: json.message };
+  const res = await fetch(`${ORDER_API}${API_ROUTES.ORDERS}/${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  });
+  if (res.status === 204) {
+    return { status: res.status, message: "Order deleted successfully" };
   }
+  const json = await res.json();  // Esto falla si no hay JSON
+  return { status: res.status, message: json.message };
+}
+
 }
 
 export const orderAPI = new Order();

@@ -489,8 +489,20 @@ class AlmacenService {
 
   async getAll() {
     return prisma.almacen.findMany({
-      include: {
-        direccion: { include: { ciudad: { include: { departamento: true } } } }
+      select: {
+        id_almacen: true,
+        nombre_almacen: true,
+        direccionId: true,
+        direccion: { include: { ciudad: { include: { departamento: true } } } },
+        gerente: true,
+        gerenteId: true,
+        despachador: true,
+        despachadorId: true,
+        capacidad_m3: true,
+        capacidad_usada_m3: true,
+        estado: true,
+        AlmacenProducto: false, // omit for list
+        Movement_Inventory: false // omit for list
       }
     });
   }

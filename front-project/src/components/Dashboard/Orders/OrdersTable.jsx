@@ -6,7 +6,7 @@ import {
   EditOutlined, 
   DeleteOutlined 
 } from '@ant-design/icons';
-import { Modal, Spin } from 'antd';
+import { Modal, Spin, Button } from 'antd';
 import { orderAPI } from '../../../api/order';
 import OrderDetailModal from './OrderDetailModal';
 import EditOrderModal from './EditOrderModal';
@@ -16,6 +16,11 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  // Estado para mostrar/ocultar modal de confirmación de borrado
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [orderToDelete, setOrderToDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const showDetailModal = (order) => {
     setSelectedOrder(order);
@@ -27,38 +32,31 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
     setEditModalVisible(true);
   };
 
-  const handleDeleteOrder = (order) => {
-    Modal.confirm({
-      title: 'Are you sure you want to delete this order?',
-      content: 'This action cannot be undone.',
-      okText: 'Yes, delete it',
-      okType: 'danger',
-      cancelText: 'Cancel',
-      onOk: async () => {
-        try {
-          setLoading(true);
-          const response = await orderAPI.deleteOrder(order.id);
-          if (response.status === 200) {
-            onApiResponse({ 
-              type: 'success', 
-              message: 'Order deleted successfully' 
-            });
-          } else {
-            onApiResponse({ 
-              type: 'error', 
-              message: response.message || 'Error deleting order' 
-            });
-          }
-        } catch (error) {
-          onApiResponse({ 
-            type: 'error', 
-            message: error.message || 'Server error' 
-          });
-        } finally {
-          setLoading(false);
-        }
+  // Abrir modal confirmación borrado
+  const showDeleteModal = (order) => {
+    setOrderToDelete(order);
+    setDeleteModalVisible(true);
+  };
+
+  // Confirmar y ejecutar borrado
+  const confirmDeleteOrder = async () => {
+    if (!orderToDelete) return;
+
+    setDeleting(true);
+    try {
+      const response = await orderAPI.deleteOrder(orderToDelete.id);
+      if (response.status === 204) {
+        onApiResponse({ type: 'success', message: 'Order deleted successfully' });
+      } else {
+        onApiResponse({ type: 'error', message: response.message || 'Error deleting order' });
       }
-    });
+    } catch (error) {
+      onApiResponse({ type: 'error', message: error.message || 'Server error' });
+    } finally {
+      setDeleting(false);
+      setDeleteModalVisible(false);
+      setOrderToDelete(null);
+    }
   };
 
   const formatDateTime = (dateTimeStr) => {
@@ -135,8 +133,9 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
                     </button>
                     <button
                       className="action-button delete"
-                      onClick={() => handleDeleteOrder(order)}
+                      onClick={() => showDeleteModal(order)}
                       title="Delete order"
+                      disabled={loading || deleting}
                     >
                       <DeleteOutlined />
                     </button>
@@ -171,6 +170,41 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
           />
         </>
       )}
+
+      {/* Modal personalizado para confirmar borrado */}
+      <Modal
+        title="Confirm Delete"
+        open={deleteModalVisible}
+        onCancel={() => {
+          if (!deleting) {
+            setDeleteModalVisible(false);
+            setOrderToDelete(null);
+          }
+        }}
+        footer={[
+          <Button key="cancel" onClick={() => {
+            if (!deleting) {
+              setDeleteModalVisible(false);
+              setOrderToDelete(null);
+            }
+          }} disabled={deleting}>
+            Cancel
+          </Button>,
+          <Button
+            key="confirm"
+            type="primary"
+            danger
+            loading={deleting}
+            onClick={confirmDeleteOrder}
+          >
+            Delete
+          </Button>,
+        ]}
+        maskClosable={!deleting}
+        closable={!deleting}
+      >
+        <p>Are you sure you want to delete this order? This action cannot be undone.</p>
+      </Modal>
     </div>
   );
 };
