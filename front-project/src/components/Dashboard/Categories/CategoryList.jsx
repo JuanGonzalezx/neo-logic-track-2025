@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 // import { getAllCategories, deleteCategory } from "../../api/category";}
 import { categoryApi } from "../../../api/category";
 import { Alert, Spin, Modal, Button } from "antd";
@@ -10,7 +11,7 @@ const CategoryList = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [apiResponse, setApiResponse] = useState(null);
-  const [permissions, setPermissions] = useState([]);
+  const permissions = useSelector(state => state.auth?.permissions || []);
 
   // States for filters and pagination
   const [searchTerm, setSearchTerm] = useState("");
@@ -21,6 +22,10 @@ const CategoryList = () => {
   const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
   const [deletingCategoryId, setDeletingCategoryId] = useState(null);
   const [deleting, setDeleting] = useState(false);
+
+  // States for editing
+  const [isEditModalVisible, setEditModalVisible] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -39,13 +44,18 @@ const CategoryList = () => {
     };
 
     fetchCategories();
-
-    // Load permissions from local storage
-    const storedPermissions = JSON.parse(localStorage.getItem('permissions')) || [];
-    setPermissions(storedPermissions);
   }, []);
 
   const hasPermission = (permissionId) => permissions.includes(permissionId);
+
+  // Block access if user lacks view permission
+  if (!hasPermission('682a67a21c1036d90c0b923d')) {
+    return (
+      <div className="category-list-container">
+        <Alert type="error" message="No tiene permiso para ver categorías." showIcon />
+      </div>
+    );
+  }
 
   const handleDeleteCategory = async () => {
     setDeleting(true);
@@ -107,13 +117,12 @@ const CategoryList = () => {
       )}
 
       <div className="page-header">
-        <h1>Categories Management</h1>
-        <Link
-          to="/dashboard/inventory/categories/add"
-          className="button button-primary"
-        >
-          <span className="button-icon add" /> New Category
-        </Link>
+        <h1>Categorías</h1>
+        {hasPermission('682a68421c1036d90c0b923e') && (
+          <Link to="/dashboard/categories/create" className="button button-primary">
+            <span className="button-icon add" /> Nueva Categoría
+          </Link>
+        )}
       </div>
 
       <div className="filter-bar">
@@ -134,46 +143,49 @@ const CategoryList = () => {
         <table className="data-table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Description</th>
-              {/* <th>Products Count</th> */}
-              <th>Actions</th>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {paginatedCategories.length > 0 ? (
+            {paginatedCategories && paginatedCategories.length > 0 ? (
               paginatedCategories.map(category => (
                 <tr key={category.id}>
-                  <td>{category.id}</td>
                   <td>{category.nombre}</td>
-                  <td>{category.descripcion || "—"}</td>
-                  {/* <td>{category.productCount || 0}</td> */}
+                  <td>{category.descripcion}</td>
                   <td>
                     <div className="table-actions">
-                      <Link to={`/dashboard/categories/edit/${category.id}`}>
-                        <button className="action-button edit">
-                          <span className="edit-icon"></span>
-                        </button>
-                      </Link>
-                      <button
-                        className="action-button delete"
+                      <Button
+                        icon={<EditOutlined />}
                         onClick={() => {
-                          setDeletingCategoryId(category.id);
-                          setDeleteModalVisible(true);
+                          if (hasPermission('682a68ae1c1036d90c0b923f')) {
+                            setEditingCategory(category);
+                            setEditModalVisible(true);
+                          }
                         }}
-                      >
-                        <span className="delete-icon"></span>
-                      </button>
+                        disabled={!hasPermission('682a68ae1c1036d90c0b923f')}
+                        className={!hasPermission('682a68ae1c1036d90c0b923f') ? 'disabled' : ''}
+                      />
+                      <Button
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={() => {
+                          if (hasPermission('682a68e51c1036d90c0b9240')) {
+                            setDeletingCategoryId(category.id);
+                            setDeleteModalVisible(true);
+                          }
+                        }}
+                        disabled={!hasPermission('682a68e51c1036d90c0b9240')}
+                        className={!hasPermission('682a68e51c1036d90c0b9240') ? 'disabled' : ''}
+                      />
                     </div>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="no-results">
-                  No categories found
-                </td>
+                <td colSpan="3" style={{ textAlign: 'center' }}>No categories found</td>
               </tr>
             )}
           </tbody>

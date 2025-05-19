@@ -424,8 +424,6 @@ const ProductForm = () => {
     
     if (!formData.codigo_barras) {
       newErrors.codigo_barras = "Barcode is required";
-    } else if (isNaN(formData.codigo_barras)) {
-      newErrors.codigo_barras = "Barcode must be a number";
     }
     
     if (!formData.precio_unitario) {
@@ -456,7 +454,7 @@ const ProductForm = () => {
         ...formData,
         precio_unitario: parseFloat(formData.precio_unitario),
         peso_kg: parseFloat(formData.peso_kg),
-        codigo_barras: Number(formData.codigo_barras)
+        codigo_barras: (formData.codigo_barras)
       };
 
       let response;

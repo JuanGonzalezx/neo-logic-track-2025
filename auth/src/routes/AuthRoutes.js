@@ -10,7 +10,8 @@ const { signIn,
     verifyPassCode,
     resetPassword,
     ChangeResetPassword,
-    sendEmailStock } = require('../controllers/AuthController');
+    sendEmailStock,
+    getUserFromToken } = require('../controllers/AuthController');
 
 router.post('/signup', signUp);
 
@@ -33,5 +34,7 @@ router.post("/verifyPassCode", verifyPassCode);
 router.post("/resetPassword", resetPassword);
 
 router.put("/ChangeResetPassword", ChangeResetPassword);
+
+router.post("/getUserByToken", getUserFromToken);
 
 module.exports = router;

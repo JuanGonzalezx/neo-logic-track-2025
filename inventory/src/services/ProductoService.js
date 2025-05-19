@@ -2,7 +2,10 @@
 const fs = require('fs');
 const csv = require('csv-parser');
 const { v4: uuidv4 } = require('uuid');
-const pLimit = require('p-limit');
+let pLimit;
+(async () => {
+  pLimit = (await import('p-limit')).default;
+})();
 const path = require('path');
 const { PrismaClient, Tipo } = require('@prisma/client');
 const prisma = new PrismaClient();

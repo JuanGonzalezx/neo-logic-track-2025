@@ -3,7 +3,10 @@ const fs = require("fs");
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");
 const csv = require("csv-parser");
-const pLimit = require('p-limit').default;
+let pLimit;
+(async () => {
+  pLimit = (await import('p-limit')).default;
+})();
 const { PrismaClient, EstadoAlmacen } = require('@prisma/client');
 const prisma = new PrismaClient();
 const DepartamentoService = require('./DepartamentoSerice');
