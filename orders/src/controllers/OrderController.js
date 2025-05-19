@@ -22,7 +22,7 @@ async function validateOrderProducts(orderProducts) {
       await reduceStock(op.product_id, op.almacen_id, op.amount);
 
       // Crea el movimiento de salida de ese almacen 
-      await createMovements(op.product_id, op.almacen_id, op.amount)
+      await createMovements(op.product_id, op.almacen_id, op.amount, op.id_proveedor)
 
     }
   } catch (error) {
@@ -90,13 +90,13 @@ const createOrder = async (req, res) => {
     // const validate = await validateOrderProducts(orderProducts);
     
     const city = await findCityByAlmacen(id_almacen)
-
+    
     const repartidor = await findRepartidorByCity(city)
     
     // Crear la orden
     const order = await prisma.order.create({
       data: {
-        delivery_id:repartidor.data.id,
+        delivery_id:repartidor.id,
         location_id,
         delivery_address,
         status,

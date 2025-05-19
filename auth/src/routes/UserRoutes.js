@@ -19,6 +19,9 @@ router.get('/despachadores/:id', UserController.getDespachadorByCity);
 router.post('/repartidores', UserController.createRepartidores);
 router.get('/repartidores/:id', UserController.getRepartidorByCity);
 
+router.post('/repartidor/:id', UserController.createRepartidor);
+
+
 
 // router.get('/',checkPermission('/api/v1/users', 'GET'), getAllUsers);
 router.get('/', UserController.getAllUsers);

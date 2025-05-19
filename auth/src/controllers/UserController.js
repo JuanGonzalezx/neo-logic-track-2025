@@ -267,6 +267,42 @@ const createRepartidores = async (req, res) => {
   }
 }
 
+const createRepartidor = async (req, res) => {
+  const { city } = req.params
+  try {
+
+    const firstName = faker.person.firstName();
+    const lastName = faker.person.lastName();
+    const fullname = `${firstName} ${lastName}`;
+    const email = faker.internet.email({ firstName, lastName }).toLowerCase();
+    const number = generateValidPhone();
+    const password = faker.internet.password({ length: 10 }) + 'A1!'; // Cumple con requisitos de complejidad
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const roleId = "68146313ef7752d9d59866da";
+    const status = "ACTIVE";
+
+    const repartidor = await prisma.users.create({
+      data: {
+        fullname,
+        email,
+        current_password: hashedPassword,
+        number,
+        roleId,
+        status,
+        ciudadId: city
+      }
+    });
+
+    res.json({
+      message: 'Repartidor creado',
+      delivery: repartidor
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error creando repartidores' });
+  }
+}
+
 const updateUser = async (req, res) => {
   const { id } = req.params;
   const { email, number, current_password, fullname, rolId, status, ciudadId } = req.body;
@@ -350,5 +386,5 @@ const deleteData = async (req, res) => {
 module.exports = {
   getAllUsers, getUserById, getUserByEmail, updateUser, createUser, deleteUser,
   deleteData, createDespachadores, getDespachadorByCity, createRepartidores,
-  getRepartidorByCity
+  getRepartidorByCity, createRepartidor
 };

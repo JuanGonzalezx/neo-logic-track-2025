@@ -24,6 +24,10 @@ async function findProductById(id) {
 async function reduceStock(product_id, almacen_id, amount) {
   try {
     let responseAlmacen = await axios.get(`${ALMACENPRODUCTS_API_BASE_URL}/producto/${product_id}/almacen/${almacen_id}`);
+    let almacen = await (await axios.get(`${ALMACENPRODUCTS_API_BASE_URL}/almacenes/${almacen_id}`)).data
+
+    console.log(almacen);
+    
 
     if (amount > responseAlmacen.data.cantidad_stock) {
       throw new Error("La cantidad del producto es mayor al disponible en el stock");

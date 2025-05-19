@@ -6,11 +6,9 @@ const AlmacenService = require('./AlmacenService');
 
 class MovementInventoryService {
     async create(data) {
-        const { id_producto, id_almacen, tipo, cantidad, fecha } = data;
+        const { id_producto, id_almacen, id_proveedor, tipo, cantidad, fecha } = data;
 
-        console.log(data);
-
-        if (!id_producto || !id_almacen || !cantidad || !fecha) {
+        if (!id_producto || !id_almacen || !cantidad || !fecha || !id_proveedor) {
             throw new Error("Todos los campos son requeridos.");
         }
 
@@ -18,6 +16,7 @@ class MovementInventoryService {
             data: {
                 id_producto,
                 id_almacen,
+                id_proveedor,
                 tipo,
                 cantidad,
                 fecha
