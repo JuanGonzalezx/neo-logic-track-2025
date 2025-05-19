@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Button, Spin } from 'antd';
 import { productAPI } from '../../../api/product';
 import { categoryApi } from '../../../api/category';
@@ -108,8 +108,6 @@ const AddProductModal = ({
 
       const categoriaNombre = categoriaResponse.data.nombre;
 
-      
-      console.log('Payload to create product:', productData);
       // Combine product data with almacen producto data
       let fullPayload = {
         ...payload,
@@ -125,7 +123,7 @@ const AddProductModal = ({
         requiere_refrigeracion: productData.requiere_refrigeracion,
         estado: productData.estado
       };
-      console.log('Payload to create productaaa:', fullPayload);
+
       const response = await productAPI.asignProductToWarehouse(fullPayload);
       
       if (response.status === 200 || response.status === 201) {
@@ -268,6 +266,7 @@ const AddProductModal = ({
             )}
           </div>
         </div>
+
         <div className="form-group">
             <label>Proveedor</label>
             <select
@@ -283,13 +282,11 @@ const AddProductModal = ({
                     {prov.nombre ?? 'Proveedor sin nombre'} - {prov.id}
                 </option>
                 ))}
-
             </select>
             {formErrors.id_proveedor && (
                 <span className="error-message">{formErrors.id_proveedor}</span>
             )}
-            </div>
-
+        </div>
 
         <div className="form-note">
           <p><small>* Required fields</small></p>

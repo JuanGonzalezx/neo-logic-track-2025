@@ -15,9 +15,20 @@ const WarehouseList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [userId, setUserId] = useState(null);
   const [userRole, setUserRole] = useState(null);
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(""); // For debouncing
+
+  const pageSize = 10;
+
+  // Function to debounce search term
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm); // Set the debounced search term
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
 
   useEffect(() => {
-    // Fetch user ID and role from token in localStorage
     const fetchUserIdAndRole = async () => {
       const token = localStorage.getItem("token");
       if (token) {
@@ -37,11 +48,12 @@ const WarehouseList = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         // Fetch warehouses and products in parallel
         const [warehousesResponse, productsResponse, providersResponse] = await Promise.all([
           warehouseAPI.getAllWarehouses(),
-          productAPI.getAllProducts(),
+          productAPI.getAllProducts({ searchTerm: debouncedSearchTerm, page: 1, limit: pageSize }),
           productAPI.getAllProviders(),
         ]);
 
@@ -56,6 +68,7 @@ const WarehouseList = () => {
         } else {
           console.error("Error loading products");
         }
+
         if (providersResponse.status === 200) {
           setAvailableProviders(providersResponse.data);
         } else {
@@ -70,15 +83,14 @@ const WarehouseList = () => {
     };
 
     fetchData();
-  }, []);
+  }, [debouncedSearchTerm]);
 
   const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
+    setSearchTerm(e.target.value); // Sets the search term and triggers debounce
   };
 
   const handleApiResponse = (response) => {
     setApiResponse(response);
-    
     // Auto-hide success messages after 3 seconds
     if (response.type === 'success') {
       setTimeout(() => {
@@ -90,7 +102,6 @@ const WarehouseList = () => {
   // Filter warehouses by search term
   let filteredWarehouses = warehouses;
 
-  // Wait for userId to be loaded before filtering
   if ((userRole === "GERENTE" || userRole === "Despachador") && userId === null) {
     return (
       <div className="warehouse-list-container">
@@ -103,33 +114,13 @@ const WarehouseList = () => {
       </div>
     );
   }
-  console.log(userRole);
-  console.log(userId);
-  // Mostrar solo el almacén asociado si es gerente o despachador
+
+  // Display only the warehouses associated with the user if role is "GERENTE" or "Despachador"
   if ((userRole === "GERENTE" || userRole === "Despachador") && userId) {
     filteredWarehouses = warehouses.filter(warehouse =>
       (userRole === "GERENTE" && String(warehouse.gerenteId) === String(userId)) ||
       (userRole === "Despachador" && String(warehouse.despachadorId) === String(userId))
     );
-    // Aplica también el filtro de búsqueda
-    filteredWarehouses = filteredWarehouses.filter(warehouse => {
-      const warehouseName = warehouse.nombre_almacen.toLowerCase();
-      const addressString = warehouse.direccion 
-        ? `${warehouse.direccion.calle || ''}, ${warehouse.direccion.ciudad?.nombre || ''}, ${warehouse.direccion.ciudad?.departamento?.nombre || ''}`.toLowerCase()
-        : '';
-      const searchLower = searchTerm.toLowerCase();
-      return warehouseName.includes(searchLower) || addressString.includes(searchLower);
-    });
-  } else {
-    filteredWarehouses = warehouses.filter(warehouse => {
-      const warehouseName = warehouse.nombre_almacen.toLowerCase();
-      const addressString = warehouse.direccion 
-        ? `${warehouse.direccion.calle || ''}, ${warehouse.direccion.ciudad?.nombre || ''}, ${warehouse.direccion.ciudad?.departamento?.nombre || ''}`.toLowerCase()
-        : '';
-      
-      const searchLower = searchTerm.toLowerCase();
-      return warehouseName.includes(searchLower) || addressString.includes(searchLower);
-    });
   }
 
   if (loading) {
@@ -138,9 +129,10 @@ const WarehouseList = () => {
         <div className="page-header">
           <h1>Warehouse Inventory</h1>
         </div>
-        <div className="loading-container"></div>
+        <div className="loading-container">
           <Spin tip="Loading warehouses..." />
         </div>
+      </div>
     );
   }
 
@@ -176,7 +168,7 @@ const WarehouseList = () => {
       <div className="warehouses-list">
         {filteredWarehouses.length > 0 ? (
           filteredWarehouses.map(warehouse => (
-            <WarehouseItem 
+            <WarehouseItem
               key={warehouse.id_almacen}
               warehouse={warehouse}
               availableProducts={availableProducts}

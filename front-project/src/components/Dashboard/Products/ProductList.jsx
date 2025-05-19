@@ -2,10 +2,58 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { productAPI } from "../../../api/product";
 import { Alert, Spin, Modal, Button } from "antd";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { Package, Plus } from "lucide-react";
+import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons"; // <-- Importamos EyeOutlined
 import "./Product.css";
 import { useSelector } from "react-redux";
+
+const pageNeighbors = 2; // cantidad de páginas visibles alrededor de la actual
+
+// Función para generar los números de página con "..." para paginación grande
+const getPageNumbers = (currentPage, totalPages) => {
+  const totalNumbers = pageNeighbors * 2 + 3; // +1 y +2 para primeros y últimos
+  const totalBlocks = totalNumbers + 2; // +2 para los ...
+
+  if (totalPages > totalBlocks) {
+    let pages = [];
+
+    const leftBound = Math.max(2, currentPage - pageNeighbors);
+    const rightBound = Math.min(totalPages - 1, currentPage + pageNeighbors);
+
+    const hasLeftSpill = leftBound > 2;
+    const hasRightSpill = rightBound < totalPages - 1;
+
+    if (!hasLeftSpill && hasRightSpill) {
+      const leftItemCount = totalNumbers - 2;
+      for (let i = 2; i <= leftItemCount; i++) {
+        pages.push(i);
+      }
+      pages.push("...");
+      pages.push(totalPages);
+    } else if (hasLeftSpill && !hasRightSpill) {
+      pages.push(1);
+      pages.push("...");
+      for (let i = totalPages - (totalNumbers - 2); i < totalPages; i++) {
+        pages.push(i);
+      }
+      pages.push(totalPages);
+    } else if (hasLeftSpill && hasRightSpill) {
+      pages.push(1);
+      pages.push("...");
+      for (let i = leftBound; i <= rightBound; i++) {
+        pages.push(i);
+      }
+      pages.push("...");
+      pages.push(totalPages);
+    } else {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    }
+    return pages;
+  }
+
+  return Array.from({ length: totalPages }, (_, i) => i + 1);
+};
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
@@ -102,14 +150,6 @@ const ProductList = () => {
     );
   }
 
-  if (loading) {
-    return (
-      <div className="product-list-container">
-        <Spin tip="Loading products..." />
-      </div>
-    );
-  }
-
   return (
     <div className="product-list-container">
       {apiResponse && (
@@ -128,7 +168,7 @@ const ProductList = () => {
         <div className="header-actions">
           {hasPermission('682a67071c1036d90c0b923a') && (
             <Link to="/dashboard/inventory/add" className="button button-primary">
-              <span className="button-icon add" /> 
+              <span className="button-icon add" />
               <span className="button-text">Add product</span>
             </Link>
           )}
@@ -139,7 +179,7 @@ const ProductList = () => {
               className="button button-secondary"
               style={{ marginLeft: 0 }}
             >
-              <span className="button-icon add" /> 
+              <span className="button-icon add" />
               <span className="button-text">Bulk Import</span>
             </Link>
           )}
@@ -187,98 +227,115 @@ const ProductList = () => {
         </div>
       </div>
 
-      <div className="table-container">
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>SKU</th>
-              <th>Product Name</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedProducts.length > 0 ? (
-              paginatedProducts.map(product => (
-                <tr key={product.id_producto}>
-                  <td>{product.sku}</td>
-                  <td>{product.nombre_producto}</td>
-                  <td>{product.categoryName}</td>
-                  <td>${product.precio_unitario.toLocaleString()}</td>
-                  <td>
-                    <span className={`status-badge ${product.estado ? 'active' : 'inactive'}`}>
-                      {product.estado ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="table-actions">
-                      <Link to={`/dashboard/inventory/${product.id_producto}`}>
-                        <button className="action-button view">
-                          <span className="view-icon"></span>
-                        </button>
-                      </Link>
-                      <Button
-                        icon={<EditOutlined />}
-                        onClick={() => navigate(`/dashboard/inventory/edit/${product.id_producto}`)}
-                        disabled={!hasPermission('682a67231c1036d90c0b923b')}
-                        className={!hasPermission('682a67231c1036d90c0b923b') ? 'disabled' : ''}
-                        style={{ marginRight: 8 }}
-                      />
-                      <Button
-                        danger
-                        icon={<DeleteOutlined />}
-                        onClick={() => {
-                          setDeletingProductId(product.id_producto);
-                          setDeleteModalVisible(true);
-                        }}
-                        disabled={!hasPermission('682a67381c1036d90c0b923c')}
-                        className={!hasPermission('682a67381c1036d90c0b923c') ? 'disabled' : ''}
-                      />
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="6" className="no-results">
-                  No products found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {filteredProducts.length > 0 && (
-        <div className="pagination">
-          <button
-            className="pagination-button"
-            onClick={() => setCurrentPage(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-          <div className="pagination-pages">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-              <button
-                key={page}
-                className={`pagination-page ${currentPage === page ? 'active' : ''}`}
-                onClick={() => setCurrentPage(page)}
-              >
-                {page}
-              </button>
-            ))}
-          </div>
-          <button
-            className="pagination-button"
-            onClick={() => setCurrentPage(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
+      {loading ? (
+        <div className="loading-container">
+          <Spin />
+          <div style={{ marginTop: 8, textAlign: "center" }}>Loading products...</div>
         </div>
+      ) : (
+        <>
+          <div className="table-container">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>SKU</th>
+                  <th>Product Name</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginatedProducts.length > 0 ? (
+                  paginatedProducts.map(product => (
+                    <tr key={product.id_producto}>
+                      <td>{product.sku}</td>
+                      <td>{product.nombre_producto}</td>
+                      <td>{product.categoryName}</td>
+                      <td>${product.precio_unitario.toLocaleString()}</td>
+                      <td>
+                        <span className={`status-badge ${product.estado ? 'active' : 'inactive'}`}>
+                          {product.estado ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="table-actions">
+                          <Link to={`/dashboard/inventory/${product.id_producto}`}>
+                            <Button
+                              icon={<EyeOutlined />}
+                              title="View product"
+                              className="action-button"
+                            />
+                          </Link>
+                          <Button
+                            icon={<EditOutlined />}
+                            onClick={() => navigate(`/dashboard/inventory/edit/${product.id_producto}`)}
+                            disabled={!hasPermission('682a67231c1036d90c0b923b')}
+                            className={!hasPermission('682a67231c1036d90c0b923b') ? 'disabled' : ''}
+                            style={{ marginRight: 8 }}
+                          />
+                          <Button
+                            danger
+                            icon={<DeleteOutlined />}
+                            onClick={() => {
+                              setDeletingProductId(product.id_producto);
+                              setDeleteModalVisible(true);
+                            }}
+                            disabled={!hasPermission('682a67381c1036d90c0b923c')}
+                            className={!hasPermission('682a67381c1036d90c0b923c') ? 'disabled' : ''}
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" className="no-results">
+                      No products found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {filteredProducts.length > 0 && (
+            <div className="pagination">
+              <button
+                className="pagination-button"
+                onClick={() => setCurrentPage(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </button>
+              <div className="pagination-pages">
+                {getPageNumbers(currentPage, totalPages).map((page, index) =>
+                  page === "..." ? (
+                    <span key={`ellipsis-${index}`} className="pagination-ellipsis">
+                      ...
+                    </span>
+                  ) : (
+                    <button
+                      key={`page-${page}`}
+                      className={`pagination-page ${currentPage === page ? "active" : ""}`}
+                      onClick={() => setCurrentPage(page)}
+                    >
+                      {page}
+                    </button>
+                  )
+                )}
+              </div>
+              <button
+                className="pagination-button"
+                onClick={() => setCurrentPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       <Modal

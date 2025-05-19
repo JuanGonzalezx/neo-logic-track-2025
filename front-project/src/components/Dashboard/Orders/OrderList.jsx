@@ -24,8 +24,6 @@ const OrderList = () => {
           warehouseAPI.getAllWarehouses(),
           orderAPI.getAllOrders(),
         ]);
-        console.log("Warehouses response:", warehousesResponse);
-        console.log("Orders response:", ordersResponse);
 
         if (warehousesResponse.status === 200) {
           setWarehouses(warehousesResponse.data);
@@ -39,7 +37,6 @@ const OrderList = () => {
           setApiResponse({ type: "error", message: "Error loading orders" });
         }
       } catch (error) {
-        console.log("Error fetching data:", error);
         setApiResponse({ type: "error", message: "Connection error" });
         console.error("Error fetching data:", error);
       } finally {
@@ -56,16 +53,8 @@ const OrderList = () => {
 
   const handleApiResponse = (response) => {
     setApiResponse(response);
-    
-    // Auto-hide success messages after 3 seconds
-    if (response.type === 'success') {
-      setTimeout(() => {
-        setApiResponse(null);
-      }, 3000);
-    }
-    
-    // Refresh data after successful operations
-    if (response.type === 'success') {
+    if (response.type === "success") {
+      setTimeout(() => setApiResponse(null), 3000);
       refreshData();
     }
   };
@@ -94,44 +83,41 @@ const OrderList = () => {
   };
 
   // Filter warehouses by search term
-  const filteredWarehouses = warehouses.filter(warehouse => {
+  const filteredWarehouses = warehouses.filter((warehouse) => {
     const warehouseName = warehouse.nombre_almacen.toLowerCase();
-    const addressString = warehouse.direccion 
-      ? `${warehouse.direccion.calle || ''}, ${warehouse.direccion.ciudad?.nombre || ''}, ${warehouse.direccion.ciudad?.departamento?.nombre || ''}`.toLowerCase()
-      : '';
-    
+    const addressString = warehouse.direccion
+      ? `${warehouse.direccion.calle || ""}, ${warehouse.direccion.ciudad?.nombre || ""}, ${warehouse.direccion.ciudad?.departamento?.nombre || ""}`.toLowerCase()
+      : "";
+
     const searchLower = searchTerm.toLowerCase();
     return warehouseName.includes(searchLower) || addressString.includes(searchLower);
   });
 
-  // Filter and sort orders
-  const filteredOrders = orders.filter(order => {
+  // Filter and sort orders (for "all orders" tab)
+  const filteredOrders = orders.filter((order) => {
     const orderId = order.id.toLowerCase();
     const address = order.delivery_address.toLowerCase();
     const status = order.status.toLowerCase();
-    
-    
-    const searchLower = searchTerm.toLowerCase();
     const warehouseId = order.id_almacen?.toLowerCase() || "";
-    return orderId.includes(searchLower) || 
-           address.includes(searchLower) ||
-    warehouseId.includes(searchLower);
+    const searchLower = searchTerm.toLowerCase();
+
+    return (
+      orderId.includes(searchLower) ||
+      address.includes(searchLower) ||
+      warehouseId.includes(searchLower)
+    );
   });
 
-  // Sort orders
   const sortedOrders = [...filteredOrders].sort((a, b) => {
     if (sortField === "creation_date") {
       const dateA = new Date(a.creation_date);
       const dateB = new Date(b.creation_date);
       return sortDirection === "asc" ? dateA - dateB : dateB - dateA;
     }
-    
-    // Default string comparison for other fields
+
     const valueA = a[sortField] || "";
     const valueB = b[sortField] || "";
-    return sortDirection === "asc" 
-      ? valueA.localeCompare(valueB) 
-      : valueB.localeCompare(valueA);
+    return sortDirection === "asc" ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
   });
 
   if (loading) {
@@ -165,13 +151,13 @@ const OrderList = () => {
       </div>
 
       <div className="tabs-container">
-        <div 
+        <div
           className={`tab ${viewMode === "warehouses" ? "active" : ""}`}
           onClick={() => setViewMode("warehouses")}
         >
           Warehouses
         </div>
-        <div 
+        <div
           className={`tab ${viewMode === "orders" ? "active" : ""}`}
           onClick={() => setViewMode("orders")}
         >
@@ -184,9 +170,11 @@ const OrderList = () => {
           <span className="search-icon"></span>
           <input
             type="text"
-            placeholder={viewMode === "warehouses" 
-              ? "Search warehouses by name or location..." 
-              : "Search orders by ID, address, or status..."}
+            placeholder={
+              viewMode === "warehouses"
+                ? "Search warehouses by name or location..."
+                : "Search orders by ID, address, or status..."
+            }
             value={searchTerm}
             onChange={handleSearch}
           />
@@ -196,23 +184,47 @@ const OrderList = () => {
       {viewMode === "warehouses" ? (
         <div className="warehouses-list">
           {filteredWarehouses.length > 0 ? (
-            filteredWarehouses.map(warehouse => (
-              <WarehouseOrderItem 
-                key={warehouse.id_almacen}
-                warehouse={warehouse}
-                onApiResponse={handleApiResponse}
-              />
-            ))
+            filteredWarehouses.map((warehouse) => {
+              // Extraemos sólo las órdenes de ese almacén y ordenamos
+              const ordersForWarehouse = orders.filter(
+                (order) => order.id_almacen === warehouse.id_almacen
+              );
+              // Ordenar las órdenes de ese almacén con los mismos criterios globales
+              const sortedOrdersForWarehouse = [...ordersForWarehouse].sort((a, b) => {
+                if (sortField === "creation_date") {
+                  const dateA = new Date(a.creation_date);
+                  const dateB = new Date(b.creation_date);
+                  return sortDirection === "asc" ? dateA - dateB : dateB - dateA;
+                }
+                const valueA = a[sortField] || "";
+                const valueB = b[sortField] || "";
+                return sortDirection === "asc"
+                  ? valueA.localeCompare(valueB)
+                  : valueB.localeCompare(valueA);
+              });
+
+              return (
+                <WarehouseOrderItem
+                  key={warehouse.id_almacen}
+                  warehouse={warehouse}
+                  orders={sortedOrdersForWarehouse}
+                  onApiResponse={handleApiResponse}
+                  onSort={handleSort}
+                  sortField={sortField}
+                  sortDirection={sortDirection}
+                />
+              );
+            })
           ) : (
             <div className="no-results">
-              {searchTerm 
-                ? `No warehouses found matching "${searchTerm}"` 
+              {searchTerm
+                ? `No warehouses found matching "${searchTerm}"`
                 : "No warehouses available"}
             </div>
           )}
         </div>
       ) : (
-        <OrdersTable 
+        <OrdersTable
           orders={sortedOrders}
           onSort={handleSort}
           sortField={sortField}

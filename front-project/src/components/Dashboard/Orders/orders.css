@@ -15,9 +15,12 @@
   overflow: hidden;
 }
 
+/* Modificado para que en desktop flex fila y botón a la derecha */
 .warehouse-order-header {
   display: flex;
-  flex-direction: column;
+  flex-direction: row; /* Cambiado a fila para escritorio */
+  justify-content: space-between; /* Separar info y botón */
+  align-items: center;
   padding: 16px 24px;
   cursor: pointer;
   border-bottom: 1px solid transparent;
@@ -32,7 +35,7 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  margin-bottom: 12px;
+  margin-bottom: 0; /* Quitamos margen para alinear bien */
 }
 
 .warehouse-order-info h3 {
@@ -93,6 +96,14 @@
   gap: 4px;
 }
 
+/* *** Grid responsive para detalles en modal */
+.order-details-container .details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
 .order-address {
   font-size: 14px;
 }
@@ -102,71 +113,79 @@
 }
 
 /* Order Products */
-.order-products {
+.order-products,
+.selected-products-list {
   padding: 0 24px 24px;
 }
 
-.product-list-item {
-  display: flex;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid #f0f0f0;
+/* *** Scroll horizontal para tablas en modales */
+.order-products-section > div,
+.selected-products-list {
+  overflow-x: auto;
 }
 
-.product-quantity {
-  width: 80px;
-  text-align: center;
+/* Tabla con min-width para evitar que se achique mucho */
+.order-products-section table.data-table,
+.selected-products-list table.data-table {
+  min-width: 500px;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+/* Columnas con truncamiento */
+.order-products-section th,
+.order-products-section td,
+.selected-products-list th,
+.selected-products-list td {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.order-products-section th,
+.selected-products-list th {
+  background-color: #f5f5f5;
   font-weight: 600;
 }
 
-.product-info {
-  flex: 1;
+.order-products-section th:nth-child(1),
+.order-products-section td:nth-child(1),
+.selected-products-list th:nth-child(1),
+.selected-products-list td:nth-child(1) {
+  max-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.product-name {
-  font-weight: 500;
+.order-products-section th:nth-child(2),
+.order-products-section td:nth-child(2),
+.selected-products-list th:nth-child(2),
+.selected-products-list td:nth-child(2) {
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.product-id {
-  color: #666;
-  font-size: 13px;
-}
-
-.product-actions {
-  display: flex;
-  gap: 8px;
-}
-
-/* Order Form */
-.order-form {
-  margin-top: 16px;
-}
-
-.selected-products-list {
-  margin-top: 16px;
-  border: 1px solid #f0f0f0;
-  border-radius: 4px;
-  max-height: 300px;
-  overflow-y: auto;
-}
-
-.form-divider {
-  margin: 24px 0;
-  border-top: 1px solid #f0f0f0;
-}
-
-.product-selector {
-  display: flex;
-  gap: 12px;
-  align-items: flex-end;
-  margin-bottom: 16px;
-}
-
-.product-selector .form-group {
-  margin-bottom: 0;
+.order-products-section th:nth-child(3),
+.order-products-section td:nth-child(3),
+.selected-products-list th:nth-child(3),
+.selected-products-list td:nth-child(3) {
+  max-width: 100px;
 }
 
 /* Status Badges */
+.status-badge {
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  display: inline-block;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
 .status-badge.PENDING {
   background-color: #fff3e0;
   color: #ff9800;
@@ -230,26 +249,41 @@
 
 /* Responsive styles */
 @media (max-width: 768px) {
+  .warehouse-order-header {
+    flex-direction: column; /* Cambia a columna para móviles */
+    align-items: flex-start;
+  }
+
+  .warehouse-order-info {
+    margin-bottom: 12px; /* espacio entre info y botón en móvil */
+  }
+
+  .warehouse-order-actions {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start; /* botón alineado a la izquierda debajo */
+  }
+
   .order-item {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .order-primary-info {
     width: 100%;
     margin-bottom: 8px;
   }
-  
+
   .order-details {
     width: 100%;
     margin-bottom: 12px;
   }
-  
+
   .order-actions {
     width: 100%;
     justify-content: flex-end;
   }
-  
+
   .order-filter-controls {
     flex-direction: column;
     align-items: flex-start;
@@ -259,7 +293,7 @@
     flex-direction: column;
     gap: 16px;
   }
-  
+
   .product-selector .form-group {
     width: 100%;
   }
