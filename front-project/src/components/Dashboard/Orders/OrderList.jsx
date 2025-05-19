@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Alert, Spin } from "antd";
 import { warehouseAPI } from "../../../api/warehouse";
 import { orderAPI } from "../../../api/order";
+import { getUserFromToken } from "../../../api/auth";
 import WarehouseOrderItem from "./WarehouseOrderItem";
 import OrdersTable from "./OrdersTable";
 import "./orders.css";
@@ -15,6 +16,26 @@ const OrderList = () => {
   const [viewMode, setViewMode] = useState("warehouses"); // warehouses or orders
   const [sortField, setSortField] = useState("creation_date");
   const [sortDirection, setSortDirection] = useState("desc");
+  const [userId, setUserId] = useState(null);
+  const [userRole, setUserRole] = useState(null);
+
+  useEffect(() => {
+    const fetchUserIdAndRole = async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          const res = await getUserFromToken({ token });
+          if (res) {
+            setUserId(res.id);
+            setUserRole(res.role?.name || null);
+          }
+        } catch {
+          // Swallow error
+        }
+      }
+    };
+    fetchUserIdAndRole();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -83,7 +104,18 @@ const OrderList = () => {
   };
 
   // Filter warehouses by search term
-  const filteredWarehouses = warehouses.filter((warehouse) => {
+  let filteredWarehouses = warehouses;
+
+  // Only show warehouses associated to gerente/despachador
+  if ((userRole === "GERENTE" || userRole === "Despachador") && userId) {
+    filteredWarehouses = warehouses.filter(
+      (warehouse) =>
+        (userRole === "GERENTE" && String(warehouse.gerenteId) === String(userId)) ||
+        (userRole === "Despachador" && String(warehouse.despachadorId) === String(userId))
+    );
+  }
+
+  filteredWarehouses = filteredWarehouses.filter((warehouse) => {
     const warehouseName = warehouse.nombre_almacen.toLowerCase();
     const addressString = warehouse.direccion
       ? `${warehouse.direccion.calle || ""}, ${warehouse.direccion.ciudad?.nombre || ""}, ${warehouse.direccion.ciudad?.departamento?.nombre || ""}`.toLowerCase()
@@ -97,7 +129,6 @@ const OrderList = () => {
   const filteredOrders = orders.filter((order) => {
     const orderId = order.id.toLowerCase();
     const address = order.delivery_address.toLowerCase();
-    const status = order.status.toLowerCase();
     const warehouseId = order.id_almacen?.toLowerCase() || "";
     const searchLower = searchTerm.toLowerCase();
 
