@@ -75,7 +75,7 @@ class AlmacenService {
 
 
   async bulkCreateFromCSV(filePath) {
-    const startTime = Date.now(); // <- MARCAR INICIO
+    const startTime = Date.now();
     const results = [];
     const logStream = createLogStream();
 
@@ -113,7 +113,6 @@ class AlmacenService {
     const allCities = await prisma.ciudad.findMany({ include: { departamento: true } });
     log(`  → ${allCities.length} ciudades cargadas.`);
 
-    // Mapas para búsqueda rápida
     const cityMapFullKey = new Map();
     const cityMapByName = new Map();
     allCities.forEach((c) => {
@@ -125,7 +124,7 @@ class AlmacenService {
       cityMapByName.get(cityKeyName).push(c);
     });
 
-    // --- Paso 1: Preparar usuarios (gerentes) ---
+    // --- Cache y pLimit para gerentes ---
     const nuevosGerentesCache = new Map();
     const emailsToCreate = new Map();
 
@@ -136,7 +135,6 @@ class AlmacenService {
       }
     }
 
-    // Buscar usuarios existentes en paralelo con límite para no saturar
     const limitUsuarios = pLimit(300);
     await Promise.all(
       [...nuevosGerentesCache.keys()].map(email =>
@@ -152,13 +150,12 @@ class AlmacenService {
             }
           } catch (error) {
             appendLog(`Error buscando usuario ${email}: ${error.message}`);
-            emailsToCreate.set(email, true); // intentar crear por si acaso
+            emailsToCreate.set(email, true);
           }
         })
       )
     );
 
-    // Crear usuarios nuevos en paralelo con límite
     const createUserLimit = pLimit(300);
     await Promise.all(
       results.map(row => createUserLimit(async () => {
@@ -173,7 +170,6 @@ class AlmacenService {
           };
           try {
             const createdUser = await createUser(payloadUser);
-            // Mapea userId a id para mantener uniformidad
             const userWithId = {
               ...createdUser,
               id: createdUser.userId || createdUser.id
@@ -188,7 +184,78 @@ class AlmacenService {
       }))
     );
 
-    // --- Paso 2: Validar almacenes ya existentes en batch para evitar múltiples consultas
+    // --- NUEVO: Cache y pLimit para despachadores (por ciudad) ---
+    const nuevosDespachadoresCache = new Map();
+    const citiesToProcess = new Set();
+
+    // Detectar ciudades únicas a procesar
+    for (const row of results) {
+      const normalizedCiudad = normalizeString(row.ciudad);
+      const normalizedDepartamento = normalizeString(row.departamento);
+      let ciudadEntity = null;
+
+      if (normalizedCiudad === "bogota" || normalizedCiudad === "bogotá") {
+        const posiblesCiudades = cityMapByName.get(normalizedCiudad);
+        ciudadEntity = posiblesCiudades?.[0] || null;
+      } else {
+        const ciudadKey = `${normalizedCiudad}|${normalizedDepartamento}`;
+        ciudadEntity = cityMapFullKey.get(ciudadKey);
+      }
+      if (ciudadEntity) {
+        citiesToProcess.add(ciudadEntity.id);
+      }
+    }
+
+    const limitDespachadores = pLimit(50);
+    const despachadoresToCreate = new Set();
+
+    // Buscar despachadores existentes por ciudad
+    await Promise.all(
+      [...citiesToProcess].map(ciudadId =>
+        limitDespachadores(async () => {
+          try {
+            const despachador = await findDespachadorByCity(ciudadId);
+            if (despachador) {
+              // CORRECCIÓN: extraer la data directamente si viene en despachador.data
+              const despachadorData = despachador.data ? despachador.data : despachador;
+              nuevosDespachadoresCache.set(ciudadId, despachadorData);
+              log(`Despachador encontrado para ciudad ${ciudadId} con datos: ${JSON.stringify(despachadorData)}`);
+            } else {
+              despachadoresToCreate.add(ciudadId);
+              log(`Despachador NO encontrado para ciudad ${ciudadId}, marcar para creación`);
+            }
+          } catch (error) {
+            appendLog(`Error buscando despachador para ciudad ${ciudadId}: ${error.message}`);
+            despachadoresToCreate.add(ciudadId); // intentar crear por si acaso
+          }
+        })
+      )
+    );
+
+    // Crear despachadores faltantes
+    await Promise.all(
+      [...despachadoresToCreate].map(ciudadId =>
+        limitDespachadores(async () => {
+          try {
+            const ciudad = allCities.find(c => c.id === ciudadId);
+            const despachadorPayload = {
+              fullname: `Despachador ${ciudad?.nombre || ciudadId}`,
+              email: `despachador.${ciudadId}@empresa.com`,
+              number: '3000000000', // teléfono genérico o dinámico
+              roleId: process.env.ROL_DESPACHADOR_ID,
+              current_password: process.env.CONTRASENA_GENERICA,
+            };
+            const createdDespachador = await createUser(despachadorPayload);
+            nuevosDespachadoresCache.set(ciudadId, createdDespachador);
+            log(`Despachador creado para ciudad ${ciudadId} con ID: ${createdDespachador.id || "N/A"}`);
+          } catch (error) {
+            appendLog(`Error creando despachador para ciudad ${ciudadId}: ${error.message}`);
+          }
+        })
+      )
+    );
+
+    // --- Verificamos almacenes ya existentes para evitar duplicados ---
     const allAlmacenIds = results.map(r => r.id_almacen);
     const existingAlmacenes = await prisma.almacen.findMany({
       where: { id_almacen: { in: allAlmacenIds } },
@@ -197,7 +264,7 @@ class AlmacenService {
     const existingAlmacenesSet = new Set(existingAlmacenes.map(a => a.id_almacen));
     log(`Almacenes existentes detectados: ${existingAlmacenesSet.size}`);
 
-    // --- Paso 3: Preparar direcciones y almacenes para bulk insert ---
+    // Preparar inserciones
     const direccionesToInsert = [];
     const almacenesToInsert = [];
     const direccionIdMap = new Map();
@@ -215,7 +282,6 @@ class AlmacenService {
         continue;
       }
 
-      // Ciudad especial Bogotá
       let ciudadEntity = null;
       if (normalizedCiudad === "bogota" || normalizedCiudad === "bogotá") {
         const posiblesCiudades = cityMapByName.get(normalizedCiudad);
@@ -233,6 +299,7 @@ class AlmacenService {
         continue;
       }
 
+      // Gerente
       const emailKey = row.email?.toLowerCase();
       const gerenteObj = nuevosGerentesCache.get(emailKey);
       if (!emailKey || !gerenteObj) {
@@ -242,12 +309,24 @@ class AlmacenService {
         continue;
       }
 
+      // Despachador
+      const despachadorObj = nuevosDespachadoresCache.get(ciudadEntity.id);
+      if (!despachadorObj) {
+        const errorMsg = `Fila ${filaNum}: Despachador no encontrado para ciudad ${ciudadEntity.nombre}`;
+        appendLog(errorMsg);
+        errors.push({ fila: filaNum, error: "Despachador no válido" });
+        continue;
+      }
+
+      if (!despachadorObj.id || !despachadorObj.fullname) {
+        appendLog(`Fila ${filaNum}: Despachador con datos incompletos: ${JSON.stringify(despachadorObj)}`);
+      }
+
       if (existingAlmacenesSet.has(row.id_almacen)) {
         appendLog(`Fila ${filaNum}: Almacén '${row.id_almacen}' ya existe. Omitido.`);
         continue;
       }
 
-      // Generar ID único para dirección si no es UUID (usa hash o UUID)
       let direccionId = row.direccion;
       if (!direccionIdMap.has(direccionId)) {
         direccionId = uuidv4();
@@ -273,23 +352,16 @@ class AlmacenService {
         gerente: row.gerente,
         capacidad_m3: parseInt(row.capacidad_m2 || 0),
         capacidad_usada_m3: 0,
-        estado: row.estado.toUpperCase()
+        estado: row.estado.toUpperCase(),
+        gerenteId: gerenteObj?.id,
+        despachador: despachadorObj?.fullname || null,
+        despachadorId: despachadorObj?.id || null,
       };
-
-      const gerenteId = gerenteObj?.id;
-      log(`Fila ${filaNum}: email=${emailKey}, gerenteId=${gerenteId || "NO ASIGNADO"}`);
-
-      if (gerenteId) {
-        almacenObj.gerenteId = gerenteId;
-      } else {
-        appendLog(`Fila ${filaNum}: gerenteId NO encontrado para email ${emailKey}`);
-        errors.push({ fila: filaNum, error: "gerenteId no asignado" });
-      }
 
       almacenesToInsert.push(almacenObj);
     }
 
-    // --- Paso 4: Bulk insert direcciones ---
+    // Bulk insert direcciones
     try {
       const insertDirecciones = await prisma.direccion.createMany({
         data: direccionesToInsert,
@@ -301,7 +373,7 @@ class AlmacenService {
       errors.push({ error: `Insertar direcciones: ${error.message}` });
     }
 
-    // --- Paso 5: Bulk insert almacenes ---
+    // Bulk insert almacenes
     try {
       const insertAlmacenes = await prisma.almacen.createMany({
         data: almacenesToInsert,
@@ -313,20 +385,17 @@ class AlmacenService {
       errors.push({ error: `Insertar almacenes: ${error.message}` });
     }
 
-
     const endTime = Date.now();
     const durationSeconds = ((endTime - startTime) / 1000).toFixed(2);
     log(`Tiempo total de carga masiva: ${durationSeconds} segundos`);
 
     logStream.end();
+
     return {
       totalCreados: almacenesToInsert.length,
       errores: errors,
     };
   }
-
-
-
 
   async create(almacenDataFromCSV) {
     const {
@@ -388,10 +457,10 @@ class AlmacenService {
           longitud,
         },
       });
-      
+
       despachadorEntity = await findDespachadorByCity(ciudadEntity.id)
       console.log(despachadorEntity.data);
-      
+
 
       const nuevoAlmacen = await tx.almacen.create({
         data: {
@@ -400,8 +469,8 @@ class AlmacenService {
           direccionId: nuevaDireccion.id,
           gerente: gerenteEntity.fullname || nombre_gerente,
           gerenteId: gerenteEntity.id,
-          despachador:despachadorEntity.data.fullname,
-          despachadorId: despachadorEntity.data.id,
+          despachador: despachadorEntity.fullname,
+          despachadorId: despachadorEntity.id,
           capacidad_m3,
           capacidad_usada_m3: 0,
           estado: estadoAlmacen
