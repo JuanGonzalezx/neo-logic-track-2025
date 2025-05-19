@@ -160,16 +160,18 @@ const updateOrder = async (req, res) => {
 const deleteOrder = async (req, res) => {
   const { id } = req.params;
   try {
-    const deletedOrder = orderService.deleteOrder(id);
-    if (!deleteOrder) {
-      throw new Error("Don´t found the order");
+    const deletedOrder = await orderService.deleteOrder(id);  // await
+    if (!deletedOrder) {  // nombre correcto
+      return res.status(404).json({ message: "Order not found" });
     }
-    res.status(204).json({ message: 'Order deleted successfully' });
+    // 204 No Content -> no enviar JSON, solo estado
+    return res.status(204).send();
   } catch (error) {
     console.error('Error deleting order:', error);
-    res.status(500).json({ message: 'Error deleting order', error: error.message });
+    return res.status(500).json({ message: 'Error deleting order', error: error.message });
   }
 };
+
 
 module.exports = {
   getAllOrders,

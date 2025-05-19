@@ -68,25 +68,22 @@ class OrderService {
   
 
   async deleteOrder(order_id) {
-    try {
-      const order = await prisma.order.findUnique({ where: { id: order_id } })
-      if (!order) {
-        throw new Error("No existe esa orden a eliminar");
-        
-      }
-      const products = await prisma.orderProducts.findMany({ where: { order_id: order_id } })
-      for (const prod of products) {
-
-        const productExists = await returnStockAndCapacity(order.id_almacen, prod.product_id, prod.amount);
-      }
-
-      const deleteProducts =  await prisma.orderProducts.deleteMany({ where : { order_id: order_id}})
-      const deleteOrder = await prisma.order.delete({where: {id: order_id}})
-
-    } catch (error) {
-      throw new Error("No se puede eliminar el pedido");
+  try {
+    const order = await prisma.order.findUnique({ where: { id: order_id } });
+    if (!order) {
+      return null; // para manejar en el controlador
     }
+    const products = await prisma.orderProducts.findMany({ where: { order_id } });
+    for (const prod of products) {
+      await returnStockAndCapacity(order.id_almacen, prod.product_id, prod.amount);
+    }
+    await prisma.orderProducts.deleteMany({ where: { order_id } });
+    await prisma.order.delete({ where: { id: order_id } });
+    return true;
+  } catch (error) {
+    throw new Error("No se puede eliminar el pedido: " + error.message);
   }
+}
 }
 
 module.exports = new OrderService();
