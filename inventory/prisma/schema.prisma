@@ -29,7 +29,7 @@ model Producto {
   categoria_id           String
   descripcion            String
   sku                    String
-  codigo_barras          Int
+  codigo_barras          String
   precio_unitario        Float
   peso_kg                Float
   dimensiones_cm         String

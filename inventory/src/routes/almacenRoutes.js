@@ -4,9 +4,10 @@ const router = express.Router();
 const AlmacenController = require('../controllers/AlmacenController');
 const { checkPermission } = require('../middlewares/authMiddleware'); // Ajusta la ruta real
 const PERM_MAP = require('../config/permissions-map');
+const multer = require('multer');
 
 const A_PERM = PERM_MAP.ALMACENES;
-
+const upload = multer({ dest: 'uploads/' }); // Carpeta temporal
 // El body de esta solicitud vendrá con los campos del CSV
 // router.post('/', checkPermission(A_PERM.CREATE.url, A_PERM.CREATE.method), AlmacenController.create);
 // router.get('/', checkPermission(A_PERM.GET_ALL.url, A_PERM.GET_ALL.method), AlmacenController.getAll);
@@ -15,6 +16,7 @@ const A_PERM = PERM_MAP.ALMACENES;
 // router.delete('/:id_almacen', checkPermission(A_PERM.DELETE.url, A_PERM.DELETE.method), AlmacenController.delete);
 
 router.post('/', AlmacenController.create);
+router.post('/almacenes/bulk', upload.single('file'), AlmacenController.bulkCreate);
 router.get('/', AlmacenController.getAll);
 router.get('/:id_almacen', AlmacenController.getById);
 router.put('/:id_almacen', AlmacenController.update);

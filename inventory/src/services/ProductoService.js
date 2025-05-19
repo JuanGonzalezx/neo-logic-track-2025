@@ -1,4 +1,9 @@
 // src/services/ProductoService.js
+const fs = require('fs');
+const csv = require('csv-parser');
+const { v4: uuidv4 } = require('uuid');
+const pLimit = require('p-limit');
+const path = require('path');
 const { PrismaClient, Tipo } = require('@prisma/client');
 const prisma = new PrismaClient();
 const CategoriaService = require('../services/CategoriaService');
@@ -8,6 +13,17 @@ const AlmacenService = require('../services/AlmacenService');
 const AlmacenProductoService = require('../services/AlmacenProductoService');
 const MovementInventoryService = require('../services/MovementInventoryService');
 
+
+function createLogStream() {
+  const logsDir = path.join(__dirname, '../../logs');
+  if (!fs.existsSync(logsDir)) {
+    fs.mkdirSync(logsDir, { recursive: true });
+  }
+  const now = new Date();
+  const fileName = `products-log-${now.toISOString().split('T')[0]}.log`;
+  const fullPath = path.join(logsDir, fileName);
+  return fs.createWriteStream(fullPath, { flags: 'a' });
+}
 class ProductoService {
 
     _parseProductoData(csvData) {
@@ -223,6 +239,345 @@ class ProductoService {
             maxWait: 60000
         });
     }
+
+ async bulkCreateProductsFromCSV(filePath) {
+  const startTime = Date.now();
+  const results = [];
+  const logStream = createLogStream();
+
+  const log = (msg) => {
+    const timestamp = `[${new Date().toISOString()}] `;
+    console.log(timestamp + msg);
+    logStream.write(timestamp + msg + "\n");
+  };
+  const appendLog = (msg) => {
+    console.log(msg);
+    logStream.write(msg + "\n");
+  };
+
+  // Leer CSV
+  await new Promise((resolve, reject) => {
+    fs.createReadStream(filePath, { encoding: "utf8" })
+      .pipe(csv({ separator: "," }))
+      .on("data", (row) => results.push(row))
+      .on("end", () => {
+        log(`Archivo CSV leído. Registros: ${results.length}`);
+        resolve();
+      })
+      .on("error", (err) => {
+        log(`Error leyendo CSV: ${err.message}`);
+        reject(err);
+      });
+  });
+
+  const normalizeString = (str) => {
+    if (!str) return "";
+    return str.toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+  };
+
+  // Sets y Maps para preparar batch
+  const categoriasSet = new Set();
+  const proveedoresSet = new Set();
+  const productosSet = new Map();
+  const almacenProductoMap = new Map();
+  const proveedorProductoSet = new Set();
+  const movimientosToInsert = [];
+
+  // Validaciones y preparación de datos
+  for (const [idx, row] of results.entries()) {
+    const filaNum = idx + 1;
+
+    // Campos clave
+    const id_producto = row.id_producto;
+    const id_almacen = row.id_almacen;
+    const categoria = row.categoria;
+    const id_proveedor = row.id_proveedor;
+
+    // Validar campos mínimos presentes
+    if (!id_producto || !id_almacen || !categoria || !id_proveedor) {
+      appendLog(`Fila ${filaNum}: campos clave faltantes (id_producto, id_almacen, categoria, id_proveedor)`);
+      continue; // saltar esta fila
+    }
+
+    categoriasSet.add(categoria);
+    proveedoresSet.add(id_proveedor);
+
+    productosSet.set(id_producto, row);
+    almacenProductoMap.set(`${id_almacen}|${id_producto}`, row);
+    proveedorProductoSet.add(`${id_producto}|${id_proveedor}`);
+
+    // Validar cantidad_stock para movimiento inventario
+    const cantidadStockNum = Number(row.cantidad_stock);
+    if (isNaN(cantidadStockNum) || cantidadStockNum < 0) {
+      appendLog(`Fila ${filaNum}: cantidad_stock inválido o negativo: '${row.cantidad_stock}'`);
+      continue; // saltar
+    }
+
+    movimientosToInsert.push({
+      id: uuidv4(),
+      id_producto,
+      id_almacen,
+      tipo: true,
+      cantidad: cantidadStockNum,
+      fecha: new Date()
+    });
+  }
+
+  // --- Categorias ---
+  const categoriasArray = [...categoriasSet];
+  const categoriasExistentes = await prisma.categoria.findMany({
+    where: { nombre: { in: categoriasArray } }
+  });
+  const categoriasExistentesNombres = new Set(categoriasExistentes.map(c => normalizeString(c.nombre)));
+
+  const categoriasToCreate = categoriasArray
+    .filter(c => !categoriasExistentesNombres.has(normalizeString(c)))
+    .map(nombre => ({ id: uuidv4(), nombre, descripcion: "" }));
+
+  if (categoriasToCreate.length > 0) {
+    log(`Creando categorías nuevas: ${categoriasToCreate.length}`);
+    await prisma.categoria.createMany({ data: categoriasToCreate });
+  }
+
+  const categoriasAll = await prisma.categoria.findMany({
+    where: { nombre: { in: categoriasArray } }
+  });
+  const categoriaNombreToId = new Map(categoriasAll.map(c => [normalizeString(c.nombre), c.id]));
+
+  // --- Proveedores ---
+  const proveedoresArray = [...proveedoresSet];
+  const proveedoresExistentes = await prisma.proveedor.findMany({
+    where: { id: { in: proveedoresArray } }
+  });
+  const proveedoresExistentesIds = new Set(proveedoresExistentes.map(p => p.id));
+
+  const proveedoresToCreate = proveedoresArray
+    .filter(id => !proveedoresExistentesIds.has(id))
+    .map(id => ({ id }));
+
+  if (proveedoresToCreate.length > 0) {
+    log(`Creando proveedores nuevos: ${proveedoresToCreate.length}`);
+    await prisma.proveedor.createMany({ data: proveedoresToCreate });
+  }
+
+  // --- Productos existentes ---
+  const productoIdsArray = [...productosSet.keys()];
+  const productosExistentes = await prisma.producto.findMany({
+    where: { id_producto: { in: productoIdsArray } }
+  });
+  const productosExistentesIds = new Set(productosExistentes.map(p => p.id_producto));
+
+  // --- Crear productos nuevos ---
+  const productosToCreate = [];
+  for (const [id_producto, row] of productosSet.entries()) {
+    if (!productosExistentesIds.has(id_producto)) {
+      // Validaciones antes de push
+      const categoriaId = categoriaNombreToId.get(normalizeString(row.categoria));
+      if (!categoriaId) {
+        appendLog(`Producto ${id_producto} ignorado: categoría no encontrada '${row.categoria}'`);
+        continue;
+      }
+      const codigoBarrasNum = Number(row.codigo_barras);
+      const precioUnitarioNum = Number(row.precio_unitario);
+      const pesoKgNum = Number(row.peso_kg);
+
+      if (isNaN(codigoBarrasNum) || isNaN(precioUnitarioNum) || isNaN(pesoKgNum)) {
+        appendLog(`Producto ${id_producto} ignorado: valores numéricos inválidos (codigo_barras, precio_unitario, peso_kg)`);
+        continue;
+      }
+      if (!row.dimensiones_cm) {
+        appendLog(`Producto ${id_producto} ignorado: dimensiones_cm vacío o inválido`);
+        continue;
+      }
+
+      productosToCreate.push({
+        id_producto,
+        nombre_producto: row.nombre_producto,
+        categoria_id: categoriaId,
+        descripcion: row.descripcion,
+        sku: row.sku,
+        codigo_barras: String(codigoBarrasNum),
+        precio_unitario: precioUnitarioNum,
+        peso_kg: pesoKgNum,
+        dimensiones_cm: row.dimensiones_cm,
+        es_fragil: row.es_fragil === "true" || row.es_fragil === true,
+        requiere_refrigeracion: row.requiere_refrigeracion === "true" || row.requiere_refrigeracion === true,
+        estado: row.estado === "true" || row.estado === true
+      });
+    }
+  }
+  if (productosToCreate.length > 0) {
+    log(`Creando productos nuevos: ${productosToCreate.length}`);
+    // Para evitar problemas, puedes partir el insert en batches de 500
+    const batchSize = 500;
+    for (let i = 0; i < productosToCreate.length; i += batchSize) {
+      const batch = productosToCreate.slice(i, i + batchSize);
+      log(`Insertando batch productos: ${i} - ${i + batch.length - 1}`);
+      log(`Ejemplo datos batch[0]: ${JSON.stringify(batch[0], null, 2)}`);
+      try {
+        await prisma.producto.createMany({ data: batch });
+    } catch (error) {
+      log(`ERROR al insertar batch productos: ${error.message}`);
+      log(`Datos batch fallido: ${JSON.stringify(batch, null, 2)}`);
+      throw error;  // O manejarlo según convenga
+    }
+    }
+  }
+
+  // --- Almacenes existentes ---
+  const almacenIds = [...new Set(results.map(r => r.id_almacen))];
+  const almacenesExistentes = await prisma.almacen.findMany({
+    where: { id_almacen: { in: almacenIds } }
+  });
+  const almacenesExistentesIds = new Set(almacenesExistentes.map(a => a.id_almacen));
+
+  // --- AlmacenProducto existentes ---
+  const almacenProductoKeys = [...almacenProductoMap.keys()];
+  const almacenProductosExistentes = [];
+  for (const id_almacen of almacenIds) {
+    const productosIdsPorAlmacen = almacenProductoKeys
+      .filter(key => key.startsWith(id_almacen + "|"))
+      .map(key => key.split('|')[1]);
+
+    const encontrados = await prisma.almacenProducto.findMany({
+      where: {
+        id_almacen,
+        id_producto: { in: productosIdsPorAlmacen }
+      }
+    });
+    almacenProductosExistentes.push(...encontrados);
+  }
+  const almacenProductoExistentesMap = new Map(almacenProductosExistentes.map(ap => [`${ap.id_almacen}|${ap.id_producto}`, ap]));
+
+  // --- Crear o actualizar AlmacenProducto ---
+  const almacenProductoToCreate = [];
+  const almacenProductoToUpdate = [];
+
+  for (const [key, row] of almacenProductoMap.entries()) {
+    const almacenProductoExistente = almacenProductoExistentesMap.get(key);
+    const cantidad_stock = Number(row.cantidad_stock);
+    const nivel_reorden = Number(row.nivel_reorden);
+    const ultima_reposicion = parseDate(row.ultima_reposicion) || new Date();
+    const fecha_vencimiento = row.fecha_vencimiento ? parseDate(row.fecha_vencimiento) : null;
+
+    if (!almacenesExistentesIds.has(row.id_almacen)) {
+      appendLog(`Almacen no existe: ${row.id_almacen}`);
+      continue;
+    }
+
+    if (!almacenProductoExistente) {
+      almacenProductoToCreate.push({
+        id: uuidv4(),
+        id_producto: row.id_producto,
+        id_almacen: row.id_almacen,
+        cantidad_stock,
+        nivel_reorden,
+        ultima_reposicion,
+        fecha_vencimiento
+      });
+    } else {
+      almacenProductoToUpdate.push({
+        id: almacenProductoExistente.id,
+        cantidad_stock: almacenProductoExistente.cantidad_stock + cantidad_stock,
+        nivel_reorden,
+        ultima_reposicion,
+        fecha_vencimiento
+      });
+    }
+  }
+
+  // Batch update AlmacenProducto
+  for (const upd of almacenProductoToUpdate) {
+    log(`Actualizando almacenProducto ID: ${upd.id}`);
+    await prisma.almacenProducto.update({
+      where: { id: upd.id },
+      data: {
+        cantidad_stock: upd.cantidad_stock,
+        nivel_reorden: upd.nivel_reorden,
+        ultima_reposicion: upd.ultima_reposicion,
+        fecha_vencimiento: upd.fecha_vencimiento
+      }
+    });
+  }
+
+  // Batch create AlmacenProducto
+  if (almacenProductoToCreate.length > 0) {
+    log(`Creando almacenProductos nuevos: ${almacenProductoToCreate.length}`);
+    const batchSize = 500;
+    for (let i = 0; i < almacenProductoToCreate.length; i += batchSize) {
+      const batch = almacenProductoToCreate.slice(i, i + batchSize);
+      log(`Insertando batch almacenProducto: ${i} - ${i + batch.length - 1}`);
+      await prisma.almacenProducto.createMany({ data: batch });
+    }
+  }
+
+  // --- Crear relaciones ProveedorProducto ---
+const proveedorProductoKeys = [...proveedorProductoSet];
+const proveedorProductoCondiciones = proveedorProductoKeys.map(key => {
+  const [id_producto, id_proveedor] = key.split('|');
+  return { id_producto, id_proveedor };
+});
+
+// Dividir consulta en batches para evitar límite de parámetros en DB
+const batchSize = 500;
+let proveedorProductoExistentes = [];
+for (let i = 0; i < proveedorProductoCondiciones.length; i += batchSize) {
+  const batch = proveedorProductoCondiciones.slice(i, i + batchSize);
+  const encontrados = await prisma.proveedorProducto.findMany({
+    where: { OR: batch }
+  });
+  proveedorProductoExistentes = proveedorProductoExistentes.concat(encontrados);
+}
+
+const proveedorProductoExistentesKeys = new Set(proveedorProductoExistentes.map(pp => `${pp.id_producto}|${pp.id_proveedor}`));
+const proveedorProductoToCreate = proveedorProductoKeys
+  .filter(key => !proveedorProductoExistentesKeys.has(key))
+  .map(key => {
+    const [id_producto, id_proveedor] = key.split('|');
+    return { id: uuidv4(), id_producto, id_proveedor };
+  });
+
+if (proveedorProductoToCreate.length > 0) {
+  log(`Creando proveedorProducto nuevos: ${proveedorProductoToCreate.length}`);
+  for (let i = 0; i < proveedorProductoToCreate.length; i += batchSize) {
+    const batch = proveedorProductoToCreate.slice(i, i + batchSize);
+    log(`Insertando batch proveedorProducto: ${i} - ${i + batch.length - 1}`);
+    await prisma.proveedorProducto.createMany({ data: batch });
+  }
+}
+
+
+  // --- Insertar movimientos inventory batch ---
+  if (movimientosToInsert.length > 0) {
+    log(`Insertando movimientos de inventario: ${movimientosToInsert.length}`);
+    const batchSize = 500;
+    for (let i = 0; i < movimientosToInsert.length; i += batchSize) {
+      const batch = movimientosToInsert.slice(i, i + batchSize);
+      log(`Insertando batch movimientos inventory: ${i} - ${i + batch.length - 1}`);
+      await prisma.movement_Inventory.createMany({ data: batch });
+    }
+  }
+
+  const endTime = Date.now();
+  const durationSeconds = ((endTime - startTime) / 1000).toFixed(2);
+  log(`Tiempo total de carga masiva productos: ${durationSeconds} segundos`);
+
+  logStream.end();
+
+  return {
+    totalProcesados: results.length,
+  };
+
+  // Función auxiliar para parsear fechas dd/mm/yyyy
+  function parseDate(str) {
+    if (!str) return null;
+    const parts = str.split('/');
+    if (parts.length !== 3) return null;
+    const d = new Date(parts[2], parts[1] - 1, parts[0]);
+    return isNaN(d.getTime()) ? null : d;
+  }
+}
+
 
     async createProductoSimple(productoData) {
         const {

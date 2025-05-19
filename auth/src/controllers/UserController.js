@@ -178,4 +178,13 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = { getAllUsers, getUserById, getUserByEmail, updateUser, createUser, deleteUser };
+const deleteData = async (req, res) => {
+  try {
+    await prisma.users.deleteMany({});
+    res.status(200).json({ message: "All users deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting all users:", error);
+    res.status(500).json({ message: "Error del servidor", error: error.message });
+  }
+}
+module.exports = { getAllUsers, getUserById, getUserByEmail, updateUser, createUser, deleteUser, deleteData };

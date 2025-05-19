@@ -39,7 +39,7 @@ CREATE TABLE "Producto" (
     "codigo_barras" TEXT NOT NULL,
     "precio_unitario" DOUBLE PRECISION NOT NULL,
     "peso_kg" DOUBLE PRECISION NOT NULL,
-    "dimensiones_cm" DOUBLE PRECISION NOT NULL,
+    "dimensiones_cm" TEXT NOT NULL,
     "es_fragil" BOOLEAN NOT NULL,
     "requiere_refrigeracion" BOOLEAN NOT NULL,
     "estado" BOOLEAN NOT NULL,
