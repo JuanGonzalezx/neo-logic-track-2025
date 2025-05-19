@@ -12,7 +12,6 @@ const ProductList = () => {
   const [loading, setLoading] = useState(true);
   const [apiResponse, setApiResponse] = useState(null);
   const [categories, setCategories] = useState([]);
-  const userPermissions = useSelector(state => state.auth.user?.permissions || []);
   const permissions = useSelector(state => state.auth?.permissions || []);
 
   const [searchTerm, setSearchTerm] = useState("");

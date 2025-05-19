@@ -18,7 +18,6 @@ const AppLoader = () => {
       try {
         console.log("Token:", token);
         const response = await getUserFromToken({ token });
-
         if (response && response.id && response.role && response.permissions) {
           dispatch(setUser({
             token, // use the token from localStorage

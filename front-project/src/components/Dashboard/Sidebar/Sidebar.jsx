@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -13,13 +14,7 @@ import './Sidebar.css';
 const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
   const location = useLocation();
   const [activeSection, setActiveSection] = useState(null);
-  const [permissions, setPermissions] = useState([]);
-
-  useEffect(() => {
-    // Load permissions from local storage
-    const storedPermissions = JSON.parse(localStorage.getItem('permissions')) || [];
-    setPermissions(storedPermissions);
-  }, []);
+  const permissions = useSelector(state => state.auth?.permissions || []);
 
   useEffect(() => {
     if (location.pathname.startsWith('/dashboard/users')) {

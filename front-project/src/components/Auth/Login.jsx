@@ -82,7 +82,13 @@ const Login = () => {
         }
         // acceso directo con token
         else if (response.token) {
-          dispatch(setUser({ token: response.token, isAuthenticated: true }));
+          dispatch(setUser({
+            user: response.user, // <-- add this!
+            token: response.token,
+            isAuthenticated: true,
+            role: response.role,
+            permissions: response.permissions
+          }));
           localStorage.setItem("token", response.token);
           navigate("/dashboard");
         }
@@ -107,7 +113,13 @@ const Login = () => {
     try {
       const response = await auth.AuthenticationCode({ email: emailToVerify, code });
       if (response.token) {
-        dispatch(setUser({ token: response.token, isAuthenticated: true, role: response.role, permissions: response.permissions }));
+        dispatch(setUser({
+          user: response.user, // <-- Ensure user object is included
+          token: response.token,
+          isAuthenticated: true,
+          role: response.role,
+          permissions: response.permissions
+        }));
         localStorage.setItem("token", response.token);
         setShowModal(false);
         navigate("/dashboard");

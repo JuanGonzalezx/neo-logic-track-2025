@@ -34,5 +34,6 @@ export const ENV ={
         ALMACEN_PRODUCTO: "/almacenproductos",
         MOVEMENTS: "/movements",
         ORDERS: "/orders",
+        GET_USER_FROM_TOKEN: "/auth/getUserByToken",
     }
 }

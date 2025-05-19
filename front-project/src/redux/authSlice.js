@@ -18,6 +18,7 @@ const authSlice = createSlice({
                 state.loading = action.payload;
             },
             setUser:(state, action) => {
+                state.currentUser = action.payload.user; // <-- Fix: set currentUser from payload
                 state.isAuthenticated = action.payload.isAuthenticated;
                 state.token = action.payload.token;
                 state.role = action.payload.role;
