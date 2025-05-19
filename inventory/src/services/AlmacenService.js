@@ -8,7 +8,7 @@ const { PrismaClient, EstadoAlmacen } = require('@prisma/client');
 const prisma = new PrismaClient();
 const DepartamentoService = require('./DepartamentoSerice');
 const CiudadService = require('./CiudadSerice');
-const { findUser, createUser, findUserByEmail } = require('../lib/userServiceClient'); // Ajusta la ruta
+const { findUser, createUser, findUserByEmail, findDespachadorByCity } = require('../lib/userServiceClient'); // Ajusta la ruta
 
 const logDir = path.join(__dirname, "../../logs");
 if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
@@ -73,257 +73,257 @@ class AlmacenService {
     };
   }
 
-   
-async bulkCreateFromCSV(filePath) {
-  const startTime = Date.now(); // <- MARCAR INICIO
-  const results = [];
-  const logStream = createLogStream();
 
-  const log = (msg) => {
-    const timestamp = `[${new Date().toISOString()}] `;
-    console.log(timestamp + msg);
-    logStream.write(timestamp + msg + "\n");
-  };
-  const appendLog = (msg) => {
-    console.log(msg);
-    logStream.write(msg + "\n");
-  };
+  async bulkCreateFromCSV(filePath) {
+    const startTime = Date.now(); // <- MARCAR INICIO
+    const results = [];
+    const logStream = createLogStream();
 
-  // Leer CSV
-  await new Promise((resolve, reject) => {
-    fs.createReadStream(filePath, { encoding: "utf8" })
-      .pipe(csv({ separator: "," }))
-      .on("data", (row) => results.push(row))
-      .on("end", () => {
-        log(`Archivo CSV leído. Registros: ${results.length}`);
-        resolve();
-      })
-      .on("error", (err) => {
-        log(`Error leyendo CSV: ${err.message}`);
-        reject(err);
-      });
-  });
-
-  const normalizeString = (str) => {
-    if (!str) return "";
-    return str.toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
-  };
-
-  log("Cargando ciudades y departamentos...");
-  const allCities = await prisma.ciudad.findMany({ include: { departamento: true } });
-  log(`  → ${allCities.length} ciudades cargadas.`);
-
-  // Mapas para búsqueda rápida
-  const cityMapFullKey = new Map();
-  const cityMapByName = new Map();
-  allCities.forEach((c) => {
-    const cityKeyFull = `${normalizeString(c.nombre)}|${normalizeString(c.departamento?.nombre)}`;
-    cityMapFullKey.set(cityKeyFull, c);
-
-    const cityKeyName = normalizeString(c.nombre);
-    if (!cityMapByName.has(cityKeyName)) cityMapByName.set(cityKeyName, []);
-    cityMapByName.get(cityKeyName).push(c);
-  });
-
-  // --- Paso 1: Preparar usuarios (gerentes) ---
-  const nuevosGerentesCache = new Map();
-  const emailsToCreate = new Map();
-
-  for (const row of results) {
-    const emailKey = row.email?.toLowerCase();
-    if (emailKey && !nuevosGerentesCache.has(emailKey)) {
-      nuevosGerentesCache.set(emailKey, null); // marcar para buscar
-    }
-  }
-
-  // Buscar usuarios existentes en paralelo con límite para no saturar
-  const limitUsuarios = pLimit(300);
-  await Promise.all(
-    [...nuevosGerentesCache.keys()].map(email =>
-      limitUsuarios(async () => {
-        try {
-          const user = await findUserByEmail(email);
-          if (user) {
-            nuevosGerentesCache.set(email, user);
-            log(`Usuario encontrado en cache: ${email} con ID: ${user.id || "N/A"}`);
-          } else {
-            emailsToCreate.set(email, true);
-            log(`Usuario NO encontrado, marcar para creación: ${email}`);
-          }
-        } catch (error) {
-          appendLog(`Error buscando usuario ${email}: ${error.message}`);
-          emailsToCreate.set(email, true); // intentar crear por si acaso
-        }
-      })
-    )
-  );
-
-  // Crear usuarios nuevos en paralelo con límite
-  const createUserLimit = pLimit(300);
-  await Promise.all(
-    results.map(row => createUserLimit(async () => {
-      const emailKey = row.email?.toLowerCase();
-      if (emailKey && emailsToCreate.has(emailKey)) {
-        const payloadUser = {
-          fullname: row.gerente.trim(),
-          email: row.email.trim(),
-          number: row.telefono.trim(),
-          roleId: process.env.ROL_GERENTE_ID,
-          current_password: process.env.CONTRASENA_GENERICA,
-        };
-        try {
-          const createdUser = await createUser(payloadUser);
-          // Mapea userId a id para mantener uniformidad
-          const userWithId = {
-            ...createdUser,
-            id: createdUser.userId || createdUser.id
-          };
-          nuevosGerentesCache.set(emailKey, userWithId);
-          emailsToCreate.delete(emailKey);
-          log(`Usuario creado: ${emailKey} con ID ${userWithId.id || "N/A"}`);
-        } catch (error) {
-          appendLog(`Error creando usuario ${emailKey}: ${error.message}`);
-        }
-      }
-    }))
-  );
-
-  // --- Paso 2: Validar almacenes ya existentes en batch para evitar múltiples consultas
-  const allAlmacenIds = results.map(r => r.id_almacen);
-  const existingAlmacenes = await prisma.almacen.findMany({
-    where: { id_almacen: { in: allAlmacenIds } },
-    select: { id_almacen: true }
-  });
-  const existingAlmacenesSet = new Set(existingAlmacenes.map(a => a.id_almacen));
-  log(`Almacenes existentes detectados: ${existingAlmacenesSet.size}`);
-
-  // --- Paso 3: Preparar direcciones y almacenes para bulk insert ---
-  const direccionesToInsert = [];
-  const almacenesToInsert = [];
-  const direccionIdMap = new Map();
-  const errors = [];
-
-  for (const [idx, row] of results.entries()) {
-    const filaNum = idx + 1;
-    const normalizedCiudad = normalizeString(row.ciudad);
-    const normalizedDepartamento = normalizeString(row.departamento);
-
-    if (!normalizedCiudad || !normalizedDepartamento) {
-      const errorMsg = `Fila ${filaNum}: Ciudad o departamento inválidos`;
-      appendLog(errorMsg);
-      errors.push({ fila: filaNum, error: "Ciudad o departamento inválidos" });
-      continue;
-    }
-
-    // Ciudad especial Bogotá
-    let ciudadEntity = null;
-    if (normalizedCiudad === "bogota" || normalizedCiudad === "bogotá") {
-      const posiblesCiudades = cityMapByName.get(normalizedCiudad);
-      ciudadEntity = posiblesCiudades?.[0] || null;
-      appendLog(`Fila ${filaNum}: Ciudad Bogotá detectada, se ignora departamento.`);
-    } else {
-      const ciudadKey = `${normalizedCiudad}|${normalizedDepartamento}`;
-      ciudadEntity = cityMapFullKey.get(ciudadKey);
-    }
-
-    if (!ciudadEntity) {
-      const errorMsg = `Fila ${filaNum}: Ciudad "${row.ciudad}" con departamento "${row.departamento}" no existe`;
-      appendLog(errorMsg);
-      errors.push({ fila: filaNum, error: "Ciudad no existe en BD" });
-      continue;
-    }
-
-    const emailKey = row.email?.toLowerCase();
-    const gerenteObj = nuevosGerentesCache.get(emailKey);
-    if (!emailKey || !gerenteObj) {
-      const errorMsg = `Fila ${filaNum}: Gerente no encontrado o inválido para email ${emailKey}`;
-      appendLog(errorMsg);
-      errors.push({ fila: filaNum, error: "Gerente no válido" });
-      continue;
-    }
-
-    if (existingAlmacenesSet.has(row.id_almacen)) {
-      appendLog(`Fila ${filaNum}: Almacén '${row.id_almacen}' ya existe. Omitido.`);
-      continue;
-    }
-
-    // Generar ID único para dirección si no es UUID (usa hash o UUID)
-    let direccionId = row.direccion;
-    if (!direccionIdMap.has(direccionId)) {
-      direccionId = uuidv4();
-      direccionIdMap.set(row.direccion, direccionId);
-
-      direccionesToInsert.push({
-        id: direccionId,
-        calle: row.direccion,
-        ciudadId: ciudadEntity.id,
-        latitud: parseFloat(row.latitud),
-        longitud: parseFloat(row.longitud),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-    } else {
-      direccionId = direccionIdMap.get(row.direccion);
-    }
-
-    const almacenObj = {
-      id_almacen: row.id_almacen,
-      nombre_almacen: row.nombre_almacen,
-      direccionId,
-      gerente: row.gerente,
-      capacidad_m3: parseInt(row.capacidad_m2 || 0),
-      capacidad_usada_m3: 0,
-      estado: row.estado.toUpperCase()
+    const log = (msg) => {
+      const timestamp = `[${new Date().toISOString()}] `;
+      console.log(timestamp + msg);
+      logStream.write(timestamp + msg + "\n");
+    };
+    const appendLog = (msg) => {
+      console.log(msg);
+      logStream.write(msg + "\n");
     };
 
-    const gerenteId = gerenteObj?.id;
-    log(`Fila ${filaNum}: email=${emailKey}, gerenteId=${gerenteId || "NO ASIGNADO"}`);
+    // Leer CSV
+    await new Promise((resolve, reject) => {
+      fs.createReadStream(filePath, { encoding: "utf8" })
+        .pipe(csv({ separator: "," }))
+        .on("data", (row) => results.push(row))
+        .on("end", () => {
+          log(`Archivo CSV leído. Registros: ${results.length}`);
+          resolve();
+        })
+        .on("error", (err) => {
+          log(`Error leyendo CSV: ${err.message}`);
+          reject(err);
+        });
+    });
 
-    if (gerenteId) {
-      almacenObj.gerenteId = gerenteId;
-    } else {
-      appendLog(`Fila ${filaNum}: gerenteId NO encontrado para email ${emailKey}`);
-      errors.push({ fila: filaNum, error: "gerenteId no asignado" });
+    const normalizeString = (str) => {
+      if (!str) return "";
+      return str.toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+    };
+
+    log("Cargando ciudades y departamentos...");
+    const allCities = await prisma.ciudad.findMany({ include: { departamento: true } });
+    log(`  → ${allCities.length} ciudades cargadas.`);
+
+    // Mapas para búsqueda rápida
+    const cityMapFullKey = new Map();
+    const cityMapByName = new Map();
+    allCities.forEach((c) => {
+      const cityKeyFull = `${normalizeString(c.nombre)}|${normalizeString(c.departamento?.nombre)}`;
+      cityMapFullKey.set(cityKeyFull, c);
+
+      const cityKeyName = normalizeString(c.nombre);
+      if (!cityMapByName.has(cityKeyName)) cityMapByName.set(cityKeyName, []);
+      cityMapByName.get(cityKeyName).push(c);
+    });
+
+    // --- Paso 1: Preparar usuarios (gerentes) ---
+    const nuevosGerentesCache = new Map();
+    const emailsToCreate = new Map();
+
+    for (const row of results) {
+      const emailKey = row.email?.toLowerCase();
+      if (emailKey && !nuevosGerentesCache.has(emailKey)) {
+        nuevosGerentesCache.set(emailKey, null); // marcar para buscar
+      }
     }
 
-    almacenesToInsert.push(almacenObj);
-  }
+    // Buscar usuarios existentes en paralelo con límite para no saturar
+    const limitUsuarios = pLimit(300);
+    await Promise.all(
+      [...nuevosGerentesCache.keys()].map(email =>
+        limitUsuarios(async () => {
+          try {
+            const user = await findUserByEmail(email);
+            if (user) {
+              nuevosGerentesCache.set(email, user);
+              log(`Usuario encontrado en cache: ${email} con ID: ${user.id || "N/A"}`);
+            } else {
+              emailsToCreate.set(email, true);
+              log(`Usuario NO encontrado, marcar para creación: ${email}`);
+            }
+          } catch (error) {
+            appendLog(`Error buscando usuario ${email}: ${error.message}`);
+            emailsToCreate.set(email, true); // intentar crear por si acaso
+          }
+        })
+      )
+    );
 
-  // --- Paso 4: Bulk insert direcciones ---
-  try {
-    const insertDirecciones = await prisma.direccion.createMany({
-      data: direccionesToInsert,
-      skipDuplicates: true,
+    // Crear usuarios nuevos en paralelo con límite
+    const createUserLimit = pLimit(300);
+    await Promise.all(
+      results.map(row => createUserLimit(async () => {
+        const emailKey = row.email?.toLowerCase();
+        if (emailKey && emailsToCreate.has(emailKey)) {
+          const payloadUser = {
+            fullname: row.gerente.trim(),
+            email: row.email.trim(),
+            number: row.telefono.trim(),
+            roleId: process.env.ROL_GERENTE_ID,
+            current_password: process.env.CONTRASENA_GENERICA,
+          };
+          try {
+            const createdUser = await createUser(payloadUser);
+            // Mapea userId a id para mantener uniformidad
+            const userWithId = {
+              ...createdUser,
+              id: createdUser.userId || createdUser.id
+            };
+            nuevosGerentesCache.set(emailKey, userWithId);
+            emailsToCreate.delete(emailKey);
+            log(`Usuario creado: ${emailKey} con ID ${userWithId.id || "N/A"}`);
+          } catch (error) {
+            appendLog(`Error creando usuario ${emailKey}: ${error.message}`);
+          }
+        }
+      }))
+    );
+
+    // --- Paso 2: Validar almacenes ya existentes en batch para evitar múltiples consultas
+    const allAlmacenIds = results.map(r => r.id_almacen);
+    const existingAlmacenes = await prisma.almacen.findMany({
+      where: { id_almacen: { in: allAlmacenIds } },
+      select: { id_almacen: true }
     });
-    log(`Direcciones insertadas: ${insertDirecciones.count}`);
-  } catch (error) {
-    appendLog(`Error insertando direcciones: ${error.message}`);
-    errors.push({ error: `Insertar direcciones: ${error.message}` });
+    const existingAlmacenesSet = new Set(existingAlmacenes.map(a => a.id_almacen));
+    log(`Almacenes existentes detectados: ${existingAlmacenesSet.size}`);
+
+    // --- Paso 3: Preparar direcciones y almacenes para bulk insert ---
+    const direccionesToInsert = [];
+    const almacenesToInsert = [];
+    const direccionIdMap = new Map();
+    const errors = [];
+
+    for (const [idx, row] of results.entries()) {
+      const filaNum = idx + 1;
+      const normalizedCiudad = normalizeString(row.ciudad);
+      const normalizedDepartamento = normalizeString(row.departamento);
+
+      if (!normalizedCiudad || !normalizedDepartamento) {
+        const errorMsg = `Fila ${filaNum}: Ciudad o departamento inválidos`;
+        appendLog(errorMsg);
+        errors.push({ fila: filaNum, error: "Ciudad o departamento inválidos" });
+        continue;
+      }
+
+      // Ciudad especial Bogotá
+      let ciudadEntity = null;
+      if (normalizedCiudad === "bogota" || normalizedCiudad === "bogotá") {
+        const posiblesCiudades = cityMapByName.get(normalizedCiudad);
+        ciudadEntity = posiblesCiudades?.[0] || null;
+        appendLog(`Fila ${filaNum}: Ciudad Bogotá detectada, se ignora departamento.`);
+      } else {
+        const ciudadKey = `${normalizedCiudad}|${normalizedDepartamento}`;
+        ciudadEntity = cityMapFullKey.get(ciudadKey);
+      }
+
+      if (!ciudadEntity) {
+        const errorMsg = `Fila ${filaNum}: Ciudad "${row.ciudad}" con departamento "${row.departamento}" no existe`;
+        appendLog(errorMsg);
+        errors.push({ fila: filaNum, error: "Ciudad no existe en BD" });
+        continue;
+      }
+
+      const emailKey = row.email?.toLowerCase();
+      const gerenteObj = nuevosGerentesCache.get(emailKey);
+      if (!emailKey || !gerenteObj) {
+        const errorMsg = `Fila ${filaNum}: Gerente no encontrado o inválido para email ${emailKey}`;
+        appendLog(errorMsg);
+        errors.push({ fila: filaNum, error: "Gerente no válido" });
+        continue;
+      }
+
+      if (existingAlmacenesSet.has(row.id_almacen)) {
+        appendLog(`Fila ${filaNum}: Almacén '${row.id_almacen}' ya existe. Omitido.`);
+        continue;
+      }
+
+      // Generar ID único para dirección si no es UUID (usa hash o UUID)
+      let direccionId = row.direccion;
+      if (!direccionIdMap.has(direccionId)) {
+        direccionId = uuidv4();
+        direccionIdMap.set(row.direccion, direccionId);
+
+        direccionesToInsert.push({
+          id: direccionId,
+          calle: row.direccion,
+          ciudadId: ciudadEntity.id,
+          latitud: parseFloat(row.latitud),
+          longitud: parseFloat(row.longitud),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+      } else {
+        direccionId = direccionIdMap.get(row.direccion);
+      }
+
+      const almacenObj = {
+        id_almacen: row.id_almacen,
+        nombre_almacen: row.nombre_almacen,
+        direccionId,
+        gerente: row.gerente,
+        capacidad_m3: parseInt(row.capacidad_m2 || 0),
+        capacidad_usada_m3: 0,
+        estado: row.estado.toUpperCase()
+      };
+
+      const gerenteId = gerenteObj?.id;
+      log(`Fila ${filaNum}: email=${emailKey}, gerenteId=${gerenteId || "NO ASIGNADO"}`);
+
+      if (gerenteId) {
+        almacenObj.gerenteId = gerenteId;
+      } else {
+        appendLog(`Fila ${filaNum}: gerenteId NO encontrado para email ${emailKey}`);
+        errors.push({ fila: filaNum, error: "gerenteId no asignado" });
+      }
+
+      almacenesToInsert.push(almacenObj);
+    }
+
+    // --- Paso 4: Bulk insert direcciones ---
+    try {
+      const insertDirecciones = await prisma.direccion.createMany({
+        data: direccionesToInsert,
+        skipDuplicates: true,
+      });
+      log(`Direcciones insertadas: ${insertDirecciones.count}`);
+    } catch (error) {
+      appendLog(`Error insertando direcciones: ${error.message}`);
+      errors.push({ error: `Insertar direcciones: ${error.message}` });
+    }
+
+    // --- Paso 5: Bulk insert almacenes ---
+    try {
+      const insertAlmacenes = await prisma.almacen.createMany({
+        data: almacenesToInsert,
+        skipDuplicates: true,
+      });
+      log(`Almacenes insertados: ${insertAlmacenes.count}`);
+    } catch (error) {
+      appendLog(`Error insertando almacenes: ${error.message}`);
+      errors.push({ error: `Insertar almacenes: ${error.message}` });
+    }
+
+
+    const endTime = Date.now();
+    const durationSeconds = ((endTime - startTime) / 1000).toFixed(2);
+    log(`Tiempo total de carga masiva: ${durationSeconds} segundos`);
+
+    logStream.end();
+    return {
+      totalCreados: almacenesToInsert.length,
+      errores: errors,
+    };
   }
-
-  // --- Paso 5: Bulk insert almacenes ---
-  try {
-    const insertAlmacenes = await prisma.almacen.createMany({
-      data: almacenesToInsert,
-      skipDuplicates: true,
-    });
-    log(`Almacenes insertados: ${insertAlmacenes.count}`);
-  } catch (error) {
-    appendLog(`Error insertando almacenes: ${error.message}`);
-    errors.push({ error: `Insertar almacenes: ${error.message}` });
-  }
-
-
-  const endTime = Date.now();
-  const durationSeconds = ((endTime - startTime) / 1000).toFixed(2);
-  log(`Tiempo total de carga masiva: ${durationSeconds} segundos`);
-
-  logStream.end();
-  return {
-    totalCreados: almacenesToInsert.length,
-    errores: errors,
-  };
-}
 
 
 
@@ -366,6 +366,8 @@ async bulkCreateFromCSV(filePath) {
       gerenteEntity = await findUserByEmail(email_gerente);
     }
 
+    let despachadorEntity;
+
     if (!gerenteEntity) {
       const gerentePayload = {
         fullname: nombre_gerente,
@@ -386,6 +388,10 @@ async bulkCreateFromCSV(filePath) {
           longitud,
         },
       });
+      
+      despachadorEntity = await findDespachadorByCity(ciudadEntity.id)
+      console.log(despachadorEntity.data);
+      
 
       const nuevoAlmacen = await tx.almacen.create({
         data: {
@@ -394,6 +400,8 @@ async bulkCreateFromCSV(filePath) {
           direccionId: nuevaDireccion.id,
           gerente: gerenteEntity.fullname || nombre_gerente,
           gerenteId: gerenteEntity.id,
+          despachador:despachadorEntity.data.fullname,
+          despachadorId: despachadorEntity.data.id,
           capacidad_m3,
           capacidad_usada_m3: 0,
           estado: estadoAlmacen

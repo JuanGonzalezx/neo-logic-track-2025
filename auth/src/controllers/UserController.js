@@ -1,7 +1,10 @@
+const { faker } = require('@faker-js/faker');
+const axios = require('axios');
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const bcrypt = require("bcryptjs");
 const { findCityById } = require('../lib/cityServiceClient');
+
 
 const getAllUsers = async (req, res) => {
   try {
@@ -40,6 +43,24 @@ const getUserByEmail = async (req, res) => {
     res.status(200).json(user);
   } catch (error) {
     console.error("Error fetching user by email:", error);
+    res.status(500).json({ message: "Error del server", error: error.message });
+  }
+}
+
+const getDespachadorByCity = async (req, res) => {
+  const { id } = req.params
+
+  try {
+    const despachadores = await prisma.users.findFirst({
+      where: {
+        roleId: "681462ffef7752d9d59866d9",
+        ciudadId: id
+      }
+    })
+    res.status(200).json({data: despachadores})
+    return despachadores
+  } catch (error) {
+    console.error("Error fetching despachador by city:", error);
     res.status(500).json({ message: "Error del server", error: error.message });
   }
 }
@@ -106,6 +127,69 @@ const createUser = async (req, res) => {
     res.status(500).json({ message: "User was not created", error: error.message });
   }
 };
+
+const generateValidPhone = () => {
+  // Genera un número válido colombiano: 3 seguido de 9 dígitos
+  return `3${faker.string.numeric(9)}`;
+};
+
+const createDespachadores = async (req, res) => {
+
+  try {
+    // 1. Obtener todas las ciudades existentes
+    const ciudades = (await axios.get('http://localhost:3001/api/v1/ciudades')).data;
+
+    // 2. Generar usuarios para cada ciudad
+    const usersData = [];
+
+    for (const city of ciudades) {
+      const firstName = faker.person.firstName();
+      const lastName = faker.person.lastName();
+      const fullname = `${firstName} ${lastName}`;
+      const email = faker.internet.email({ firstName, lastName }).toLowerCase();
+      const number = generateValidPhone();
+      const password = faker.internet.password({ length: 10 }) + 'A1!'; // Cumple con requisitos de complejidad
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const roleId = "681462ffef7752d9d59866d9";
+      const status = "ACTIVE";
+
+      usersData.push({
+        fullname,
+        email,
+        current_password: hashedPassword,
+        number,
+        roleId,
+        status,
+        ciudadId: city.id
+      });
+    }
+
+    // 3. Insertar usuarios en lotes para mejor performance
+    const batchSize = 10;
+    for (let i = 0; i < usersData.length; i += batchSize) {
+      const batch = usersData.slice(i, i + batchSize);
+
+      await prisma.$transaction(
+        batch.map(user =>
+          prisma.users.create({
+            data: user,
+          })
+        )
+      );
+
+      console.log(`Batch ${i / batchSize + 1} inserted (${batch.length} users)`);
+    }
+
+    console.log(`Total ${usersData.length} users created successfully for ${ciudades.length} cities`);
+    res.json({
+      message: 'Usuarios creados',
+      //  count: users.count
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error creando ciudades' });
+  }
+}
 
 const updateUser = async (req, res) => {
   const { id } = req.params;
@@ -187,4 +271,7 @@ const deleteData = async (req, res) => {
     res.status(500).json({ message: "Error del servidor", error: error.message });
   }
 }
-module.exports = { getAllUsers, getUserById, getUserByEmail, updateUser, createUser, deleteUser, deleteData };
+module.exports = {
+  getAllUsers, getUserById, getUserByEmail, updateUser, createUser, deleteUser,
+  deleteData, createDespachadores, getDespachadorByCity
+};

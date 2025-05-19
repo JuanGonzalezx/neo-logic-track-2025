@@ -684,7 +684,6 @@ if (proveedorProductoToCreate.length > 0) {
             const producto = await tx.producto.findUnique({ where: { id_producto } });
             if (!producto) throw new Error('Producto no encontrado para eliminar.');
 
-            const deletedProductoProveedor = await tx.proveedorProducto.deleteMany({ where: { id_producto } });
             const deletedProductoAlmacen = await tx.almacenProducto.deleteMany({ where: { id_producto } });
             const inactivedProducto = await tx.producto.update({
                 where: { id_producto },
