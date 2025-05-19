@@ -6,6 +6,7 @@ const { findProductById, reduceStock, createMovements } = require('../lib/produc
 const { createOrderProduct } = require('./OrderProductsController');
 const { findCityByAlmacen } = require('../lib/almacenServiceClient');
 const { findRepartidorByCity } = require('../lib/userServiceClient');
+const { returnStockAndCapacity } = require('../lib/productServiceClient');
 const orderService = require('../services/orderService');
 
 
@@ -82,7 +83,7 @@ const getOrdersByAlmacen = async (req, res) => {
 
 // Crear una nueva orden con validaciones
 const createOrder = async (req, res) => {
-  const { location_id, delivery_address, status, id_almacen, orderProducts, } = req.body;
+  let { location_id, delivery_address, status, id_almacen, orderProducts, } = req.body;
   try {
 
     // Validar todos los productos, llama a dos funciones
@@ -93,7 +94,10 @@ const createOrder = async (req, res) => {
     const city = await findCityByAlmacen(id_almacen)
 
     const repartidor = await findRepartidorByCity(city)
-
+    if (!repartidor) {
+      status = "PENDING"
+    }
+    status = "ASSIGNED"
     // Crear la orden
     const order = await prisma.order.create({
       data: {
@@ -128,28 +132,10 @@ const updateOrder = async (req, res) => {
   const { id } = req.params;
   const { delivery_id, location_id, delivery_address, status, orderProducts, id_almacen } = req.body;
   try {
-    // Validar delivery_id si viene
-    if (delivery_id) {
-      const user = await findUser({ id: delivery_id });
-      if (!user) {
-        return res.status(400).json({ message: `User with id ${delivery_id} not found` });
-      }
-    }
 
-    // Validar todos los productos
-    await validateOrderProducts(orderProducts, id_almacen);
+    await orderService.updateOrderService(id, req.body)
 
-    // Actualizar orden y productos (borramos los anteriores y creamos los nuevos)
-    const order = await prisma.order.update({
-      where: { id },
-      data: {
-        delivery_id,
-        location_id,
-        delivery_address,
-        status,
-      },
-    });
-    res.status(200).json(order);
+    res.status(200).json({ message: "Usuario actualizado exitosamente" });
   } catch (error) {
     console.error('Error updating order:', error);
     res.status(400).json({ message: error.message });
@@ -162,7 +148,7 @@ const deleteOrder = async (req, res) => {
   try {
     const deletedOrder = orderService.deleteOrder(id);
     if (!deleteOrder) {
-      throw new Error("Don´t found the order");
+      throw new Error("Dont found the order");
     }
     res.status(204).json({ message: 'Order deleted successfully' });
   } catch (error) {
@@ -178,4 +164,5 @@ module.exports = {
   createOrder,
   updateOrder,
   deleteOrder,
+  validateOrderProducts
 };

@@ -1,6 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const userServiceClient = require('../lib/userServiceClient');
 const { returnStockAndCapacity } = require('../lib/productServiceClient')
+const { validateOrderProducts } = require('../controllers/OrderController')
 
 const prisma = new PrismaClient();
 
@@ -61,18 +62,46 @@ class OrderService {
     };
   }
 
-  // async updateOrder(order_id) {
-  //   const order = await 
-  // }
+  async updateOrderService(order_id, data) {
+    try {
 
-  
+      const order = await prisma.order.findUnique({ where: { id: order_id } })
+      if (!order) {
+        throw new Error("No existe esa orden a eliminar");
+      }
+
+      if (data.delivery_id) {
+        const user = await findUser({ id: data.delivery_id });
+        if (!user) {
+          return res.status(400).json({ message: `User with id ${data.delivery_id} not found` });
+        }
+
+
+        if (data.orderProducts) {
+          await returnStockAndCapacity(data.id_almacen, data.id_producto, data.amount)
+
+          await validateOrderProducts(data.orderProducts, data.id_almacen);
+        }
+
+        const orderUpdate = await prisma.order.update({
+          where: { id },
+          data: {
+            delivery_id,
+            location_id,
+            delivery_address,
+          },
+        });
+      }
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
 
   async deleteOrder(order_id) {
     try {
       const order = await prisma.order.findUnique({ where: { id: order_id } })
       if (!order) {
         throw new Error("No existe esa orden a eliminar");
-        
       }
       const products = await prisma.orderProducts.findMany({ where: { order_id: order_id } })
       for (const prod of products) {
@@ -80,11 +109,11 @@ class OrderService {
         const productExists = await returnStockAndCapacity(order.id_almacen, prod.product_id, prod.amount);
       }
 
-      const deleteProducts =  await prisma.orderProducts.deleteMany({ where : { order_id: order_id}})
-      const deleteOrder = await prisma.order.delete({where: {id: order_id}})
+      const deleteProducts = await prisma.orderProducts.deleteMany({ where: { order_id: order_id } })
+      const deleteOrder = await prisma.order.delete({ where: { id: order_id } })
 
     } catch (error) {
-      throw new Error("No se puede eliminar el pedido");
+      throw new Error(error);
     }
   }
 }
