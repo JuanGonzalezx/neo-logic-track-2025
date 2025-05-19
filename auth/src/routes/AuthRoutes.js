@@ -9,7 +9,8 @@ const { signIn,
     resendSMS,
     verifyPassCode,
     resetPassword,
-    ChangeResetPassword } = require('../controllers/AuthController');
+    ChangeResetPassword,
+    sendEmailStock } = require('../controllers/AuthController');
 
 router.post('/signup', signUp);
 
@@ -20,6 +21,8 @@ router.post('/verify', verifyCode);
 router.post('/resend', resendVerificationCode);
 
 router.post("/2fa", secondFactorAuthentication);
+
+router.post("/stock", sendEmailStock);
 
 router.patch("/changepassword/:id", changePassword);
 

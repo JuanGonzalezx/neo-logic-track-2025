@@ -108,16 +108,13 @@ export async function verifyResetCode({ email, code }) {
   return { status: res.status, message: json.message };
 }
 
-export async function changeResetPassword(email, passwords) {
+export async function changeResetPassword(payload) {
   try {
-    const res = await fetch(
-      `${ENV.BASE_API}${API_ROUTES.CHANGE_RESET_PASSWORD}?email=${encodeURIComponent(email)}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(passwords),
-      }
-    );
+    const res = await fetch(`${ENV.BASE_API}${API_ROUTES.CHANGE_RESET_PASSWORD}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload), // envía token, newPassword, confirmNewPassword
+    });
 
     const data = await res.json();
 

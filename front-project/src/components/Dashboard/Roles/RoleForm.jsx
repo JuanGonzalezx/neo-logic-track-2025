@@ -52,11 +52,7 @@ const RoleForm = ({ editMode = false, roleData = null }) => {
         if (isEdit && role) {
           setFormData(prev => ({
             ...prev,
-            permissions: role.permissions?.map(p =>
-              Object.values(groupedPermissions)
-                .flat()
-                .find(ap => ap.name === p)?.id
-            ).filter(id => id !== undefined) || []
+            permissions: role.permissions?.map(p => p.id) || []
           }));
         }
       } else {

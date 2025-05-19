@@ -208,6 +208,37 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
                       {collapsed ? <Plus size={20} /> : <span>Add Product</span>}
                     </NavLink>
                   </li>
+                  <li className="sidebar-subnav-item">
+                    <NavLink
+                      to="/dashboard/inventory/categories"
+                      end
+                      className={linkClass}
+                      onClick={handleNavLinkClick}
+                    >
+                      {collapsed ? <Plus size={20} /> : <span>All Categories</span>}
+                    </NavLink>
+                  </li>
+                  <li className="sidebar-subnav-item">
+                    <NavLink
+                      to="/dashboard/inventory/categories/add"
+                      end
+                      className={linkClass}
+                      onClick={handleNavLinkClick}
+                    >
+                      {collapsed ? <Plus size={20} /> : <span>Add Category</span>}
+                    </NavLink>
+                  </li>
+                  <li className="sidebar-subnav-item">
+                    <NavLink
+                      to="/dashboard/inventory/warehouses"
+                      end
+                      className={linkClass}
+                      onClick={handleNavLinkClick}
+                    >
+                      {collapsed ? <Plus size={20} /> : <span>All Warehouses</span>}
+                    </NavLink>
+                    
+                  </li>
                 </ul>
               )}
             </li>

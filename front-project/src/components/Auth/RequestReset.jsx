@@ -1,11 +1,8 @@
-// src/components/Auth/RequestReset.jsx
-
 import React, { useState } from 'react';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { Card, Input, Button, Alert, Spin, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { requestPasswordReset, verifyResetCode } from '../../api/auth'; // importa verifyPassCode
-import VerificationModal from './VerificationModal';
+import { requestPasswordReset } from '../../api/auth'; // solo usamos esta
 import './requestReset.css';
 
 const { Title } = Typography;
@@ -14,7 +11,6 @@ export default function RequestReset() {
     const [email, setEmail] = useState('');
     const [alert, setAlert] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [showModal, setShowModal] = useState(false);
 
     const navigate = useNavigate();
 
@@ -28,27 +24,18 @@ export default function RequestReset() {
 
         setLoading(true);
         try {
-            const { status, message } = await requestPasswordReset({ email }); // usa message
+            const { status, message } = await requestPasswordReset({ email });
             setAlert({ type: status === 200 ? 'success' : 'error', message });
-            if (status === 200) {
-                setShowModal(true);
-            }
+
+            // Si quieres redirigir después de mostrar mensaje:
+            // if (status === 200) {
+            //     setTimeout(() => navigate('/'), 4000);
+            // }
+
         } catch (err) {
             setAlert({ type: 'error', message: err.message || 'Network error' });
         } finally {
             setLoading(false);
-        }
-    };
-
-    const handleVerificationSuccess = async code => {
-        // llamamos directamente verifyPassCode importado
-        const { status, message } = await verifyResetCode({ email, code });
-        if (status === 200) {
-            setShowModal(false);
-            navigate('/reset-password/new', { state: { email } });
-            return; // sin error
-        } else {
-            return message || 'Invalid code';
         }
     };
 
@@ -93,18 +80,10 @@ export default function RequestReset() {
                         disabled={loading}
                         style={{ marginTop: 16 }}
                     >
-                        {loading ? <Spin /> : 'Send Verification Code'}
+                        {loading ? <Spin /> : 'Send Reset Link'}
                     </Button>
                 </form>
             </Card>
-
-            <VerificationModal
-                isOpen={showModal}
-                onClose={() => setShowModal(false)}
-                contactMethod="email"
-                email={email}
-                onVerificationSuccess={handleVerificationSuccess}
-            />
         </div>
     );
 }

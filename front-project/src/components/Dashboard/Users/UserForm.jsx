@@ -90,7 +90,7 @@ const UserForm = () => {
         status: formData.status,
       };
 
-console.log(payload);
+      console.log(payload);
 
 
       const { status, message } = await createUser(payload);

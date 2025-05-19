@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
+const { findCityById } = require('../lib/cityServiceClient');
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
@@ -136,8 +137,7 @@ const sendSMS = async (code, number) => {
 
 const signUp = async (req, res) => {
   let { fullname, email, current_password, number,
-    // rolId = "6813d88bd0cb1281aaa26120"
-    rolId = "681462eaef7752d9d59866d8"
+    rolId = "681462eaef7752d9d59866d8", ciudadId
   } = req.body;
 
   if (email) {
@@ -145,9 +145,18 @@ const signUp = async (req, res) => {
   }
 
   // Validate null/empty field
-  if (!fullname || !email || !current_password || !number) {
+  if (!fullname || !email || !current_password || !number || !ciudadId) {
     return res.status(400).json({
-      message: "All required fields: fullname, email, password and number",
+      message: "All required fields: fullname, email, password, number y ciudad",
+    });
+  }
+  console.log(ciudadId)
+  // Validar ciudad
+  const city = await findCityById(ciudadId);
+  console.log(city)
+  if (!city) {
+    return res.status(400).json({
+      message: "La ciudad especificada no existe.",
     });
   }
 
@@ -159,7 +168,6 @@ const signUp = async (req, res) => {
   }
 
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d])[a-zA-Z\d\W]{7,}$/;
-
   if (!passwordRegex.test(current_password)) {
     return res.status(400).json({
       message: "Password must contain at least one uppercase letter, one lowercase letter, one number and be at least 7 characters long",
@@ -170,20 +178,15 @@ const signUp = async (req, res) => {
     const existinguser = await prisma.users.findUnique({
       where: { email },
     });
-
-    // En caso de que encuentre el correo electrónico en la BD
-    // El usuario ya existe
     if (existinguser) {
       return res.status(400).json({
         message: "Email allready registered",
       });
     }
-
     const hashedPassword = await bcrypt.hash(current_password, 10);
     const verificationCode = await generateVerificationCode();
     const verificationCodeExpires = new Date();
     verificationCodeExpires.setMinutes(verificationCodeExpires.getMinutes() + 15);
-
     const user = await prisma.users.create({
       data: {
         fullname,
@@ -193,23 +196,20 @@ const signUp = async (req, res) => {
         verificationCode,
         verificationCodeExpires,
         roleId: rolId,
+        ciudadId
       },
     });
-
     // Enviar correo con código de verificación
     const emailSent = await sendEmail(email, verificationCode, fullname, "verification");
-
     if (!emailSent) {
       // Si falla el envío del correo, eliminamos el usuario creado
       await prisma.users.delete({
         where: { id: user.id },
       });
-
       return res.status(500).json({
         message: "Failed to send verification email. Please try again later.",
       });
     }
-
     res.status(201).json({
       message: "User registered succesfully. Please check your email for verification code.",
       userId: user.id,
@@ -217,7 +217,6 @@ const signUp = async (req, res) => {
     });
   } catch (error) {
     console.log("Error details:", error);
-
     res.status(500).json({
       message: "User was not created",
       error,
@@ -721,7 +720,7 @@ const resetPassword = async (req, res) => {
 
 
   const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-  const resetLink = `http://localhost:3000/reset-password?token=${token}`;
+  const resetLink = `http://localhost:5173/changeResetPassword/${token}`;
   try {
     await sendPassVerificationEmail(user.email, resetLink, user.fullname);
 
