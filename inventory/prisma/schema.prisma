@@ -112,14 +112,14 @@ model Movement_Inventory {
   id           String   @id @unique @default(uuid())
   id_producto  String
   id_almacen   String
-  id_proveedor String
+  id_proveedor String?
   tipo         Boolean
   cantidad     Int
   fecha        DateTime
 
-  proveedor Proveedor @relation(fields: [id_proveedor], references: [id])
-  producto  Producto  @relation(fields: [id_producto], references: [id_producto])
-  almacen   Almacen   @relation(fields: [id_almacen], references: [id_almacen])
+  proveedor Proveedor? @relation(fields: [id_proveedor], references: [id])
+  producto  Producto   @relation(fields: [id_producto], references: [id_producto])
+  almacen   Almacen    @relation(fields: [id_almacen], references: [id_almacen])
 
   @@unique([id_producto, id_almacen, id_proveedor, fecha])
 }

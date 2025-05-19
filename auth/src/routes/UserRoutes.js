@@ -6,7 +6,7 @@ const { checkPermission } = require('../controllers/AuthController');
 
 // router.post('/', checkPermission(PERM_MAP.USERS.CREATE.url, PERM_MAP.USERS.CREATE.method), UserController.createUser);
 // router.get('/', checkPermission(PERM_MAP.USERS.GET_ALL.url, PERM_MAP.USERS.GET_ALL.method), UserController.getAllUsers);
-router.get('/:id', checkPermission(PERM_MAP.USERS.GET_BY_ID.url, PERM_MAP.USERS.GET_BY_ID.method), UserController.getUserById);
+// router.get('/:id', checkPermission(PERM_MAP.USERS.GET_BY_ID.url, PERM_MAP.USERS.GET_BY_ID.method), UserController.getUserById);
 router.put('/:id', checkPermission(PERM_MAP.USERS.UPDATE_USER.url, PERM_MAP.USERS.UPDATE_USER.method), UserController.updateUser); 
 // router.delete('/:id', checkPermission(PERM_MAP.USERS.DELETE_USER.url, PERM_MAP.USERS.DELETE_USER.method), UserController.deleteUser);
 router.delete('/:id', UserController.deleteData);
@@ -27,7 +27,7 @@ router.post('/repartidor/:id', UserController.createRepartidor);
 router.get('/', UserController.getAllUsers);
 
 // router.get('/:id', checkPermission('/api/v1/users/:id', 'GET'), getUserById);
-// router.get('/:id', getUserById);
+router.get('/:id', UserController.getUserById);
 
 // router.post('/', checkPermission('/api/v1/users', 'POST'), createUser);
 

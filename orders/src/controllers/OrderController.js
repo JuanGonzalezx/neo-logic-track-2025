@@ -9,7 +9,7 @@ const { findRepartidorByCity } = require('../lib/userServiceClient');
 
 
 // Función para validar todos los productos en orderProducts
-async function validateOrderProducts(orderProducts) {
+async function validateOrderProducts(orderProducts, id_almacen) {
   try {
     for (const op of orderProducts) {
       const productExists = await findProductById(op.product_id);
@@ -19,10 +19,10 @@ async function validateOrderProducts(orderProducts) {
       }
 
       // Reduce el stock en almacenProducto
-      await reduceStock(op.product_id, op.almacen_id, op.amount);
+      await reduceStock(op.product_id, id_almacen, op.amount);
 
       // Crea el movimiento de salida de ese almacen 
-      await createMovements(op.product_id, op.almacen_id, op.amount, op.id_proveedor)
+      await createMovements(op.product_id, id_almacen, op.amount, op.id_proveedor)
 
     }
   } catch (error) {
@@ -81,22 +81,22 @@ const getOrdersByAlmacen = async (req, res) => {
 
 // Crear una nueva orden con validaciones
 const createOrder = async (req, res) => {
-  const { location_id, delivery_address, status, id_almacen, orderProducts,  } = req.body;
+  const { location_id, delivery_address, status, id_almacen, orderProducts, } = req.body;
   try {
 
     // Validar todos los productos, llama a dos funciones
     //1. Para actualizar stock y mandar email si es el caso
     //2. Crea el movimiento con tipo salida
-    // const validate = await validateOrderProducts(orderProducts);
-    
+    const validate = await validateOrderProducts(orderProducts, id_almacen);
+
     const city = await findCityByAlmacen(id_almacen)
-    
+
     const repartidor = await findRepartidorByCity(city)
-    
+
     // Crear la orden
     const order = await prisma.order.create({
       data: {
-        delivery_id:repartidor.id,
+        delivery_id: repartidor.id,
         location_id,
         delivery_address,
         status,

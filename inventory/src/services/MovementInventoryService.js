@@ -8,7 +8,7 @@ class MovementInventoryService {
     async create(data) {
         const { id_producto, id_almacen, id_proveedor, tipo, cantidad, fecha } = data;
 
-        if (!id_producto || !id_almacen || !cantidad || !fecha || !id_proveedor) {
+        if (!id_producto || !id_almacen || !cantidad || !fecha ) {
             throw new Error("Todos los campos son requeridos.");
         }
 

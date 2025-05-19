@@ -3,7 +3,9 @@ const axios = require('axios');
 const PRODUCTS_API_BASE_URL = process.env.PRODUCTS_SERVICE_URL || 'http://localhost:3001/api/v1/productos';
 const ALMACENPRODUCTS_API_BASE_URL = process.env.ALMACENPRODUCTS_SERVICE_URL || 'http://localhost:3001/api/v1/almacenproductos';
 const MOVEMENTS_API_BASE_URL = process.env.MOVEMENTS_SERVICE_URL || 'http://localhost:3001/api/v1/movements';
-const AUTH_API_BASE_URL = process.env.AUTH_SERVICE_URL || 'http://localhost:3000/api/v1/auth';
+const AUTH_API_BASE_URL = process.env.AUTH_SERVICE_URL || 'http://localhost:3000/api/v1';
+const ALMACENES_API_BASE_URL = process.env.ALMACENES_SERVICE_URL || 'http://localhost:3001/api/v1/almacenes';
+
 
 
 
@@ -23,30 +25,33 @@ async function findProductById(id) {
 
 async function reduceStock(product_id, almacen_id, amount) {
   try {
-    let responseAlmacen = await axios.get(`${ALMACENPRODUCTS_API_BASE_URL}/producto/${product_id}/almacen/${almacen_id}`);
-    let almacen = await (await axios.get(`${ALMACENPRODUCTS_API_BASE_URL}/almacenes/${almacen_id}`)).data
 
-    console.log(almacen);
+    let responseAlmacen = (await axios.get(`${ALMACENPRODUCTS_API_BASE_URL}/producto/${product_id}/almacen/${almacen_id}`)).data
     
 
-    if (amount > responseAlmacen.data.cantidad_stock) {
+    if (amount > responseAlmacen.cantidad_stock) {
       throw new Error("La cantidad del producto es mayor al disponible en el stock");
     }
 
-    let stockActual = responseAlmacen.data.cantidad_stock - amount
-    if (stockActual < responseAlmacen.data.nivel_reorden) {
+    let stockActual = responseAlmacen.cantidad_stock - amount
+    if (stockActual < responseAlmacen.nivel_reorden) {
+
+
+      const almacen = await (await axios.get(`${ALMACENES_API_BASE_URL}/${almacen_id}`)).data
+
+      const despachador = await (await axios.get(`${AUTH_API_BASE_URL}/users/${almacen.despachadorId}`)).data
 
       let data = {
-        fullname: "Oye ",
+        fullname: despachador.fullname,
         producto: product_id,
-        email: "juan.cardona36713@ucaldas.edu.co"
+        email: despachador.email
       }
 
-      let responseAlmacen = await axios.post(`${AUTH_API_BASE_URL}/stock`, data);
+      let res = await axios.post(`${AUTH_API_BASE_URL}/auth/stock`, data);
     }
 
-    responseAlmacen.data.cantidad_stock = stockActual
-    const response = await axios.put(`${ALMACENPRODUCTS_API_BASE_URL}/${responseAlmacen.data.id}`, responseAlmacen.data);
+    responseAlmacen.cantidad_stock = stockActual
+    const response = await axios.put(`${ALMACENPRODUCTS_API_BASE_URL}/${responseAlmacen.id}`, responseAlmacen);
 
     return responseAlmacen.data;
   } catch (error) {
@@ -54,16 +59,19 @@ async function reduceStock(product_id, almacen_id, amount) {
   }
 }
 
-async function createMovements(id_producto, id_almacen, amount) {
+async function createMovements(id_producto, id_almacen, amount, id_proveedor) {
   try {
+
     let fecha = new Date();
     let data = {
       id_producto: id_producto,
       id_almacen: id_almacen,
+      id_proveedor:null,
       tipo: false,
       cantidad: amount,
       fecha
     }
+    console.log(data);
 
     const response = await axios.post(`${MOVEMENTS_API_BASE_URL}`, data);
     return response.data;

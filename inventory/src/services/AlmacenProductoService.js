@@ -46,9 +46,7 @@ class AlmacenProductoService {
         const found = await prisma.almacenProducto.findFirst({
             where:
                 { id_almacen: id_almacen, id_producto: id_producto }
-        });
-
-        if (!found) return false
+        });        
         return found;
     }
 
