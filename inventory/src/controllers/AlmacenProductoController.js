@@ -47,6 +47,18 @@ class AlmacenProductoController {
         }
     }
 
+    async getByAlmacenProducto(req, res, next) {
+        try {
+            const items = await AlmacenProductoService.getByProductoAlmacen( req.params.id_almacen, req.params.id_producto);
+            
+            res.status(200).json(items);
+        } catch (error) {
+            handleServiceError(error, res, next);
+        }
+    }
+
+
+
     async update(req, res, next) {
         try {
             const almacenproducto = await AlmacenProductoService.update(req.params.id_almacenproducto, req.body);

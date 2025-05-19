@@ -154,7 +154,6 @@ class ProductoService {
             capacidad_usada_m3 = capacidad_usada_m3+almacenEntity.capacidad_usada_m3
             await AlmacenService.updateCapacidadm3(id_almacen, capacidad_usada_m3);
 
-
             // 5. Crear producto (si no existe) - Esta operación debe ser await y completarse ANTES de las dependientes
             if (!existingProducto) {
 

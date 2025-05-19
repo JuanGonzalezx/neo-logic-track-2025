@@ -43,7 +43,11 @@ class AlmacenProductoService {
     }
 
     async getByProductoAlmacen(id_almacen, id_producto) {
-        const found = await prisma.almacenProducto.findFirst({ where: { id_almacen, id_producto } });
+        const found = await prisma.almacenProducto.findFirst({
+            where:
+                { id_almacen: id_almacen, id_producto: id_producto }
+        });
+
         if (!found) return false
         return found;
     }
@@ -66,7 +70,6 @@ class AlmacenProductoService {
 
     async update(id, data) {
         try {
-
             return prisma.almacenProducto.update({
                 where: { id },
                 data,
