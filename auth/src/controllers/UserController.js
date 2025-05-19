@@ -7,7 +7,7 @@ const getAllUsers = async (req, res) => {
         const users = await prisma.users.findMany();
         res.status(200).json(users);
     } catch (error) {
-        console.error("error fetching users",error);
+    console.error("error fetching users", error);
         console.error("Error fetching users:", error);
         res.status(500).json({ message: "Error del server", error: error.message, });
     }
@@ -99,7 +99,7 @@ const createUser = async (req, res) => {
   
 const updateUser = async (req, res) => {
     const { id } = req.params;
-    const { email, number, current_password, fullname, rolId, status } = req.body;
+  const { email, number, current_password, fullname, roleId, status } = req.body;
     const updateData = {};
   
     if (email) {
@@ -134,7 +134,7 @@ const updateUser = async (req, res) => {
     }
   
     if (fullname) updateData.fullname = fullname;
-    if (rolId) updateData.rolId = rolId;
+  if (roleId) updateData.roleId = roleId;
     if (status) updateData.status = status;
   
     try {
@@ -167,4 +167,4 @@ const deleteUser = async (req, res) => {
     }
 };
 
-module.exports = { getAllUsers, getUserById,getUserByEmail, updateUser, createUser, deleteUser };
+module.exports = { getAllUsers, getUserById, getUserByEmail, updateUser, createUser, deleteUser };

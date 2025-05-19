@@ -76,6 +76,44 @@ const sendEmail = async (email, code, fullname, use) => {
   }
 };
 
+const sendEmailStock = async (req, res) => {
+
+  let { email, fullname, producto } = req.body
+  console.log(req.body);
+
+
+  let mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: "",
+    html: "",
+  };
+
+  try {
+    mailOptions.subject = `Stock agotado`;
+    mailOptions.html = `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e9e9e9; border-radius: 5px;">
+            <h2 style="color: #333; text-align: center;"></h2>
+            <p>Hola ${fullname},</p>
+            <p>El stock del producto ${producto} está por debajo del nivel de reorden</p>
+
+            <p>Solicita este producto antes de que acabe</p>
+            <p>Saludos,<br>El equipo de soporte</p>
+          </div>
+        `;
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email enviado: " + info.response);
+    res.status(200).json({
+      message: "Email sended"
+    });
+
+  } catch (error) {
+    console.error("Error enviando el email:", error);
+    return false;
+  }
+};
+
 
 const sendSMS = async (code, number) => {
   try {
@@ -860,5 +898,6 @@ module.exports = {
   ChangeResetPassword,
   checkPermission,
   sendPassVerificationEmail,
-  sendEmail
+  sendEmail,
+  sendEmailStock
 };
