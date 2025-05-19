@@ -170,134 +170,138 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
             )}
 
             {/* Inventory Section */}
-            <li className="sidebar-nav-item">
-              <div
-                className={`sidebar-nav-section ${activeSection === 'inventory' ? 'expanded' : ''}`}
-                onClick={() => toggleSection('inventory')}
-              >
-                <div className="section-content">
-                  <Package2 size={20} className="sidebar-icon" />
-                  {!collapsed && <span>Inventory</span>}
+            {hasPermission('682a321b98d5434a57e769d0') && (
+              <li className="sidebar-nav-item">
+                <div
+                  className={`sidebar-nav-section ${activeSection === 'inventory' ? 'expanded' : ''}`}
+                  onClick={() => toggleSection('inventory')}
+                >
+                  <div className="section-content">
+                    <Package2 size={20} className="sidebar-icon" />
+                    {!collapsed && <span>Inventory</span>}
+                  </div>
+                  {!collapsed && (
+                    <ChevronDown
+                      size={16}
+                      className={`section-arrow ${activeSection === 'inventory' ? 'expanded' : ''}`}
+                    />
+                  )}
                 </div>
-                {!collapsed && (
-                  <ChevronDown
-                    size={16}
-                    className={`section-arrow ${activeSection === 'inventory' ? 'expanded' : ''}`}
-                  />
+                {(activeSection === 'inventory' || collapsed) && (
+                  <ul className="sidebar-subnav">
+                    {hasPermission('682a321b98d5434a57e769d0') && (
+                      <li className="sidebar-subnav-item">
+                        <NavLink
+                          to="/dashboard/inventory"
+                          end
+                          className={linkClass}
+                          onClick={handleNavLinkClick}
+                        >
+                          {collapsed ? <Package2 size={20} /> : <span>All Products</span>}
+                        </NavLink>
+                      </li>
+                    )}
+                    {hasPermission('682a67071c1036d90c0b923a') && (
+                      <li className="sidebar-subnav-item">
+                        <NavLink
+                          to="/dashboard/inventory/add"
+                          end
+                          className={linkClass}
+                          onClick={handleNavLinkClick}
+                        >
+                          {collapsed ? <Plus size={20} /> : <span>Add Product</span>}
+                        </NavLink>
+                      </li>
+                    )}
+                    {hasPermission('682a67a21c1036d90c0b923d') && (
+                      <li className="sidebar-subnav-item">
+                        <NavLink
+                          to="/dashboard/inventory/categories"
+                          end
+                          className={linkClass}
+                          onClick={handleNavLinkClick}
+                        >
+                          {collapsed ? <Plus size={20} /> : <span>All Categories</span>}
+                        </NavLink>
+                      </li>
+                    )}
+                    {hasPermission('682a68421c1036d90c0b923e') && (
+                      <li className="sidebar-subnav-item">
+                        <NavLink
+                          to="/dashboard/inventory/categories/add"
+                          end
+                          className={linkClass}
+                          onClick={handleNavLinkClick}
+                        >
+                          {collapsed ? <Plus size={20} /> : <span>Add Category</span>}
+                        </NavLink>
+                      </li>
+                    )}
+                    {hasPermission('682a6d521c1036d90c0b9241') && (
+                      <li className="sidebar-subnav-item">
+                        <NavLink
+                          to="/dashboard/inventory/warehouses"
+                          end
+                          className={linkClass}
+                          onClick={handleNavLinkClick}
+                        >
+                          {collapsed ? <Plus size={20} /> : <span>All Warehouses</span>}
+                        </NavLink>
+                      </li>
+                    )}
+                  </ul>
                 )}
-              </div>
-              {(activeSection === 'inventory' || collapsed) && (
-                <ul className="sidebar-subnav">
-                  <li className="sidebar-subnav-item">
-                    <NavLink
-                      to="/dashboard/inventory"
-                      end
-                      className={linkClass}
-                      onClick={handleNavLinkClick}
-                    >
-                      {collapsed ? <Package2 size={20} /> : <span>All Products</span>}
-                    </NavLink>
-                  </li>
-                  <li className="sidebar-subnav-item">
-                    <NavLink
-                      to="/dashboard/inventory/add"
-                      end
-                      className={linkClass}
-                      onClick={handleNavLinkClick}
-                    >
-                      {collapsed ? <Plus size={20} /> : <span>Add Product</span>}
-                    </NavLink>
-                  </li>
-                  <li className="sidebar-subnav-item">
-                    <NavLink
-                      to="/dashboard/inventory/categories"
-                      end
-                      className={linkClass}
-                      onClick={handleNavLinkClick}
-                    >
-                      {collapsed ? <Plus size={20} /> : <span>All Categories</span>}
-                    </NavLink>
-                  </li>
-                  <li className="sidebar-subnav-item">
-                    <NavLink
-                      to="/dashboard/inventory/categories/add"
-                      end
-                      className={linkClass}
-                      onClick={handleNavLinkClick}
-                    >
-                      {collapsed ? <Plus size={20} /> : <span>Add Category</span>}
-                    </NavLink>
-                  </li>
-                  <li className="sidebar-subnav-item">
-                    <NavLink
-                      to="/dashboard/inventory/warehouses"
-                      end
-                      className={linkClass}
-                      onClick={handleNavLinkClick}
-                    >
-                      {collapsed ? <Plus size={20} /> : <span>All Warehouses</span>}
-                    </NavLink>
-                    
-                  </li>
-                </ul>
-              )}
-            </li>
+              </li>
+            )}
 
-
-            <li className="sidebar-nav-item">
-              <div
-                className={`sidebar-nav-section ${activeSection === 'permissions' ? 'expanded' : ''}`}
-                onClick={() => toggleSection('permissions')}
-              >
-                <div className="section-content">
-                  <Shield size={20} className="sidebar-icon" />
-                  {!collapsed && <span>Permissions</span>}
+            {/* Permissions Section */}
+            {hasPermission('681bead67a2c0df928b8b232') && (
+              <li className="sidebar-nav-item">
+                <div
+                  className={`sidebar-nav-section ${activeSection === 'permissions' ? 'expanded' : ''}`}
+                  onClick={() => toggleSection('permissions')}
+                >
+                  <div className="section-content">
+                    <Shield size={20} className="sidebar-icon" />
+                    {!collapsed && <span>Permissions</span>}
+                  </div>
+                  {!collapsed && (
+                    <ChevronDown
+                      size={16}
+                      className={`section-arrow ${activeSection === 'permissions' ? 'expanded' : ''}`}
+                    />
+                  )}
                 </div>
-                {!collapsed && (
-                  <ChevronDown
-                    size={16}
-                    className={`section-arrow ${activeSection === 'permissions' ? 'expanded' : ''}`}
-                  />
+                {(activeSection === 'permissions' || collapsed) && (
+                  <ul className="sidebar-subnav">
+                    {hasPermission('681bead67a2c0df928b8b232') && (
+                      <li className="sidebar-subnav-item">
+                        <NavLink
+                          to="/dashboard/permissions"
+                          end
+                          className={linkClass}
+                          onClick={handleNavLinkClick}
+                        >
+                          {collapsed ? <Shield size={20} /> : <span>All Permissions</span>}
+                        </NavLink>
+                      </li>
+                    )}
+                    {hasPermission('6823a8f67b94a1b6205df5a8') && (
+                      <li className="sidebar-subnav-item">
+                        <NavLink
+                          to="/dashboard/permissions/create"
+                          end
+                          className={linkClass}
+                          onClick={handleNavLinkClick}
+                        >
+                          {collapsed ? <Plus size={20} /> : <span>Add Permission</span>}
+                        </NavLink>
+                      </li>
+                    )}
+                  </ul>
                 )}
-              </div>
-              {(activeSection === 'permissions' || collapsed) && (
-                <ul className="sidebar-subnav">
-                  <li className="sidebar-subnav-item">
-                    <NavLink
-                      to="/dashboard/permissions"
-                      end
-                      className={linkClass}
-                      onClick={handleNavLinkClick}
-                    >
-                      {collapsed ? <Shield size={20} /> : <span>All Permissions</span>}
-                    </NavLink>
-                  </li>
-                  <li className="sidebar-subnav-item">
-                    <NavLink
-                      to="/dashboard/permissions/create"
-                      end
-                      className={linkClass}
-                      onClick={handleNavLinkClick}
-                    >
-                      {collapsed ? <Plus size={20} /> : <span>Add Permission</span>}
-                    </NavLink>
-                  </li>
-                </ul>
-              )}
-            </li>
-
-
-            <li className="sidebar-nav-item">
-              <NavLink
-                to="/dashboard/inventor"
-                end
-                className={linkClass}
-                onClick={handleNavLinkClick}
-              >
-                <Package2 size={20} className="sidebar-icon" />
-                {!collapsed && <span>Inventory</span>}
-              </NavLink>
-            </li>
+              </li>
+            )}
           </ul>
         </nav>
 
