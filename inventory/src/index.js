@@ -3,8 +3,8 @@ const express = require('express');
 const routes = require('./routes/routes');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-
-
+const swaggerUi = require('swagger-ui-express');
+const specs = require('./swagger');
 
 const app = express();
 
@@ -31,6 +31,8 @@ app.use(express.json());
 app.get('/', (req, res) => {
     res.status(200).json({ message: 'Microservicio de Inventario activo' });
 });
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // Middleware de error global para el microservicio (después de todas las rutas)
 app.use((err, req, res, next) => {

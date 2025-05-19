@@ -1,0 +1,128 @@
+openapi: 3.0.0
+info:
+  title: Inventory API
+  version: 1.0.0
+  description: API documentation for the Inventory microservice
+
+paths:
+  /almacenes:
+    get:
+      summary: Get all warehouses
+      tags:
+        - Warehouses
+      responses:
+        '200':
+          description: A list of warehouses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Warehouse'
+    post:
+      summary: Create a new warehouse
+      tags:
+        - Warehouses
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WarehouseInput'
+      responses:
+        '201':
+          description: Warehouse created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Warehouse'
+  /almacenes/{id_almacen}:
+    get:
+      summary: Get warehouse by ID
+      tags:
+        - Warehouses
+      parameters:
+        - in: path
+          name: id_almacen
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Warehouse found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Warehouse'
+        '404':
+          description: Warehouse not found
+    put:
+      summary: Update warehouse by ID
+      tags:
+        - Warehouses
+      parameters:
+        - in: path
+          name: id_almacen
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WarehouseInput'
+      responses:
+        '200':
+          description: Warehouse updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Warehouse'
+        '404':
+          description: Warehouse not found
+    delete:
+      summary: Delete warehouse by ID
+      tags:
+        - Warehouses
+      parameters:
+        - in: path
+          name: id_almacen
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Warehouse deleted
+        '404':
+          description: Warehouse not found
+
+components:
+  schemas:
+    Warehouse:
+      type: object
+      properties:
+        id_almacen:
+          type: string
+        name:
+          type: string
+        capacidad_m3:
+          type: number
+        gerenteId:
+          type: string
+        despachadorId:
+          type: string
+    WarehouseInput:
+      type: object
+      properties:
+        name:
+          type: string
+        capacidad_m3:
+          type: number
+        gerenteId:
+          type: string
+        despachadorId:
+          type: string
+      required:
+        - name
+        - capacidad_m3

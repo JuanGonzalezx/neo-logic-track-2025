@@ -29,6 +29,8 @@
     "p-limit": "^6.2.0",
     "path": "^0.12.7",
     "prisma": "^6.7.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "uuid": "^11.1.0"
   }
 }
