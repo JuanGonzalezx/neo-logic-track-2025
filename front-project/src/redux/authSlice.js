@@ -5,7 +5,8 @@ const initialState = {
     loading: false,
     isAuthenticated: false,
     token: null,
-    role: null
+    role: null,
+    permissions: []
     };
 
 
@@ -20,6 +21,7 @@ const authSlice = createSlice({
                 state.isAuthenticated = action.payload.isAuthenticated;
                 state.token = action.payload.token;
                 state.role = action.payload.role;
+                state.permissions = action.payload.permissions;
                 state.loading = false;
             },
             logOutUser:(state) => {
@@ -28,6 +30,7 @@ const authSlice = createSlice({
                 state.token = null;
                 state.role = null;
                 state.loading = false;
+                state.permissions = [];
                 localStorage.removeItem("token");
             }
         }

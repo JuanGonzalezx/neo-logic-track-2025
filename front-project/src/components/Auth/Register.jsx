@@ -133,10 +133,7 @@ const Register = ({ isOpen, onClose }) => {
         try {
             const response = await auth.verifyCode({ email: emailToVerify, code });
             if (response.token) {
-                dispatch(setUser({ token: response.token, isVerified: true }));
-                localStorage.setItem("token", response.token);
-                localStorage.setItem("role", response.role);
-                localStorage.setItem("permissions", JSON.stringify(response.permissions));
+                dispatch(setUser({ token: response.token, isVerified: true, role: response.role, permissions: response.permissions }));
                 setShowModal(false);
                 navigate("/dashboard");
             } else {

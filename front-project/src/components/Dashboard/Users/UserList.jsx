@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { getAllUsers, updateUser, deleteUser } from "../../../api/user";
 import { getAllRoles } from "../../../api/user";
 import {
@@ -21,7 +22,7 @@ const UserList = () => {
   const [apiResponse, setApiResponse] = useState(null);
   const [roles, setRoles] = useState([]);
   const [loadingRoles, setLoadingRoles] = useState(true);
-  const [permissions, setPermissions] = useState([]);
+  const permissions = useSelector(state => state.auth?.permissions || []); 
 
   // Estados para filtros y paginación
   const [searchTerm, setSearchTerm] = useState("");
@@ -75,10 +76,6 @@ const UserList = () => {
     };
 
     fetchData();
-
-    // Load permissions from local storage
-    const storedPermissions = JSON.parse(localStorage.getItem('permissions')) || [];
-    setPermissions(storedPermissions);
   }, []);
 
   const processUsers = (users, roles) => {

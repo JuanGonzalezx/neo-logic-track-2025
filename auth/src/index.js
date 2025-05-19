@@ -12,9 +12,9 @@ const app = express();
 const port = process.env.PORT || 3005;
 app.use(cors({
     origin: "http://localhost:5173",
-    methods: ["GET, PUT, POST, PATCH, DELETE"],
+    methods: ["GET", "PUT", "POST", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
-}))
+}));
 
 app.options("*", cors())
 

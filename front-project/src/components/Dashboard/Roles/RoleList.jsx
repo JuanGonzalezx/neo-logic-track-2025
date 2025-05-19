@@ -1,6 +1,7 @@
 import './Role.css';
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { roleAPI } from "../../../api/role";
 import {
   Alert,
@@ -30,6 +31,9 @@ const RoleList = () => {
   const [deleting, setDeleting] = useState(false);
 
   const navigate = useNavigate();
+
+  const permissions = useSelector(state => state.auth?.permissions || []);
+  const hasPermission = (permissionId) => permissions.includes(permissionId);
 
   useEffect(() => {
     fetchRoles();
@@ -152,27 +156,31 @@ const RoleList = () => {
               <div className="role-card-header">
                 <h3>{role.name}</h3>
                 <div className="role-actions">
-                  <button
-                    className="action-button edit"
-                    title="Edit Role"
-                    onClick={() => {
-                      setEditingRole(true)
-                      setRole(role)
-                      handleUpdateRole()
-                    }}
-                  >
-                    <span className="action-icon edit-icon"></span>
-                  </button>
-                  <button
-                    className="action-button delete"
-                    title="Delete Role"
-                    onClick={() => {
-                      setDeletingRoleId(role.id);
-                      setDeleteModalVisible(true)
-                    }}
-                  >
-                    <span className="action-icon delete-icon"></span>
-                  </button>
+                  {hasPermission('681537dff816d03835e5dab0') && (
+                    <button
+                      className="action-button edit"
+                      title="Edit Role"
+                      onClick={() => {
+                        setEditingRole(true);
+                        setRole(role);
+                        handleUpdateRole();
+                      }}
+                    >
+                      <span className="action-icon edit-icon"></span>
+                    </button>
+                  )}
+                  {hasPermission('681437fbfbaec847ba2ecc05') && (
+                    <button
+                      className="action-button delete"
+                      title="Delete Role"
+                      onClick={() => {
+                        setDeletingRoleId(role.id);
+                        setDeleteModalVisible(true);
+                      }}
+                    >
+                      <span className="action-icon delete-icon"></span>
+                    </button>
+                  )}
                 </div>
               </div>
 

@@ -131,4 +131,19 @@ export async function changeResetPassword(payload) {
   }
 }
 
+export async function getUserFromToken({ token }) {
+  console.log("Token recibido:", token);
+  const res = await fetch(`${ENV.BASE_API}${API_ROUTES.GET_USER_FROM_TOKEN}`, {
+    method: "POST", // Cambiado a POST para enviar token en body
+    headers: {
+      "Content-Type": "application/json",
+      // No envíes token en headers si el backend espera en body
+    },
+    body: JSON.stringify({ token }), // Enviar token en body
+  });
+  const json = await res.json();
+  return { status: res.status, ...json };
+}
+
+
 export const auth = new Auth()

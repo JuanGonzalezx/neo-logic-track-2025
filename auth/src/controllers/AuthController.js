@@ -845,6 +845,45 @@ const checkPermission = (url, methodExpected) => {
   };
 };
 
+const getUserFromToken = async (req, res, next) => {
+  const token = req.body.token; // <-- FIXED: get token string from body
+
+  if (!token) {
+    return res.status(401).json({ message: "Token no proporcionado" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const user = await prisma.users.findUnique({
+      where: { id: decoded.id },
+    });
+
+    const role = await prisma.role.findUnique({
+      where: { id: user.roleId },
+    });
+
+    if (!role) {
+      return res.status(403).json({ message: "Rol no encontrado" });
+    }
+
+    const permissions = await prisma.permission.findMany({
+      where: {
+        id: { in: role.permissionIds },
+      },
+    });
+
+    return res.status(201).json({
+      id: user.id,
+      email: user.email,
+      role: { id: role.id, name: role.name },
+      permissions,
+    });
+  } catch (error) {
+    return res.status(401).json({ message: "Token inválido o expirado" });
+  }
+};
+
 
 module.exports = {
   signUp,
@@ -859,5 +898,6 @@ module.exports = {
   ChangeResetPassword,
   checkPermission,
   sendPassVerificationEmail,
-  sendEmail
+  sendEmail,
+  getUserFromToken,
 };

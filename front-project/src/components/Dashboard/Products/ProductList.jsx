@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { productAPI } from "../../../api/product";
 import { Alert, Spin, Modal, Button } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { Package, Plus } from "lucide-react";
 import "./Product.css";
+import { useSelector } from "react-redux";
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [apiResponse, setApiResponse] = useState(null);
   const [categories, setCategories] = useState([]);
-  const [permissions, setPermissions] = useState([]);
+  // Get permissions from Redux store using useSelector at the top level
+  const userPermissions = useSelector(state => state.auth.user?.permissions || []);
+  const permissions = useSelector(state => state.auth?.permissions || []);
 
   // States for filters and pagination
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,42 +28,37 @@ const ProductList = () => {
   const [deletingProductId, setDeletingProductId] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch categories
-        console.log("Fetching categories...");
-        console.log(await productAPI.getAllCategories())
-        const categoriesResponse = await productAPI.getAllCategories();
-        if (categoriesResponse.status === 200) {
-          setCategories(categoriesResponse.data);
-        }
-        console.log(categoriesResponse, "categoriesResponse");
-        // Fetch products
-        const productsResponse = await productAPI.getAllProducts();
-        if (productsResponse.status === 200) {
-          const processedProducts = productsResponse.data.map(p => ({
-            ...p,
-            categoryName: getCategoryName(p.categoria_id, categoriesResponse.data),
-          }));
-          setProducts(processedProducts);
-        } else {
-          setApiResponse({ type: "error", message: "Error loading products" });
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setApiResponse({ type: "error", message: "Connection error" });
-      } finally {
-        setLoading(false);
+  const fetchData = async () => {
+    try {
+      // Fetch categories
+      const categoriesResponse = await productAPI.getAllCategories();
+      if (categoriesResponse.status === 200) {
+        setCategories(categoriesResponse.data);
       }
-    };
+      // Fetch products
+      const productsResponse = await productAPI.getAllProducts();
+      if (productsResponse.status === 200) {
+        const processedProducts = productsResponse.data.map(p => ({
+          ...p,
+          categoryName: getCategoryName(p.categoria_id, categoriesResponse.data),
+        }));
+        setProducts(processedProducts);
+      } else {
+        setApiResponse({ type: "error", message: "Error loading products" });
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setApiResponse({ type: "error", message: "Connection error" });
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchData();
-
-    // Load permissions from local storage
-    const storedPermissions = JSON.parse(localStorage.getItem('permissions')) || [];
-    setPermissions(storedPermissions);
-  }, []);
+  fetchData();
+}, []); // Solo ejecuta una vez al montar el componente
 
   const getCategoryName = (categoryId, categories) => {
     const category = categories.find(c => c.id === categoryId);
@@ -103,7 +101,7 @@ const ProductList = () => {
     );
     const categoryMatch = !filterCategory || p.categoria_id === filterCategory;
     const statusMatch = !filterStatus || (filterStatus === "true" ? p.status : !p.status);
-    
+
     return searchMatch && categoryMatch && statusMatch;
   });
 
@@ -112,6 +110,15 @@ const ProductList = () => {
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
+
+  // Block access if user lacks view permission
+  if (!hasPermission('682a321b98d5434a57e769d0')) {
+    return (
+      <div className="product-list-container">
+        <Alert type="error" message="No tiene permiso para ver productos." showIcon />
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -135,22 +142,22 @@ const ProductList = () => {
       )}
 
       <div className="page-header">
-        <h1>Products Management</h1>
-        <div className="header-actions">
-          <Link
-            to="/dashboard/inventory/add"
-            className="button button-primary"
-          >
-            <span className="button-icon add" /> New Product
+        <h1>Productos</h1>
+        {hasPermission('682a67071c1036d90c0b923a') && (
+          <Link to="/dashboard/inventory/add" className="button button-primary">
+            <span className="button-icon add" /> Nuevo Producto
           </Link>
+        )}
+
+        {hasPermission('682a90983da0f9eaae2c53a8') && (
           <Link
             to="/dashboard/inventory/import"
             className="button button-secondary"
             style={{ marginLeft: 8 }}
           >
-            <span className="button-icon" /> Bulk Import
+            <span className="button-icon add" /> Bulk Import
           </Link>
-        </div>
+        )}
       </div>
 
       <div className="filter-bar">
@@ -184,10 +191,10 @@ const ProductList = () => {
             className="filter-select"
             onChange={(e) => {
               setFilterStatus(e.target.value);
-              setCurrentPage(1);
-            }}
-          >
-            <option value="">All Statuses</option>
+                setCurrentPage(1);
+              }}
+              >
+              <option value="">All Statuses</option>
             <option value="true">Active</option>
             <option value="false">Inactive</option>
           </select>
@@ -226,21 +233,24 @@ const ProductList = () => {
                           <span className="view-icon"></span>
                         </button>
                       </Link>
-                      <Link to={`/dashboard/inventory/edit/${product.id_producto}`}>
-                        <button className="action-button edit">
-                          <span className="edit-icon"></span>
-                        </button>
-                      </Link>
-                      <button
-                        className="action-button delete"
+                      <Button
+                        icon={<EditOutlined />}
+                        onClick={() => navigate(`/dashboard/inventory/edit/${product.id_producto}`)}
+                        disabled={!hasPermission('682a67231c1036d90c0b923b')}
+                        className={!hasPermission('682a67231c1036d90c0b923b') ? 'disabled' : ''}
+                        style={{ marginRight: 8 }}
+                      />
+                      
+                      <Button
+                        danger
                         icon={<DeleteOutlined />}
                         onClick={() => {
                           setDeletingProductId(product.id_producto);
                           setDeleteModalVisible(true);
                         }}
-                      >
-                        <span className="delete-icon"></span>
-                      </button>
+                        disabled={!hasPermission('682a67381c1036d90c0b923c')}
+                        className={!hasPermission('682a67381c1036d90c0b923c') ? 'disabled' : ''}
+                      />
                     </div>
                   </td>
                 </tr>

@@ -9,17 +9,14 @@ import {
   ChevronDown
 } from 'lucide-react';
 import './Sidebar.css';
+import { useSelector } from 'react-redux';
 
 const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
   const location = useLocation();
   const [activeSection, setActiveSection] = useState(null);
-  const [permissions, setPermissions] = useState([]);
+  const permissions = useSelector(state => state.auth?.permissions || []);
 
-  useEffect(() => {
-    // Load permissions from local storage
-    const storedPermissions = JSON.parse(localStorage.getItem('permissions')) || [];
-    setPermissions(storedPermissions);
-  }, []);
+  // Get permissions from Redux auth slice
 
   useEffect(() => {
     if (location.pathname.startsWith('/dashboard/users')) {

@@ -33,7 +33,7 @@ router.get(
 
 router.put(
   '/:id',
-  checkPermission(UPDATE.url, UPDATE.method),
+  /*checkPermission(UPDATE.url, UPDATE.method),*/
   RoleController.updateRole
 );
 
@@ -45,7 +45,7 @@ router.delete(
 
 router.post(
   '/:id/permissions',
-  checkPermission(ASSIGN_PERMISSIONS.url, ASSIGN_PERMISSIONS.method),
+  /*checkPermission(ASSIGN_PERMISSIONS.url, ASSIGN_PERMISSIONS.method)*/
   RoleController.addPermissionsToRole
 );
 

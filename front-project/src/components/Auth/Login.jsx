@@ -107,10 +107,8 @@ const Login = () => {
     try {
       const response = await auth.AuthenticationCode({ email: emailToVerify, code });
       if (response.token) {
-        dispatch(setUser({ token: response.token, isAuthenticated: true }));
+        dispatch(setUser({ token: response.token, isAuthenticated: true, role: response.role, permissions: response.permissions }));
         localStorage.setItem("token", response.token);
-        localStorage.setItem("role", response.role);
-        localStorage.setItem("permissions", JSON.stringify(response.permissions));
         setShowModal(false);
         navigate("/dashboard");
       } else {
