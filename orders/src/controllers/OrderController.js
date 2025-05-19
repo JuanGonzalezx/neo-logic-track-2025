@@ -4,7 +4,8 @@ const prisma = new PrismaClient();
 const { findUser } = require('../lib/userServiceClient');
 const { findProductById, reduceStock, createMovements } = require('../lib/productServiceClient');
 const { createOrderProduct } = require('./OrderProductsController');
-
+const { findCityByAlmacen } = require('../lib/almacenServiceClient');
+const { findRepartidorByCity } = require('../lib/userServiceClient');
 
 
 // Función para validar todos los productos en orderProducts
@@ -80,27 +81,26 @@ const getOrdersByAlmacen = async (req, res) => {
 
 // Crear una nueva orden con validaciones
 const createOrder = async (req, res) => {
-  const { delivery_id, location_id, delivery_address, status, orderProducts, id_almacen } = req.body;
+  const { location_id, delivery_address, status, id_almacen, orderProducts,  } = req.body;
   try {
-    // Validar que delivery_id exista
-    // const user = await findUser(delivery_id);
-    // if (!user) {
-    //   return res.status(400).json({ message: `User with id ${delivery_id} not found` });
-    // }
 
     // Validar todos los productos, llama a dos funciones
     //1. Para actualizar stock y mandar email si es el caso
     //2. Crea el movimiento con tipo salida
     // const validate = await validateOrderProducts(orderProducts);
+    
+    const city = await findCityByAlmacen(id_almacen)
 
+    const repartidor = await findRepartidorByCity(city)
+    
     // Crear la orden
     const order = await prisma.order.create({
       data: {
-        delivery_id,
+        delivery_id:repartidor.data.id,
         location_id,
         delivery_address,
         status,
-        id_almacen,
+        id_almacen: id_almacen,
         creation_date: new Date()
       },
     });
@@ -109,7 +109,7 @@ const createOrder = async (req, res) => {
     for (const op of orderProducts) {
       const orderProduct = await prisma.orderProducts.create({
         data: {
-          order_id:order.id,
+          order_id: order.id,
           product_id: op.product_id,
           amount: op.amount,
         },
