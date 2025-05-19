@@ -16,7 +16,8 @@ model Order {
   creation_date    DateTime
   delivery_address String
   status           Status
-  orderProducts    OrderProducts[]
+  id_almacen       String
+  OrderProducts    OrderProducts[]
 }
 
 // Modelo OrderProducts

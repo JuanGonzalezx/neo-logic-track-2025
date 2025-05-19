@@ -42,6 +42,21 @@ async function findUserByEmail(email) {
         return null;
     }
 }
+
+async function findDespachadorByCity(city) {
+    if (!city) return null;
+    try {
+        const response = await axios.get(`${USERS_API_BASE_URL}/despachadores/${city}`);
+        return response.data;
+    } catch (error) {
+        if (error.response && error.response.status === 404) {
+            return null;
+        }
+        console.error('Error finding despachador by city in user service:', error.response ? error.response.data : error.message);
+        return null;
+    }
+}
+
 /**
  * Crea un nuevo usuario (gerente).
  * @param {object} userData ej: { nombre_completo, email, telefono, rolId (si es necesario), etc. }
@@ -72,4 +87,4 @@ async function createUser(userData) {
     }
 }
 
-module.exports = { findUser, createUser, findUserByEmail };
+module.exports = { findUser, createUser, findUserByEmail, findDespachadorByCity };

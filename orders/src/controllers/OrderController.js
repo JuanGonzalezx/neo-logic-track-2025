@@ -2,29 +2,40 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const { findUser } = require('../lib/userServiceClient');
-const { findProductById } = require('../lib/productServiceClient');
+const { findProductById, reduceStock, createMovements } = require('../lib/productServiceClient');
+const { createOrderProduct } = require('./OrderProductsController');
+const { findCityByAlmacen } = require('../lib/almacenServiceClient');
+const { findRepartidorByCity } = require('../lib/userServiceClient');
+
 
 // Función para validar todos los productos en orderProducts
 async function validateOrderProducts(orderProducts) {
-  if (!Array.isArray(orderProducts)) return false;
+  try {
+    for (const op of orderProducts) {
+      const productExists = await findProductById(op.product_id);
 
-  for (const op of orderProducts) {
-    if (!op.product_id) {
-      throw new Error('Each orderProduct must have a product_id');
+      if (!productExists) {
+        throw new Error(`Product with id ${op.product_id} not found`);
+      }
+
+      // Reduce el stock en almacenProducto
+      await reduceStock(op.product_id, op.almacen_id, op.amount);
+
+      // Crea el movimiento de salida de ese almacen 
+      await createMovements(op.product_id, op.almacen_id, op.amount)
+
     }
-    const productExists = await findProductById(op.product_id);
-    if (!productExists) {
-      throw new Error(`Product with id ${op.product_id} not found`);
-    }
+  } catch (error) {
+    console.error('Error creating order:', error);
+    throw new Error(error);
   }
-  return true;
 }
 
 // Obtener todas las órdenes
 const getAllOrders = async (req, res) => {
   try {
     const orders = await prisma.order.findMany({
-      include: { orderProducts: true },
+      include: { OrderProducts: true },
     });
     res.status(200).json(orders);
   } catch (error) {
@@ -53,34 +64,58 @@ const getOrderById = async (req, res) => {
     res.status(500).json({ message: 'Error fetching order', error: error.message });
   }
 };
+// Obtener órdenes por almacenId
+const getOrdersByAlmacen = async (req, res) => {
+  const { id_almacen } = req.params;
+  try {
+    const orders = await prisma.order.findMany({
+      where: { id_almacen },        // filtro por almacenId
+      include: { OrderProducts: true },
+    });
+    res.status(200).json(orders);
+  } catch (error) {
+    console.error('Error fetching orders by almacenId:', error);
+    res.status(500).json({ message: 'Error fetching orders by almacenId', error: error.message });
+  }
+};
 
 // Crear una nueva orden con validaciones
 const createOrder = async (req, res) => {
-  const { delivery_id, location_id, delivery_address, status, orderProducts } = req.body;
+  const { location_id, delivery_address, status, id_almacen, orderProducts,  } = req.body;
   try {
-    // Validar que delivery_id exista
-    const user = await findUser({ id: delivery_id });
-    if (!user) {
-      return res.status(400).json({ message: `User with id ${delivery_id} not found` });
-    }
 
-    // Validar todos los productos
-    await validateOrderProducts(orderProducts);
+    // Validar todos los productos, llama a dos funciones
+    //1. Para actualizar stock y mandar email si es el caso
+    //2. Crea el movimiento con tipo salida
+    // const validate = await validateOrderProducts(orderProducts);
+    
+    const city = await findCityByAlmacen(id_almacen)
 
+    const repartidor = await findRepartidorByCity(city)
+    
     // Crear la orden
     const order = await prisma.order.create({
       data: {
-        delivery_id,
+        delivery_id:repartidor.data.id,
         location_id,
         delivery_address,
         status,
-        creation_date: new Date(),
-        orderProducts: {
-          create: orderProducts,
-        },
+        id_almacen: id_almacen,
+        creation_date: new Date()
       },
     });
-    res.status(201).json(order);
+
+    // await createOrderProducts
+    for (const op of orderProducts) {
+      const orderProduct = await prisma.orderProducts.create({
+        data: {
+          order_id: order.id,
+          product_id: op.product_id,
+          amount: op.amount,
+        },
+      });
+    }
+    res.status(201).json({ message: req.body });
   } catch (error) {
     console.error('Error creating order:', error);
     res.status(400).json({ message: error.message });
@@ -141,6 +176,7 @@ const deleteOrder = async (req, res) => {
 module.exports = {
   getAllOrders,
   getOrderById,
+  getOrdersByAlmacen,
   createOrder,
   updateOrder,
   deleteOrder,

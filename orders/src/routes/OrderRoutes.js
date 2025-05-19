@@ -4,6 +4,7 @@ const OrderController = require('../controllers/OrderController');
 
 // Routes for orders
 router.get('/', OrderController.getAllOrders);
+router.get('/almacen/:id_almacen', OrderController.getOrdersByAlmacen);
 router.get('/:id', OrderController.getOrderById);
 router.post('/', OrderController.createOrder);
 router.put('/:id', OrderController.updateOrder);

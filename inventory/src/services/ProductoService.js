@@ -173,7 +173,6 @@ class ProductoService {
             capacidad_usada_m3 = capacidad_usada_m3+almacenEntity.capacidad_usada_m3
             await AlmacenService.updateCapacidadm3(id_almacen, capacidad_usada_m3);
 
-
             // 5. Crear producto (si no existe) - Esta operación debe ser await y completarse ANTES de las dependientes
             if (!existingProducto) {
 
@@ -688,7 +687,6 @@ if (proveedorProductoToCreate.length > 0) {
             const producto = await tx.producto.findUnique({ where: { id_producto } });
             if (!producto) throw new Error('Producto no encontrado para eliminar.');
 
-            const deletedProductoProveedor = await tx.proveedorProducto.deleteMany({ where: { id_producto } });
             const deletedProductoAlmacen = await tx.almacenProducto.deleteMany({ where: { id_producto } });
             const inactivedProducto = await tx.producto.update({
                 where: { id_producto },

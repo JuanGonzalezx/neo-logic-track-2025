@@ -13,6 +13,7 @@ router.get('/', AlmacenProductoController.getAll);
 router.get('/:id_almacenproducto', AlmacenProductoController.getById);
 router.get('/almacen/:id_almacen', AlmacenProductoController.getByAlmacen);
 router.get('/producto/:id_producto', AlmacenProductoController.getByProducto);
+router.get('/producto/:id_producto/almacen/:id_almacen', AlmacenProductoController.getByAlmacenProducto);
 router.put('/:id_almacenproducto', AlmacenProductoController.update);
 router.delete('/:id_almacenproducto', AlmacenProductoController.delete);
 

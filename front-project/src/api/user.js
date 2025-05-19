@@ -51,7 +51,7 @@ export async function updateUser(id, data) {
             email: data.email,
             current_password: data.current_password,
             number: data.number,
-            role: data.role,
+            roleId: data.roleId,
             status: data.status,
         }),
     });
@@ -74,7 +74,7 @@ export async function deleteUser(id) {
 export const getAllRoles = async () => {
     try {
         const res = await fetch(`${ENV.BASE_API}/roles`, {
-            method:"GET",
+            method: "GET",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${localStorage.getItem("token")}`,

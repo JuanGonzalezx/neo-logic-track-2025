@@ -17,9 +17,9 @@ enum EstadoAlmacen {
 }
 
 model Proveedor {
-  id                String              @id
-  nombre            String?
-  ProveedorProducto ProveedorProducto[]
+  id                 String               @id
+  nombre             String?
+  Movement_Inventory Movement_Inventory[]
 }
 
 model Producto {
@@ -36,7 +36,6 @@ model Producto {
   es_fragil              Boolean
   requiere_refrigeracion Boolean
   estado                 Boolean
-  ProveedorProducto      ProveedorProducto[]
   AlmacenProducto        AlmacenProducto[]
   Movement_Inventory     Movement_Inventory[]
 }
@@ -48,17 +47,6 @@ model Categoria {
   Producto    Producto[]
 }
 
-model ProveedorProducto {
-  id           String @id @default(uuid())
-  id_producto  String
-  id_proveedor String
-
-  producto  Producto  @relation(fields: [id_producto], references: [id_producto], onDelete: Cascade)
-  proveedor Proveedor @relation(fields: [id_proveedor], references: [id])
-
-  @@unique([id_producto, id_proveedor])
-}
-
 model Almacen {
   id_almacen         String               @id
   nombre_almacen     String
@@ -66,6 +54,8 @@ model Almacen {
   direccion          Direccion            @relation(fields: [direccionId], references: [id])
   gerente            String
   gerenteId          String? // Opcional: si quieres almacenar el ID del usuario del microservicio de usuarios
+  despachador        String?
+  despachadorId      String?
   capacidad_m3       Int
   capacidad_usada_m3 Int
   estado             EstadoAlmacen
@@ -119,15 +109,17 @@ model AlmacenProducto {
 }
 
 model Movement_Inventory {
-  id          String   @id @unique @default(uuid())
-  id_producto String
-  id_almacen  String
-  tipo        Boolean
-  cantidad    Int
-  fecha       DateTime
+  id           String   @id @unique @default(uuid())
+  id_producto  String
+  id_almacen   String
+  id_proveedor String
+  tipo         Boolean
+  cantidad     Int
+  fecha        DateTime
 
-  producto Producto @relation(fields: [id_producto], references: [id_producto])
-  almacen  Almacen  @relation(fields: [id_almacen], references: [id_almacen])
+  proveedor Proveedor @relation(fields: [id_proveedor], references: [id])
+  producto  Producto  @relation(fields: [id_producto], references: [id_producto])
+  almacen   Almacen   @relation(fields: [id_almacen], references: [id_almacen])
 
-  @@unique([id_producto, id_almacen, fecha])
+  @@unique([id_producto, id_almacen, id_proveedor, fecha])
 }
