@@ -96,6 +96,7 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
                 Date {getSortIcon('creation_date')}
               </th>
               <th>Delivery Address</th>
+              <th>Delivery ID</th>
               <th onClick={() => onSort('status')}>
                 Status {getSortIcon('status')}
               </th>
@@ -109,6 +110,7 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
                 <td>{order.id.substring(0, 8)}...</td>
                 <td>{formatDateTime(order.creation_date)}</td>
                 <td>{order.delivery_address}</td>
+                <td>{order.delivery_id}</td>
                 <td>
                   <span className={`status-badge ${order.status}`}>
                     {order.status}

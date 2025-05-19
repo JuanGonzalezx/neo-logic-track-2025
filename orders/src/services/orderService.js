@@ -1,6 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const userServiceClient = require('../lib/userServiceClient');
 const { returnStockAndCapacity } = require('../lib/productServiceClient')
+const { validateOrderProducts } = require('../controllers/OrderController')
 
 const prisma = new PrismaClient();
 
@@ -61,14 +62,43 @@ class OrderService {
     };
   }
 
-  // async updateOrder(order_id) {
-  //   const order = await 
-  // }
+  async updateOrderService(order_id, data) {
+    try {
 
-  
+      const order = await prisma.order.findUnique({ where: { id: order_id } })
+      if (!order) {
+        throw new Error("No existe esa orden a eliminar");
+      }
+
+      if (data.delivery_id) {
+        const user = await findUser({ id: data.delivery_id });
+        if (!user) {
+          return res.status(400).json({ message: `User with id ${data.delivery_id} not found` });
+        }
+
+
+        if (data.orderProducts) {
+          await returnStockAndCapacity(data.id_almacen, data.id_producto, data.amount)
+
+          await validateOrderProducts(data.orderProducts, data.id_almacen);
+        }
+
+        const orderUpdate = await prisma.order.update({
+          where: { id },
+          data: {
+            delivery_id,
+            location_id,
+            delivery_address,
+          },
+        });
+      }
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
 
   async deleteOrder(order_id) {
-  try {
+    try {
     const order = await prisma.order.findUnique({ where: { id: order_id } });
     if (!order) {
       return null; // para manejar en el controlador
