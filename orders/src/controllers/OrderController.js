@@ -2,36 +2,10 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const { findUser } = require('../lib/userServiceClient');
-const { findProductById, reduceStock, createMovements } = require('../lib/productServiceClient');
-const { createOrderProduct } = require('./OrderProductsController');
 const { findCityByAlmacen } = require('../lib/almacenServiceClient');
 const { findRepartidorByCity } = require('../lib/userServiceClient');
-const { returnStockAndCapacity } = require('../lib/productServiceClient');
-const orderService = require('../services/orderService');
-
-
-// Función para validar todos los productos en orderProducts
-async function validateOrderProducts(orderProducts, id_almacen) {
-  try {
-    for (const op of orderProducts) {
-      const productExists = await findProductById(op.product_id);
-
-      if (!productExists) {
-        throw new Error(`Product with id ${op.product_id} not found`);
-      }
-
-      // Reduce el stock en almacenProducto
-      await reduceStock(op.product_id, id_almacen, op.amount);
-
-      // Crea el movimiento de salida de ese almacen 
-      await createMovements(op.product_id, id_almacen, op.amount, op.id_proveedor)
-
-    }
-  } catch (error) {
-    console.error('Error creating order:', error);
-    throw new Error(error);
-  }
-}
+const { validateOrderProducts, updateOrderService, deleteOrders } = require('../services/orderService');
+const { findCoordinateById } = require('../lib/coordinateServiceClient');
 
 // Obtener todas las órdenes
 const getAllOrders = async (req, res) => {
@@ -66,12 +40,12 @@ const getOrderById = async (req, res) => {
     res.status(500).json({ message: 'Error fetching order', error: error.message });
   }
 };
-// Obtener órdenes por almacenId
+
 const getOrdersByAlmacen = async (req, res) => {
   const { id_almacen } = req.params;
   try {
     const orders = await prisma.order.findMany({
-      where: { id_almacen },        // filtro por almacenId
+      where: { id_almacen },
       include: { OrderProducts: true },
     });
     res.status(200).json(orders);
@@ -83,30 +57,54 @@ const getOrdersByAlmacen = async (req, res) => {
 
 // Crear una nueva orden con validaciones
 const createOrder = async (req, res) => {
-  let { location_id, delivery_address, status, id_almacen, orderProducts, } = req.body;
+  let { location_id, delivery_address, status, id_almacen,
+    orderProducts, coordinate_id, distance, timeEstimated,
+    deliveryAutomatic, client_id } = req.body;
   try {
-
+    const client = await findUser(client_id);
+    if (!client) {
+      return res.status(400).json({ message: `Client with id ${client_id} not found` });
+    }
     // Validar todos los productos, llama a dos funciones
     //1. Para actualizar stock y mandar email si es el caso
     //2. Crea el movimiento con tipo salida
     const validate = await validateOrderProducts(orderProducts, id_almacen);
-
-    const city = await findCityByAlmacen(id_almacen)
-
-    const repartidor = await findRepartidorByCity(city)
-    if (!repartidor) {
-      status = "PENDING"
+    
+    const coordinate = await findCoordinateById(coordinate_id)
+    if (!coordinate) {  
+      return res.status(400).json({ message: `Coordinate with id ${coordinate_id} not found` });
     }
-    status = "ASSIGNED"
+
+    let repartidor = null;
+
+    if (deliveryAutomatic) {
+      const city = await findCityByAlmacen(id_almacen)
+      repartidor = await findRepartidorByCity(city)
+      repartidor = repartidor.id
+      if (!repartidor) {
+        status = "PENDING"
+      }
+      status = "ASSIGNED"
+    } else {
+      status = "PENDING"
+      repartidor = "00000000-0000-0000-0000-000000000000"; // Default repartidor
+    }
+
     // Crear la orden
     const order = await prisma.order.create({
       data: {
-        delivery_id: repartidor.id,
+        delivery_id: repartidor,
         location_id,
         delivery_address,
         status,
         id_almacen: id_almacen,
+        client_id: client_id,
+        timeEstimated: timeEstimated,
+        distance: distance,
+        coordinate_id: coordinate_id,
         creation_date: new Date()
+      }, include: {
+        OrderProducts: true,
       },
     });
 
@@ -120,7 +118,7 @@ const createOrder = async (req, res) => {
         },
       });
     }
-    res.status(201).json({ message: req.body });
+    res.status(201).json({ message: order });
   } catch (error) {
     console.error('Error creating order:', error);
     res.status(400).json({ message: error.message });
@@ -130,23 +128,25 @@ const createOrder = async (req, res) => {
 // Actualizar orden con validaciones
 const updateOrder = async (req, res) => {
   const { id } = req.params;
-  const { delivery_id, location_id, delivery_address, status, orderProducts, id_almacen } = req.body;
+
   try {
+    if (req.body.id_almacen) {
+      throw new Error("No puedes cambiar el almacen de la orden");
+    }
 
-    await orderService.updateOrderService(id, req.body)
-
-    res.status(200).json({ message: "Usuario actualizado exitosamente" });
+    const order = await updateOrderService(id, req.body)
+    res.status(200).json({ message: "Pedido actualizado exitosamente", order: order });
   } catch (error) {
     console.error('Error updating order:', error);
     res.status(400).json({ message: error.message });
   }
 };
 
-// Borrar una orden
+
 const deleteOrder = async (req, res) => {
   const { id } = req.params;
   try {
-    const deletedOrder = orderService.deleteOrder(id);
+    const deletedOrder = deleteOrders(id);
     if (!deleteOrder) {
       throw new Error("Dont found the order");
     }
@@ -164,6 +164,5 @@ module.exports = {
   getOrdersByAlmacen,
   createOrder,
   updateOrder,
-  deleteOrder,
-  validateOrderProducts
+  deleteOrder
 };
