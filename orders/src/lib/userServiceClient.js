@@ -1,6 +1,7 @@
 const axios = require('axios');
 
 const USERS_API_BASE_URL = process.env.USERS_SERVICE_URL || 'http://localhost:3000/api/v1/users';
+const AUTH_API_BASE_URL = process.env.AUTH_SERVICE_URL || 'http://localhost:3000/api/v1/auth';
 
 async function findUser(queryParams) {
   try {
@@ -9,14 +10,29 @@ async function findUser(queryParams) {
     if (!data) {
       throw new Error("no se encontro al usuario");
     }
-    return data
+    return data.data
 
   } catch (error) {
     if (error.response && error.response.status === 404) {
-      return null;
+      return data;
     }
     console.error('Error finding user:', error.response ? error.response.data : error.message);
-    return null;
+    return data;
+  }
+}
+
+async function sendEmailOrder(email, fullname, order) {
+  try {
+    const data = {
+      email,
+      fullname,
+      order
+    };
+    const response = await axios.post(`${AUTH_API_BASE_URL}/order`, data);
+    return response.data;
+  } catch (error) {
+    console.error('Error sending email:', error.response ? error.response.data : error.message);
+    throw error;
   }
 }
 
@@ -54,4 +70,4 @@ async function findRepartidorByCity(city) {
   }
 }
 
-module.exports = { findUser, findDespachadorByCity, findRepartidorByCity };
+module.exports = { findUser, findDespachadorByCity, findRepartidorByCity, sendEmailOrder };

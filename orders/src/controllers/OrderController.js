@@ -1,9 +1,8 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const { findUser } = require('../lib/userServiceClient');
+const { findUser, findRepartidorByCity, sendEmailOrder } = require('../lib/userServiceClient');
 const { findCityByAlmacen } = require('../lib/almacenServiceClient');
-const { findRepartidorByCity } = require('../lib/userServiceClient');
 const { validateOrderProducts, updateOrderService, deleteOrders } = require('../services/orderService');
 const { findCoordinateById } = require('../lib/coordinateServiceClient');
 
@@ -65,13 +64,16 @@ const createOrder = async (req, res) => {
     if (!client) {
       return res.status(400).json({ message: `Client with id ${client_id} not found` });
     }
+
+    console.log(client);
+    
     // Validar todos los productos, llama a dos funciones
     //1. Para actualizar stock y mandar email si es el caso
     //2. Crea el movimiento con tipo salida
     const validate = await validateOrderProducts(orderProducts, id_almacen);
-    
+
     const coordinate = await findCoordinateById(coordinate_id)
-    if (!coordinate) {  
+    if (!coordinate) {
       return res.status(400).json({ message: `Coordinate with id ${coordinate_id} not found` });
     }
 
@@ -117,6 +119,8 @@ const createOrder = async (req, res) => {
           amount: op.amount,
         },
       });
+
+      await sendEmailOrder(client.email, client.fullname, order.id)
     }
     res.status(201).json({ message: order });
   } catch (error) {

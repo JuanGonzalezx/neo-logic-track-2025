@@ -115,6 +115,41 @@ const sendEmailStock = async (req, res) => {
   }
 };
 
+const sendEmailOrder = async (req, res) => {
+
+  let { email, fullname, order } = req.body
+  console.log(req.body);
+
+  let mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: "",
+    html: "",
+  };
+
+  try {
+    mailOptions.subject = `Pedido creado`;
+    mailOptions.html = `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e9e9e9; border-radius: 5px;">
+            <h2 style="color: #333; text-align: center;"> Hola ${fullname} </h2>
+            <p>Tu pedido ha sido exitoso. Este es el código de tu pedido con el cual </p>
+            <p>Podrás hacer seguimiento a tu pedido: <strong>${order}</strong></p>
+            <p>Gracias por hacer parte de nosotros</p>
+            <p>Saludos,<br>El equipo de soporte</p>
+          </div>
+        `;
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email enviado: " + info.response);
+    res.status(200).json({
+      message: "Email sended"
+    });
+
+  } catch (error) {
+    console.error("Error enviando el email:", error);
+    return false;
+  }
+};
 
 const sendSMS = async (code, number) => {
   try {
@@ -939,4 +974,5 @@ module.exports = {
   sendEmail,
   sendEmailStock,
   getUserFromToken,
+  sendEmailOrder
 };
