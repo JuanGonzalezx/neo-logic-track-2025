@@ -96,7 +96,638 @@ paths:
           description: Warehouse deleted
         '404':
           description: Warehouse not found
+  /almacenproductos:
+    get:
+      summary: Get all warehouse-product relations
+      tags: [AlmacenProducto]
+      responses:
+        '200':
+          description: List of warehouse-product relations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AlmacenProducto'
+    post:
+      summary: Create a warehouse-product relation
+      tags: [AlmacenProducto]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlmacenProductoInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlmacenProducto'
+  /almacenproductos/{id_almacenproducto}:
+    get:
+      summary: Get warehouse-product relation by ID
+      tags: [AlmacenProducto]
+      parameters:
+        - in: path
+          name: id_almacenproducto
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlmacenProducto'
+        '404':
+          description: Not found
+  /almacenproductos/producto/{id_producto}:
+    get:
+      summary: Get warehouse-product relations by product
+      tags: [AlmacenProducto]
+      parameters:
+        - in: path
+          name: id_producto
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AlmacenProducto'
+  /almacenproductos/almacen/{id_almacen}:
+    get:
+      summary: Get warehouse-product relations by warehouse
+      tags: [AlmacenProducto]
+      parameters:
+        - in: path
+          name: id_almacen
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AlmacenProducto'
+  /almacenproductos/almacen/{id_almacen}/producto/{id_producto}:
+    get:
+      summary: Get warehouse-product relation by warehouse and product
+      tags: [AlmacenProducto]
+      parameters:
+        - in: path
+          name: id_almacen
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: id_producto
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlmacenProducto'
+  /categorias:
+    get:
+      summary: Get all categories
+      tags: [Categoria]
+      responses:
+        '200':
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Categoria'
+    post:
+      summary: Create a category
+      tags: [Categoria]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoriaInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categoria'
+  /ciudades:
+    get:
+      summary: Get all cities
+      tags: [Ciudad]
+      responses:
+        '200':
+          description: List of cities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ciudad'
+    post:
+      summary: Create a city
+      tags: [Ciudad]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CiudadInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ciudad'
+  /ciudades/{id}:
+    get:
+      summary: Get city by ID
+      tags: [Ciudad]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ciudad'
+        '404':
+          description: Not found
+    put:
+      summary: Update city by ID
+      tags: [Ciudad]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CiudadInput'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ciudad'
+        '404':
+          description: Not found
+    delete:
+      summary: Delete city by ID
+      tags: [Ciudad]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: Not found
 
+  /departamentos:
+    get:
+      summary: Get all departments
+      tags: [Departamento]
+      responses:
+        '200':
+          description: List of departments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Departamento'
+    post:
+      summary: Create a department
+      tags: [Departamento]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartamentoInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Departamento'
+  /departamentos/{id}:
+    get:
+      summary: Get department by ID
+      tags: [Departamento]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Departamento'
+        '404':
+          description: Not found
+    put:
+      summary: Update department by ID
+      tags: [Departamento]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartamentoInput'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Departamento'
+        '404':
+          description: Not found
+    delete:
+      summary: Delete department by ID
+      tags: [Departamento]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: Not found
+  /movimientos:
+    get:
+      summary: Get all inventory movements
+      tags: [Movimiento]
+      responses:
+        '200':
+          description: List of movements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movimiento'
+    post:
+      summary: Create a movement
+      tags: [Movimiento]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MovimientoInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movimiento'
+  /movimientos/{id_movement}:
+    get:
+      summary: Get movement by ID
+      tags: [Movimiento]
+      parameters:
+        - in: path
+          name: id_movement
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movimiento'
+        '404':
+          description: Not found
+    delete:
+      summary: Delete movement by ID
+      tags: [Movimiento]
+      parameters:
+        - in: path
+          name: id_movement
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: Not found
+
+  /productos:
+    get:
+      summary: Get all products
+      tags: [Producto]
+      responses:
+        '200':
+          description: List of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Producto'
+    post:
+      summary: Create a product
+      tags: [Producto]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductoInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Producto'
+  /productos/{id_producto}:
+    get:
+      summary: Get product by ID
+      tags: [Producto]
+      parameters:
+        - in: path
+          name: id_producto
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Producto'
+        '404':
+          description: Not found
+    put:
+      summary: Update product by ID
+      tags: [Producto]
+      parameters:
+        - in: path
+          name: id_producto
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductoInput'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Producto'
+        '404':
+          description: Not found
+    delete:
+      summary: Delete product by ID
+      tags: [Producto]
+      parameters:
+        - in: path
+          name: id_producto
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: Not found
+  /proveedores:
+    get:
+      summary: Get all suppliers
+      tags: [Proveedor]
+      responses:
+        '200':
+          description: List of suppliers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Proveedor'
+    post:
+      summary: Create a supplier
+      tags: [Proveedor]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProveedorInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Proveedor'
+  /proveedores/{id_proveedor}:
+    get:
+      summary: Get supplier by ID
+      tags: [Proveedor]
+      parameters:
+        - in: path
+          name: id_proveedor
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Proveedor'
+        '404':
+          description: Not found
+    put:
+      summary: Update supplier by ID
+      tags: [Proveedor]
+      parameters:
+        - in: path
+          name: id_proveedor
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProveedorInput'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Proveedor'
+        '404':
+          description: Not found
+    delete:
+      summary: Delete supplier by ID
+      tags: [Proveedor]
+      parameters:
+        - in: path
+          name: id_proveedor
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: Not found
+
+  /proveedorproductos:
+    get:
+      summary: Get all supplier-product relations
+      tags: [ProveedorProducto]
+      responses:
+        '200':
+          description: List of supplier-product relations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProveedorProducto'
+    post:
+      summary: Create a supplier-product relation
+      tags: [ProveedorProducto]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProveedorProductoInput'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProveedorProducto'
+  /proveedorproductos/{id_proveedorproductos}:
+    get:
+      summary: Get supplier-product relation by ID
+      tags: [ProveedorProducto]
+      parameters:
+        - in: path
+          name: id_proveedorproductos
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProveedorProducto'
+        '404':
+          description: Not found
+  /proveedorproductos/producto/{id_producto}:
+    get:
+      summary: Get supplier-product relations by product
+      tags: [ProveedorProducto]
+      parameters:
+        - in: path
+          name: id_producto
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProveedorProducto'
+  /proveedorproductos/proveedor/{id_proveedor}:
+    get:
+      summary: Get supplier-product relations by supplier
+      tags: [ProveedorProducto]
+      parameters:
+        - in: path
+          name: id_proveedor
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProveedorProducto'
 components:
   schemas:
     Warehouse:
@@ -126,3 +757,187 @@ components:
       required:
         - name
         - capacidad_m3
+    AlmacenProducto:
+      type: object
+      properties:
+        id_almacenproducto:
+          type: string
+        almacenId:
+          type: string
+        productoId:
+          type: string
+        stock:
+          type: number
+    AlmacenProductoInput:
+      type: object
+      properties:
+        almacenId:
+          type: string
+        productoId:
+          type: string
+        stock:
+          type: number
+      required:
+        - almacenId
+        - productoId
+    Categoria:
+      type: object
+      properties:
+        id_categoria:
+          type: string
+        nombre:
+          type: string
+    CategoriaInput:
+      type: object
+      properties:
+        nombre:
+          type: string
+      required:
+        - nombre
+    Ciudad:
+      type: object
+      properties:
+        id:
+          type: string
+        nombre:
+          type: string
+    CiudadInput:
+      type: object
+      properties:
+        nombre:
+          type: string
+      required:
+        - nombre
+    Departamento:
+      type: object
+      properties:
+        id:
+          type: string
+        nombre:
+          type: string
+    DepartamentoInput:
+      type: object
+      properties:
+        nombre:
+          type: string
+      required:
+        - nombre
+    Movimiento:
+      type: object
+      properties:
+        id_movement:
+          type: string
+        productoId:
+          type: string
+        almacenId:
+          type: string
+        cantidad:
+          type: number
+        tipo:
+          type: string
+          enum: [entrada, salida]
+        fecha:
+          type: string
+          format: date-time
+    MovimientoInput:
+      type: object
+      properties:
+        productoId:
+          type: string
+        almacenId:
+          type: string
+        cantidad:
+          type: number
+        tipo:
+          type: string
+          enum: [entrada, salida]
+        fecha:
+          type: string
+          format: date-time
+      required:
+        - productoId
+        - almacenId
+        - cantidad
+        - tipo
+        - fecha
+    Producto:
+      type: object
+      properties:
+        id_producto:
+          type: string
+        nombre:
+          type: string
+        descripcion:
+          type: string
+        precio:
+          type: number
+        categoriaId:
+          type: string
+    ProductoInput:
+      type: object
+      properties:
+        nombre:
+          type: string
+        descripcion:
+          type: string
+        precio:
+          type: number
+        categoriaId:
+          type: string
+      required:
+        - nombre
+        - precio
+        - categoriaId
+    Proveedor:
+      type: object
+      properties:
+        id_proveedor:
+          type: string
+        nombre:
+          type: string
+        contacto:
+          type: string
+        telefono:
+          type: string
+        email:
+          type: string
+    ProveedorInput:
+      type: object
+      properties:
+        nombre:
+          type: string
+        contacto:
+          type: string
+        telefono:
+          type: string
+        email:
+          type: string
+      required:
+        - nombre
+    ProveedorProducto:
+      type: object
+      properties:
+        id_proveedorproductos:
+          type: string
+        proveedorId:
+          type: string
+        productoId:
+          type: string
+        precio:
+          type: number
+        stock:
+          type: number
+    ProveedorProductoInput:
+      type: object
+      properties:
+        proveedorId:
+          type: string
+        productoId:
+          type: string
+        precio:
+          type: number
+        stock:
+          type: number
+      required:
+        - proveedorId
+        - productoId
