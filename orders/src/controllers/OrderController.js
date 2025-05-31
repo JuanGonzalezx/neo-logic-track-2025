@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 const { findUser, findRepartidorByCity, sendEmailOrder } = require('../lib/userServiceClient');
 const { findCityByAlmacen } = require('../lib/almacenServiceClient');
 const { validateOrderProducts, updateOrderService, deleteOrders } = require('../services/orderService');
-const { findCoordinateById } = require('../lib/coordinateServiceClient');
+const { createCoordinate, findCoordinateById } = require('../lib/coordinateServiceClient');
 
 // Obtener todas las órdenes
 const getAllOrders = async (req, res) => {
@@ -23,17 +23,23 @@ const getAllOrders = async (req, res) => {
 const getOrderById = async (req, res) => {
   const { id } = req.params;
   try {
-    const order = await prisma.order.findUnique({
+    let order = await prisma.order.findUnique({
       where: { id },
       include: { OrderProducts: true },
     });
+
+    const coordinate = await findCoordinateById(order.coordinate_id);
+
+    order = {
+      ...order,
+      coordinate
+    }
+
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    const deliveryUser = await findUser({ id: order.delivery_id });
-
-    res.status(200).json({ ...order, deliveryUser });
+    res.status(200).json({ ...order });
   } catch (error) {
     console.error('Error fetching order:', error);
     res.status(500).json({ message: 'Error fetching order', error: error.message });
@@ -56,33 +62,29 @@ const getOrdersByAlmacen = async (req, res) => {
 
 // Crear una nueva orden con validaciones
 const createOrder = async (req, res) => {
-  let { location_id, delivery_address, status, id_almacen,
-    orderProducts, coordinate_id, distance, timeEstimated,
-    deliveryAutomatic, client_id } = req.body;
+  let { auto_assign, customer_email, customer_name, delivery_address,
+    id_almacen, latitude, longitude, orderProducts, status
+  } = req.body;
   try {
-    const client = await findUser(client_id);
-    if (!client) {
-      return res.status(400).json({ message: `Client with id ${client_id} not found` });
-    }
 
-    console.log(client);
-    
-    // Validar todos los productos, llama a dos funciones
-    //1. Para actualizar stock y mandar email si es el caso
-    //2. Crea el movimiento con tipo salida
-    const validate = await validateOrderProducts(orderProducts, id_almacen);
+    await validateOrderProducts(orderProducts, id_almacen);
 
-    const coordinate = await findCoordinateById(coordinate_id)
-    if (!coordinate) {
-      return res.status(400).json({ message: `Coordinate with id ${coordinate_id} not found` });
+    const city = await findCityByAlmacen(id_almacen)
+
+    const coordenada = {
+      latitude,
+      longitude,
+      cityId: city,
+      street: delivery_address,
+      postal_code: req.body.postal_code || "00000"
     }
+    const coordinate = await createCoordinate(coordenada)
 
     let repartidor = null;
 
-    if (deliveryAutomatic) {
-      const city = await findCityByAlmacen(id_almacen)
+    if (auto_assign) {
       repartidor = await findRepartidorByCity(city)
-      repartidor = repartidor.id
+      repartidor = repartidor
       if (!repartidor) {
         status = "PENDING"
       }
@@ -95,15 +97,15 @@ const createOrder = async (req, res) => {
     // Crear la orden
     const order = await prisma.order.create({
       data: {
-        delivery_id: repartidor,
-        location_id,
+        delivery_id: repartidor.id,
         delivery_address,
         status,
+        customer_email,
+        customer_name,
+        delivery_email: repartidor.email,
+        delivery_name: repartidor.fullname,
         id_almacen: id_almacen,
-        client_id: client_id,
-        timeEstimated: timeEstimated,
-        distance: distance,
-        coordinate_id: coordinate_id,
+        coordinate_id: coordinate.id,
         creation_date: new Date()
       }, include: {
         OrderProducts: true,
@@ -120,7 +122,7 @@ const createOrder = async (req, res) => {
         },
       });
 
-      await sendEmailOrder(client.email, client.fullname, order.id)
+      await sendEmailOrder(customer_email, customer_name, order.id)
     }
     res.status(201).json({ message: order });
   } catch (error) {

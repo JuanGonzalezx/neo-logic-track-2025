@@ -10,7 +10,7 @@ async function findUser(queryParams) {
     if (!data) {
       throw new Error("no se encontro al usuario");
     }
-    return data.data
+    return data
 
   } catch (error) {
     if (error.response && error.response.status === 404) {

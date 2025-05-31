@@ -5,7 +5,10 @@ CREATE TYPE "Status" AS ENUM ('PENDING', 'ASSIGNED', 'ON_ROUTE', 'DELIVERED', 'C
 CREATE TABLE "Order" (
     "id" TEXT NOT NULL,
     "delivery_id" TEXT NOT NULL,
-    "client_id" TEXT NULL,
+    "customer_name" TEXT NULL,
+    "customer_email" TEXT NULL,
+    "delivery_name" TEXT NULL,
+    "delivery_email" TEXT NULL,
     "coordinate_id" TEXT NULL,
     "creation_date" TIMESTAMP(3) NOT NULL,
     "delivery_address" TEXT NOT NULL,

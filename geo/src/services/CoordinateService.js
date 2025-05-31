@@ -5,17 +5,19 @@ const CityServiceClient = require('../lib/CityServiceClient');
 
 class CoordinateService {
 
-    async create(data) {
+    async findOrCreate(data) {
+console.log(data);
 
         if (!data.latitude || !data.longitude || !data.cityId || !data.street) {
             throw new Error("Los campos latitude, longitude, cityId y userId son requeridos.");
         }
+
         let coordinate = await prisma.coordinates.findFirst({
             where: { latitude: data.latitude, longitude: data.longitude }
         });
 
         if (coordinate) {
-            throw new Error("Ya existe una coordinate con esas coordenadas.");
+           return coordinate;
         }
 
         const city = await CityServiceClient.findCity(data.cityId);

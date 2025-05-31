@@ -12,7 +12,10 @@ datasource db {
 model Order {
   id               String          @id @default(uuid())
   delivery_id      String
-  client_id        String?
+  customer_name    String?
+  customer_email   String?
+  delivery_name    String?
+  delivery_email   String?
   coordinate_id    String?
   creation_date    DateTime
   delivery_address String
