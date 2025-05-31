@@ -7,6 +7,8 @@ CREATE TABLE "Order" (
     "delivery_id" TEXT NOT NULL,
     "customer_name" TEXT NULL,
     "customer_email" TEXT NULL,
+    "delivery_name" TEXT NULL,
+    "delivery_email" TEXT NULL,
     "coordinate_id" TEXT NULL,
     "creation_date" TIMESTAMP(3) NOT NULL,
     "delivery_address" TEXT NOT NULL,

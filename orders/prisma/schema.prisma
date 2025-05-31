@@ -14,6 +14,8 @@ model Order {
   delivery_id      String
   customer_name    String?
   customer_email   String?
+  delivery_name    String?
+  delivery_email   String?
   coordinate_id    String?
   creation_date    DateTime
   delivery_address String

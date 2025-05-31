@@ -31,9 +31,9 @@ const getOrderById = async (req, res) => {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    const deliveryUser = await findUser({ id: order.delivery_id });
+    // const deliveryUser = await findUser({ id: order.delivery_id });
 
-    res.status(200).json({ ...order, deliveryUser });
+    res.status(200).json({ ...order });
   } catch (error) {
     console.error('Error fetching order:', error);
     res.status(500).json({ message: 'Error fetching order', error: error.message });
@@ -78,7 +78,7 @@ const createOrder = async (req, res) => {
 
     if (auto_assign) {
       repartidor = await findRepartidorByCity(city)
-      repartidor = repartidor.id
+      repartidor = repartidor
       if (!repartidor) {
         status = "PENDING"
       }
@@ -91,11 +91,13 @@ const createOrder = async (req, res) => {
     // Crear la orden
     const order = await prisma.order.create({
       data: {
-        delivery_id: repartidor,
+        delivery_id: repartidor.id,
         delivery_address,
         status,
         customer_email,
         customer_name,
+        delivery_email: repartidor.email,
+        delivery_name: repartidor.fullname,
         id_almacen: id_almacen,
         coordinate_id: coordinate.id,
         creation_date: new Date()
