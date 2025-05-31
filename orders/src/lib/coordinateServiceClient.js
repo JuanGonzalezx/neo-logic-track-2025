@@ -2,9 +2,9 @@ const axios = require('axios');
 
 const COORDINATE_API_BASE_URL = process.env.COORDINATE_SERVICE_URL || 'http://localhost:3003/api/v1/coordinates';
 
-async function findCoordinateById(id) {
+async function findCoordinateById(data) {
   try {
-    const response = await axios.get(`${COORDINATE_API_BASE_URL}/${id}`);
+    const response = await axios.post(`${COORDINATE_API_BASE_URL}`, data);
     return response.data;
   } catch (error) {
     if (error.response && error.response.status === 404) {
