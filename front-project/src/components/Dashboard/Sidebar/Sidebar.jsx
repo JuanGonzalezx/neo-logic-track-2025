@@ -318,7 +318,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
 
             <li className="sidebar-nav-item">
               <NavLink
-                to="/dashboard/inventor"
+                to="/dashboard/inventory"
                 end
                 className={linkClass}
                 onClick={handleNavLinkClick}
