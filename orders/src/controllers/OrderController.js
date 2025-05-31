@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 const { findUser, findRepartidorByCity, sendEmailOrder } = require('../lib/userServiceClient');
 const { findCityByAlmacen } = require('../lib/almacenServiceClient');
 const { validateOrderProducts, updateOrderService, deleteOrders } = require('../services/orderService');
-const { findCoordinateById } = require('../lib/coordinateServiceClient');
+const { createCoordinate, findCoordinateById } = require('../lib/coordinateServiceClient');
 
 // Obtener todas las órdenes
 const getAllOrders = async (req, res) => {
@@ -23,15 +23,21 @@ const getAllOrders = async (req, res) => {
 const getOrderById = async (req, res) => {
   const { id } = req.params;
   try {
-    const order = await prisma.order.findUnique({
+    let order = await prisma.order.findUnique({
       where: { id },
       include: { OrderProducts: true },
     });
+
+    const coordinate = await findCoordinateById(order.coordinate_id);
+
+    order = {
+      ...order,
+      coordinate
+    }
+
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
-
-    // const deliveryUser = await findUser({ id: order.delivery_id });
 
     res.status(200).json({ ...order });
   } catch (error) {
@@ -72,8 +78,8 @@ const createOrder = async (req, res) => {
       street: delivery_address,
       postal_code: req.body.postal_code || "00000"
     }
-    const coordinate = await findCoordinateById(coordenada)
-    
+    const coordinate = await createCoordinate(coordenada)
+
     let repartidor = null;
 
     if (auto_assign) {
