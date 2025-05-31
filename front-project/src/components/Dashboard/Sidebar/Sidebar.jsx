@@ -166,6 +166,50 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
               </li>
             )}
 
+            {hasPermission('681bead67a2c0df928b8b232') && (
+            <li className="sidebar-nav-item">
+              <div
+                className={`sidebar-nav-section ${activeSection === 'permissions' ? 'expanded' : ''}`}
+                onClick={() => toggleSection('permissions')}
+              >
+                <div className="section-content">
+                  <Shield size={20} className="sidebar-icon" />
+                  {!collapsed && <span>Permissions</span>}
+                </div>
+                {!collapsed && (
+                  <ChevronDown
+                    size={16}
+                    className={`section-arrow ${activeSection === 'permissions' ? 'expanded' : ''}`}
+                  />
+                )}
+              </div>
+              {(activeSection === 'permissions' || collapsed) && (
+                <ul className="sidebar-subnav">
+                  <li className="sidebar-subnav-item">
+                    <NavLink
+                      to="/dashboard/permissions"
+                      end
+                      className={linkClass}
+                      onClick={handleNavLinkClick}
+                    >
+                      {collapsed ? <Shield size={20} /> : <span>All Permissions</span>}
+                    </NavLink>
+                  </li>
+                  <li className="sidebar-subnav-item">
+                    <NavLink
+                      to="/dashboard/permissions/create"
+                      end
+                      className={linkClass}
+                      onClick={handleNavLinkClick}
+                    >
+                      {collapsed ? <Plus size={20} /> : <span>Add Permission</span>}
+                    </NavLink>
+                  </li>
+                </ul>
+              )}
+            </li>
+            )}
+
             {/* Inventory Section */}
             <li className="sidebar-nav-item">
               <div
@@ -272,61 +316,8 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
               )}
             </li>
 
-            {hasPermission('681bead67a2c0df928b8b232') && (
-            <li className="sidebar-nav-item">
-              <div
-                className={`sidebar-nav-section ${activeSection === 'permissions' ? 'expanded' : ''}`}
-                onClick={() => toggleSection('permissions')}
-              >
-                <div className="section-content">
-                  <Shield size={20} className="sidebar-icon" />
-                  {!collapsed && <span>Permissions</span>}
-                </div>
-                {!collapsed && (
-                  <ChevronDown
-                    size={16}
-                    className={`section-arrow ${activeSection === 'permissions' ? 'expanded' : ''}`}
-                  />
-                )}
-              </div>
-              {(activeSection === 'permissions' || collapsed) && (
-                <ul className="sidebar-subnav">
-                  <li className="sidebar-subnav-item">
-                    <NavLink
-                      to="/dashboard/permissions"
-                      end
-                      className={linkClass}
-                      onClick={handleNavLinkClick}
-                    >
-                      {collapsed ? <Shield size={20} /> : <span>All Permissions</span>}
-                    </NavLink>
-                  </li>
-                  <li className="sidebar-subnav-item">
-                    <NavLink
-                      to="/dashboard/permissions/create"
-                      end
-                      className={linkClass}
-                      onClick={handleNavLinkClick}
-                    >
-                      {collapsed ? <Plus size={20} /> : <span>Add Permission</span>}
-                    </NavLink>
-                  </li>
-                </ul>
-              )}
-            </li>
-            )}
+            
 
-            <li className="sidebar-nav-item">
-              <NavLink
-                to="/dashboard/inventory"
-                end
-                className={linkClass}
-                onClick={handleNavLinkClick}
-              >
-                <Package2 size={20} className="sidebar-icon" />
-                {!collapsed && <span>Inventory</span>}
-              </NavLink>
-            </li>
           </ul>
         </nav>
 

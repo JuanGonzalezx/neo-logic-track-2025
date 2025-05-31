@@ -115,7 +115,7 @@
 /* Order Products */
 .order-products,
 .selected-products-list {
-  padding: 0 24px 24px;
+  padding: 24px 24px 24px;
 }
 
 /* *** Scroll horizontal para tablas en modales */
