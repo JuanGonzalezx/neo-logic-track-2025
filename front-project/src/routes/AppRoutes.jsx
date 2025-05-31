@@ -5,9 +5,13 @@ import RepartidorDashboard from "../components/Dashboard/RepartidorDashboard";
 import Unauthorized from "../components/Auth/Unauthorized"; // Página simple de acceso denegado
 
 import ProtectedRoute from "./ProtectedRoute";
+import Home from "../components/Home/Home";
 
 <Routes>
-  <Route path="/" element={isAuthenticated ? <Navigate to="/redirect" /> : <Login />} />
+  <Route path="/" element={<Home />} />
+  {/* <Route path="/" element={isAuthenticated ? <Navigate to="/redirect" /> : <Home />} /> */}
+
+  <Route path="/track/:orderId" element={<div>Tracking Page (Coming Soon)</div>} />
 
   <Route path="/admin" element={
       <AdminDashboard />

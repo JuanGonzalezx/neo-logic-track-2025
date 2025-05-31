@@ -71,7 +71,6 @@ const Login = () => {
       console.log("Respuesta del servidor:", response);
 
       if (response.status === 200) {
-
         // alerta verde
         setApiResponse({ type: "success", message: response.message });
 
@@ -92,6 +91,9 @@ const Login = () => {
           localStorage.setItem("token", response.token);
           navigate("/dashboard");
         }
+      } else if (response.status === 400 && response.message && response.message.toLowerCase().includes('contraseña')) {
+        console.error("Contraseña incorrecta");
+        setApiResponse({ type: "error", message: "Correo o contraseña incorrecta"});
       } else if (response.status === 400) {
         // alerta roja
         setApiResponse({ type: "error", message: response.message });
@@ -151,9 +153,20 @@ const Login = () => {
         className="login-container"
         style={{ maxWith: 400, margin: "0 auto", marginTop: 50 }}
       >
-        <Title level={2} style={{ textAlign: "center" }}>
-          Login
-        </Title>
+        {/* <Title level={2} style={{ textAlign: "center" }}>
+          Entra
+        </Title> */}
+
+        {/* Mostrar alerta de error o éxito */}
+        {apiResponse && (
+          <Alert
+            style={{ marginBottom: 16 }}
+            message={apiResponse.message}
+            type={apiResponse.type}
+            showIcon
+          />
+        )}
+
         <form onSubmit={handleSubmit}>
           {/* Input de email */}
           <div className="form-group">
@@ -216,12 +229,12 @@ const Login = () => {
           id={0}
         />
 
-        <div className="verification-resend-text">
+        {/* <div className="verification-resend-text">
           ¿Not registered?{' '}
           <button onClick={handleSignUp} className="verification-resend-link">
             Sign Up
           </button>
-        </div>
+        </div> */}
       </div>
     </>
   );
