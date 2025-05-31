@@ -153,9 +153,9 @@ const Login = () => {
         className="login-container"
         style={{ maxWith: 400, margin: "0 auto", marginTop: 50 }}
       >
-        <Title level={2} style={{ textAlign: "center" }}>
-          Login
-        </Title>
+        {/* <Title level={2} style={{ textAlign: "center" }}>
+          Entra
+        </Title> */}
 
         {/* Mostrar alerta de error o éxito */}
         {apiResponse && (
@@ -229,12 +229,12 @@ const Login = () => {
           id={0}
         />
 
-        <div className="verification-resend-text">
+        {/* <div className="verification-resend-text">
           ¿Not registered?{' '}
           <button onClick={handleSignUp} className="verification-resend-link">
             Sign Up
           </button>
-        </div>
+        </div> */}
       </div>
     </>
   );

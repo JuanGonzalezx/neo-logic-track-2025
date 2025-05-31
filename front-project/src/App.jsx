@@ -25,6 +25,7 @@ import CategoryList from "./components/Dashboard/Categories/CategoryList";
 import CategoryForm from "./components/Dashboard/Categories/CategoryForm";
 import WarehouseList from "./components/Dashboard/Warehouses/WarehouseList";
 import OrderList from "./components/Dashboard/Orders/OrderList";
+import Home from "./components/Home/Home";
 function App() {
   const navigate = useNavigate();
   let { isAuthenticated } = useSelector((state) => state.auth);
@@ -43,7 +44,7 @@ function App() {
 
   return (
       <Routes>
-        <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} />
+        <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Home />} />
         <Route path="/signup" element={<Register />} />
         <Route path="/reset-password" element={<RequestReset />} />
         <Route path="/changeResetPassword/:token" element={<ChangeResetPassword />} />

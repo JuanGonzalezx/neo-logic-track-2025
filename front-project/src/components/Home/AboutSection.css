@@ -1,0 +1,162 @@
+/* About Section Styles */
+.about-section {
+  padding: 48px 0;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.about-section h2 {
+  font-size: 28px;
+  color: #1a3b68;
+  text-align: center;
+  margin-bottom: 32px;
+  position: relative;
+}
+
+.about-section h2:after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background-color: #4a5568;
+}
+
+.about-content {
+  display: flex;
+  gap: 32px;
+  padding: 0 24px;
+}
+
+.about-image {
+  flex: 1;
+  min-width: 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.about-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.about-image img:hover {
+  transform: scale(1.05);
+}
+
+.about-text {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.about-text p {
+  color: #4a5568;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Features */
+.about-features {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.feature {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.feature-icon {
+  font-size: 24px;
+  padding: 12px;
+  background-color: rgba(26, 59, 104, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  min-height: 40px;
+}
+
+.feature-info {
+  flex: 1;
+}
+
+.feature-info h3 {
+  font-size: 18px;
+  color: #1a3b68;
+  margin: 0 0 4px;
+}
+
+.feature-info p {
+  font-size: 14px;
+  color: #4a5568;
+  margin: 0;
+}
+
+/* CTA Button */
+.about-cta {
+  display: inline-block;
+  background-color: #1a3b68;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  margin-top: 16px;
+  align-self: flex-start;
+  transition: all 0.2s ease;
+}
+
+.about-cta:hover {
+  background-color: #12294b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(26, 59, 104, 0.2);
+}
+
+/* Responsive Styles */
+@media (max-width: 880px) {
+  .about-content {
+    flex-direction: column;
+  }
+  
+  .about-image {
+    max-height: 240px;
+  }
+  
+  .about-section h2 {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-section {
+    padding: 32px 0;
+  }
+  
+  .about-features {
+    gap: 24px;
+  }
+  
+  .feature {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .about-cta {
+    align-self: center;
+    width: 100%;
+    text-align: center;
+  }
+}

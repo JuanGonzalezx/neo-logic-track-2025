@@ -171,10 +171,10 @@ const Register = ({ isOpen, onClose }) => {
             <button onClick={onClose} className="verification-close-button">
                 <X size={24} />
             </button>
-
+{/* 
             <Title level={2} style={{ textAlign: "center" }}>
                 Sign Up
-            </Title>
+            </Title> */}
 
             {/* Mostramos la alerta justo antes del form */}
             {apiResponse && (
@@ -271,13 +271,13 @@ const Register = ({ isOpen, onClose }) => {
                     {loading ? <Spin /> : "Create"}
                 </button>
             </form>
-
+{/* 
             <div className="verification-resend-text">
                 ¿registered?{" "}
                 <button onClick={handleLogin} className="verification-resend-link">
                     Login
                 </button>
-            </div>
+            </div> */}
 
             <VerificationModal
                 isOpen={showModal}
