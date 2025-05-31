@@ -30,19 +30,18 @@ function calcularVolumen(dimensiones) {
 }
 
 async function returnStockAndCapacity(id_almacen, id_producto, amount) {
+
   let almacenProducto = (await axios.get(`${ALMACENPRODUCTS_API_BASE_URL}/producto/${id_producto}/almacen/${id_almacen}`)).data
   let almacen = (await axios.get(`${ALMACENES_API_BASE_URL}/${id_almacen}`)).data ///si daaaaaaaaaaaa
   let producto = (await axios.get(`${PRODUCTS_API_BASE_URL}/${id_producto}`)).data ///si daaaaaaaaaaaa
 
   const stockNuevo = almacenProducto.cantidad_stock + amount
-  const capacidadNueva = almacen.capacidad_usada_m3 + calcularVolumen(producto.dimensiones_cm)*amount
+  const capacidadNueva = almacen.capacidad_usada_m3 + calcularVolumen(producto.dimensiones_cm) * amount
 
   const updateStock = {
     cantidad_stock: stockNuevo
   }
   let updateAlmPro = (await axios.put(`${ALMACENPRODUCTS_API_BASE_URL}/${almacenProducto.id}`, updateStock)).data
-
-
   let updateAlm = (await axios.put(`${ALMACENES_API_BASE_URL}/${almacen.id_almacen}/capacidad/${capacidadNueva}`)).data
 }
 
@@ -51,7 +50,6 @@ async function reduceStock(product_id, almacen_id, amount) {
 
     let responseAlmacen = (await axios.get(`${ALMACENPRODUCTS_API_BASE_URL}/producto/${product_id}/almacen/${almacen_id}`)).data
 
-
     if (amount > responseAlmacen.cantidad_stock) {
       throw new Error("La cantidad del producto es mayor al disponible en el stock");
     }
@@ -59,9 +57,7 @@ async function reduceStock(product_id, almacen_id, amount) {
     let stockActual = responseAlmacen.cantidad_stock - amount
     if (stockActual < responseAlmacen.nivel_reorden) {
 
-
       const almacen = await (await axios.get(`${ALMACENES_API_BASE_URL}/${almacen_id}`)).data
-
       const despachador = await (await axios.get(`${AUTH_API_BASE_URL}/users/${almacen.despachadorId}`)).data
 
       let data = {
@@ -75,7 +71,6 @@ async function reduceStock(product_id, almacen_id, amount) {
 
     responseAlmacen.cantidad_stock = stockActual
     const response = await axios.put(`${ALMACENPRODUCTS_API_BASE_URL}/${responseAlmacen.id}`, responseAlmacen);
-
     return responseAlmacen.data;
   } catch (error) {
     throw new Error(error);

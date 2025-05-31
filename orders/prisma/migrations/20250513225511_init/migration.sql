@@ -5,12 +5,14 @@ CREATE TYPE "Status" AS ENUM ('PENDING', 'ASSIGNED', 'ON_ROUTE', 'DELIVERED', 'C
 CREATE TABLE "Order" (
     "id" TEXT NOT NULL,
     "delivery_id" TEXT NOT NULL,
-    "location_id" TEXT NOT NULL,
+    "client_id" TEXT NULL,
+    "coordinate_id" TEXT NULL,
     "creation_date" TIMESTAMP(3) NOT NULL,
     "delivery_address" TEXT NOT NULL,
     "id_almacen" TEXT NOT NULL,
     "status" "Status" NOT NULL,
-
+    "distance" DOUBLE PRECISION NULL,
+    "timeEstimated" TEXT NULL,
     CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
 );
 
@@ -25,4 +27,4 @@ CREATE TABLE "OrderProducts" (
 );
 
 -- AddForeignKey
-ALTER TABLE "OrderProducts" ADD CONSTRAINT "OrderProducts_order_id_fkey" FOREIGN KEY ("order_id") REFERENCES "Order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "OrderProducts" ADD CONSTRAINT "OrderProducts_order_id_fkey" FOREIGN KEY ("order_id") REFERENCES "Order"("id") ON DELETE CASCADE ON UPDATE CASCADE;

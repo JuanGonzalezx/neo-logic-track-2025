@@ -11,7 +11,8 @@ const { signIn,
     resetPassword,
     ChangeResetPassword,
     sendEmailStock,
-    getUserFromToken } = require('../controllers/AuthController');
+    getUserFromToken,
+    sendEmailOrder } = require('../controllers/AuthController');
 
 router.post('/signup', signUp);
 
@@ -24,6 +25,8 @@ router.post('/resend', resendVerificationCode);
 router.post("/2fa", secondFactorAuthentication);
 
 router.post("/stock", sendEmailStock);
+
+router.post("/order", sendEmailOrder);
 
 router.patch("/changepassword/:id", changePassword);
 

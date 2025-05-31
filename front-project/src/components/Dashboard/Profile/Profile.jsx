@@ -1,21 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { KeyRound } from 'lucide-react';
 import ChangePasswordModal from './ChangePasswordModal';
+import { getUserFromToken } from "../../../api/auth";
 import './Profile.css';
-
-
 
 const Profile = () => {
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) return setLoading(false);
+            const response = await getUserFromToken({ token });
+            if (response && response.status === 201) {
+                setUser(response);
+            }
+            setLoading(false);
+        };
+        fetchUser();
+    }, []);
 
     // Get user initials for avatar
     const getUserInitials = (name) => {
+        if (!name) return '';
         return name
             .split(' ')
             .map((part) => part[0])
             .join('')
             .toUpperCase();
     };
+
+    if (loading) return <div>Loading...</div>;
+    if (!user) return <div>No user data found.</div>;
 
     return (
         <div className="profile-container">
@@ -33,17 +51,13 @@ const Profile = () => {
             <div className="profile-card">
                 <div className="profile-header">
                     <div className="profile-avatar-init">
-                        {getUserInitials("Juan Dario")}
+                        {getUserInitials(user.fullname)}
                     </div>
                     <div className="profile-title">
-                        {/* <h2>{user.name}</h2> */}
-                        <h2>Darío</h2>
+                        <h2>{user.fullname}</h2>
                         <span className={`status-badge active`}>
                             Active
                         </span>
-                        {/* <span className={`status-badge ${user.status}`}>
-                            {user.status === 'active' ? 'Active' : 'Inactive'}
-                        </span> */}
                     </div>
                 </div>
 
@@ -52,31 +66,24 @@ const Profile = () => {
                     <div className="info-grid">
                         <div className="info-item">
                             <div className="info-label">Name</div>
-                            <div>Juan Dario</div>
-                            {/* <div className="info-value">{user.name}</div> */}
+                            <div>{user.fullname}</div>
                         </div>
                         <div className="info-item">
                             <div className="info-label">Email</div>
-                            <div>juandario@gmail.com</div>
-                            {/* <div className="info-value">{user.email}</div> */}
+                            <div>{user.email}</div>
                         </div>
                         <div className="info-item">
                             <div className="info-label">Phone</div>
-                            <div>3136381995</div>
-                            {/* <div className="info-value">{user.phone}</div> */}
+                            <div>{user.telefono}</div>
                         </div>
                         <div className="info-item">
                             <div className="info-label">Role</div>
-                            <div>Celador</div>
-                            {/* <div className="info-value">{user.role}</div> */}
+                            <div>{user.role?.name}</div>
                         </div>
                         <div className="info-item">
                             <div className="info-label">Status</div>
                             <div className="info-value">
                                 <div>Active</div>
-                                {/* <span className={`status-badge ${user.status}`}>
-                                    {/* {user.status === 'active' ? 'Active' : 'Inactive'} */}
-                                {/* </span> */}
                             </div>
                         </div>
                     </div>

@@ -1,41 +1,16 @@
 const { PrismaClient } = require('@prisma/client');
 const userServiceClient = require('../lib/userServiceClient');
 const { returnStockAndCapacity } = require('../lib/productServiceClient')
-const { validateOrderProducts } = require('../controllers/OrderController')
+const { findProductById, reduceStock, createMovements } = require('../lib/productServiceClient');
+const { updateOrderProduct } = require('../controllers/OrderProductsController');
+const { findUser } = require('../lib/userServiceClient');
+
 
 const prisma = new PrismaClient();
 
 class OrderService {
 
-  async createOrder(orderData) {
-    // Validar que delivery_id exista en users
-    // const deliveryUser = await userServiceClient.findUser({ id: orderData.delivery_id });
-    // if (!deliveryUser) {
-    //   const error = new Error(`User with id ${orderData.delivery_id} not found`);
-    //   error.statusCode = 400;
-    //   throw error;
-    // }
 
-    // Crear la orden en la base de datos
-    const newOrder = await prisma.order.create({
-      data: {
-        delivery_id: orderData.delivery_id,
-        location_id: orderData.location_id,
-        creation_date: new Date(orderData.creation_date),
-        delivery_address: orderData.delivery_address,
-        status: orderData.status,
-        // Suponiendo que orderProducts es un array de productos asociados
-        orderProducts: {
-          create: orderData.orderProducts || [],
-        },
-      },
-      include: {
-        orderProducts: true,
-      },
-    });
-
-    return newOrder;
-  }
 
   async assignRepartidor(city) {
     const repartidor = await userServiceClient.findRepartidorByCity(city)
@@ -65,7 +40,7 @@ class OrderService {
   async updateOrderService(order_id, data) {
     try {
 
-      const order = await prisma.order.findUnique({ where: { id: order_id } })
+      const order = await prisma.order.findUnique({ where: { id: order_id }, include: { OrderProducts: true } })
       if (!order) {
         throw new Error("No existe esa orden a eliminar");
       }
@@ -75,45 +50,91 @@ class OrderService {
         if (!user) {
           return res.status(400).json({ message: `User with id ${data.delivery_id} not found` });
         }
+      }
 
-
-        if (data.orderProducts) {
-          await returnStockAndCapacity(data.id_almacen, data.id_producto, data.amount)
-
-          await validateOrderProducts(data.orderProducts, data.id_almacen);
+      if (data.orderProducts) {
+        for (const op of order.OrderProducts) {
+          await returnStockAndCapacity(order.id_almacen, op.product_id, op.amount)
         }
 
-        const orderUpdate = await prisma.order.update({
-          where: { id },
-          data: {
-            delivery_id,
-            location_id,
-            delivery_address,
-          },
-        });
+        await validateOrderProducts(data.orderProducts, order.id_almacen);
+
       }
-    } catch (error) {
+
+      await prisma.orderProducts.deleteMany({
+        where: { order_id: order_id }
+      });
+
+      await prisma.orderProducts.createMany({
+        data: data.orderProducts.map(product => ({
+          order_id: order_id,
+          product_id: product.product_id,
+          amount: product.amount,
+        }))
+      });
+
+      const orderUpdate = await prisma.order.update({
+        where: { id: order_id },
+        data: {
+          delivery_id: data.delivery_id,
+          coordinate_id: data.coordinate_id,
+          delivery_address: data.delivery_address,
+          status: data.status,
+          timeEstimated: data.timeEstimated,
+          distance: data.distance,
+          client_id: data.client_id
+        }, include: { OrderProducts: true }
+      });
+      return orderUpdate;
+    }
+    catch (error) {
       throw new Error(error);
     }
   }
 
-  async deleteOrder(order_id) {
+  async deleteOrders(order_id) {
     try {
-    const order = await prisma.order.findUnique({ where: { id: order_id } });
-    if (!order) {
-      return null; // para manejar en el controlador
+      const order = await prisma.order.findUnique({ where: { id: order_id } })
+      if (!order) {
+        throw new Error("No existe esa orden a eliminar");
+      }
+      const products = await prisma.orderProducts.findMany({ where: { order_id: order_id } })
+      for (const prod of products) {
+        const productExists = await returnStockAndCapacity(order.id_almacen, prod.product_id, prod.amount);
+      }
+
+      const deleteProducts = await prisma.orderProducts.deleteMany({ where: { order_id: order_id } })
+      const deleteOrder = await prisma.order.update({ where: { id: order_id }, data: { status: "CANCELLED" } });
+
+    } catch (error) {
+      throw new Error(error);
     }
-    const products = await prisma.orderProducts.findMany({ where: { order_id } });
-    for (const prod of products) {
-      await returnStockAndCapacity(order.id_almacen, prod.product_id, prod.amount);
-    }
-    await prisma.orderProducts.deleteMany({ where: { order_id } });
-    await prisma.order.delete({ where: { id: order_id } });
-    return true;
-  } catch (error) {
-    throw new Error("No se puede eliminar el pedido: " + error.message);
   }
 }
-}
 
+async function validateOrderProducts(orderProducts, id_almacen) {
+  console.log("Validating order products:", orderProducts);
+
+  try {
+    for (const op of orderProducts) {
+      const productExists = await findProductById(op.product_id);
+
+      if (!productExists) {
+        throw new Error(`Product with id ${op.product_id} not found`);
+      }
+
+      // Reduce el stock en almacenProducto
+      await reduceStock(op.product_id, id_almacen, op.amount);
+
+      // Crea el movimiento de salida de ese almacen 
+      await createMovements(op.product_id, id_almacen, op.amount, op.id_proveedor)
+
+    }
+  } catch (error) {
+    console.error('Error creating order:', error);
+    throw new Error(error);
+  }
+}
 module.exports = new OrderService();
+
+module.exports.validateOrderProducts = validateOrderProducts;

@@ -1,0 +1,32 @@
+// This isyourPrismaschemafile,
+//learnmoreaboutitinthedocs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Coordinates {
+  id               String             @id @unique @default(uuid())
+  street           String?
+  cityId           String
+  postal_code      String?
+  latitude         Float
+  longitude        Float
+  Coordinates_User Coordinates_User[]
+}
+
+model Coordinates_User {
+  id            String      @id @unique @default(uuid())
+  user_id       String
+  coordinate_id String
+  coordinate    Coordinates @relation(fields: [coordinate_id], references: [id])
+}
