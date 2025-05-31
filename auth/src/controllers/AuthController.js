@@ -949,6 +949,8 @@ const getUserFromToken = async (req, res, next) => {
     return res.status(201).json({
       id: user.id,
       email: user.email,
+      telefono: user.number,
+      fullname: user.fullname,
       role: { id: role.id, name: role.name },
       permissions,
     });
