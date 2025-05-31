@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { changeResetPassword } from '../../api/auth';
 import { Input, Button, Card, Alert } from 'antd';
+import './ChangeResetPassword.css';
 
 export default function ChangeResetPassword() {
   const { token } = useParams(); // ← obtenemos el token de la URL
@@ -15,7 +16,7 @@ export default function ChangeResetPassword() {
   e.preventDefault();
 
   if (!password || password !== confirm) {
-    setAlert({ type: 'error', message: 'Passwords do not match' });
+    setAlert({ type: 'error', message: 'Contraseñas no concuerdan' });
     return;
   }
 
@@ -36,24 +37,24 @@ export default function ChangeResetPassword() {
   }
 };
   return (
-    <div style={{ maxWidth: 400, margin: '50px auto' }}>
-      <Card title="Reset Your Password">
+    <div className="reset-password-container">
+      <Card title="Cambio de contraseña" className="reset-password-card">
         {alert && <Alert style={{ marginBottom: 16 }} type={alert.type} message={alert.message} />}
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="reset-password-form">
           <Input.Password
-            placeholder="New password"
+            placeholder="Nueva contraseña"
             value={password}
             onChange={e => setPassword(e.target.value)}
-            style={{ marginBottom: 16 }}
+            className="reset-password-input"
           />
           <Input.Password
-            placeholder="Confirm password"
+            placeholder="Confirme contraseña"
             value={confirm}
             onChange={e => setConfirm(e.target.value)}
-            style={{ marginBottom: 16 }}
+            className="reset-password-input"
           />
-          <Button type="primary" block htmlType="submit">
-            Change Password
+          <Button type="primary" block htmlType="submit" className="reset-password-button">
+            Cambiar
           </Button>
         </form>
       </Card>

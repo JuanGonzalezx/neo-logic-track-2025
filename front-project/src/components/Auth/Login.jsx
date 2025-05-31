@@ -174,19 +174,19 @@ const Login = () => {
             <input
               name="email"
               value={formData.email}
-              placeholder="Enter your email"
+              placeholder="Correo electrónico"
               onChange={handleChange}
             />
             {errors.email && <span className="field-error">{errors.email}</span>}
           </div>
           {/* input de password */}
           <div className="form-group">
-            <label htmlFor="current_password">Password</label>
+            <label htmlFor="current_password">Contraseña</label>
             <input
               type="password"
               name="current_password"
               value={formData.current_password}
-              placeholder="Enter your password"
+              placeholder="Contraseña"
               onChange={handleChange}
             />
             {errors.current_password && (
@@ -210,14 +210,14 @@ const Login = () => {
           </div>
 
           <button type="submit" className="login-button" disabled={loading}>
-            {loading ? <Spin /> : "Login"}
+            {loading ? <Spin /> : "Ingresar"}
           </button>
         </form>
 
         {/* Forgot Password Button */}
         <div style={{ marginTop: 16, textAlign: "center" }}>
           <button onClick={handleForgot} className="verification-resend-link">
-            Forgot Password?
+            Olvide mi contraseña
           </button>
         </div>
 
