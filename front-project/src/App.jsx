@@ -1,10 +1,6 @@
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { updateDeliveryLocation } from "./api/geoService"; 
-import { getUserFromToken } from "./api/auth";
-import { useEffect } from "react";
 import './App.css';
-// import jwtDecode from 'jwt-decode';
 
 import Login from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
@@ -31,8 +27,8 @@ import WarehouseList from "./components/Dashboard/Warehouses/WarehouseList";
 import OrderList from "./components/Dashboard/Orders/OrderList";
 import Home from "./components/Home/Home";
 import OrderTrackingPage from "./components/Dashboard/Orders/OrderTrackingPanel";
+import ListadoRepartidores from './components/Dashboard/Orders/ListadoRepartidores';
 function App() {
-  const navigate = useNavigate();
   let { isAuthenticated } = useSelector((state) => state.auth);
 
   useEffect(() => {
@@ -120,6 +116,7 @@ function App() {
         <Route path="/dashboard/inventory/orders" element={<OrderList />} />
         <Route path="profile" element={<Profile />} />
         <Route path="/dashboard/inventory/orders/:orderId/tracking" element={<OrderTrackingPage />} />
+          <Route path="repartidores" element={<ListadoRepartidores />} />
       </Route>
       <Route path="/track/:orderId" element={<OrderTrackingPage />} />
     </Routes>

@@ -59,7 +59,7 @@ const OrderTrackingPage = () => {
     lng: parseFloat(order.coordinate.longitude)
   };
   console.log(order)
-  const deliveryUserId = order.delivery_id;
+
   return (
     <div className="order-tracking-page">
       <h2>Seguimiento de Orden</h2>
@@ -67,7 +67,7 @@ const OrderTrackingPage = () => {
       <OrderRouteMap
         warehouseMarker={warehouseMarker}
         orderMarker={orderMarker}
-        deliveryUserId={deliveryUserId} // Si tienes esto
+        deliveryPosition={order.deliveryUser?.location} // Si tienes esto
       />
     </div>
   );

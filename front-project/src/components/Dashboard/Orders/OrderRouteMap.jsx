@@ -1,44 +1,27 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import { GoogleMap, Marker, DirectionsRenderer, useJsApiLoader } from "@react-google-maps/api";
-import { createGeoSocket } from "../../../api/socket";
+
+const containerStyle = { width: "100%", height: "60vh" };
 
 const WAREHOUSE_ICON = "/assets/warehouse.png";
 const HOUSE_ICON = "/assets/house.png";
 const DELIVERY_ICON = "/assets/delivery.png";
-const containerStyle = { width: "100%", height: "60vh" };
 
-const OrderRouteMap = ({ warehouseMarker, orderMarker, deliveryUserId, initialDeliveryPosition }) => {
+const OrderRouteMap = ({ warehouseMarker, orderMarker, deliveryPosition }) => {
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-    libraries: ["places"]
+    libraries: ['places']
   });
 
-  const [deliveryPosition, setDeliveryPosition] = useState(initialDeliveryPosition);
   const [directions, setDirections] = useState(null);
   const [routeInfo, setRouteInfo] = useState({ distance: "", duration: "" });
-  const socketRef = useRef(null);
 
   useEffect(() => {
-  if (!deliveryUserId) return;
-  const socket = createGeoSocket();
-  socket.emit("subscribe", { deliveryPersonId: deliveryUserId });
-  socket.on("locationUpdate", (data) => {
-    if (data.coordinate) {
-      setDeliveryPosition({
-        lat: parseFloat(data.coordinate.latitude),
-        lng: parseFloat(data.coordinate.longitude),
-      });
-    }
-  });
-  return () => socket.disconnect();
-}, [deliveryUserId]);
-
-  useEffect(() => {
-    if (isLoaded && warehouseMarker && orderMarker && deliveryPosition) {
+    if (isLoaded && warehouseMarker && orderMarker) {
       const directionsService = new window.google.maps.DirectionsService();
       directionsService.route(
         {
-          origin: deliveryPosition,
+          origin: warehouseMarker,
           destination: orderMarker,
           travelMode: window.google.maps.TravelMode.DRIVING
         },
@@ -54,7 +37,7 @@ const OrderRouteMap = ({ warehouseMarker, orderMarker, deliveryUserId, initialDe
         }
       );
     }
-  }, [isLoaded, warehouseMarker, orderMarker, deliveryPosition]);
+  }, [isLoaded, warehouseMarker, orderMarker]);
 
   if (!isLoaded) return <div>Cargando mapa...</div>;
 
@@ -62,14 +45,42 @@ const OrderRouteMap = ({ warehouseMarker, orderMarker, deliveryUserId, initialDe
     <div className="order-map-section">
       <h3>Ruta y Seguimiento</h3>
       <div className="map-wrapper">
-        <GoogleMap mapContainerStyle={containerStyle} center={deliveryPosition || orderMarker} zoom={13}>
-          <Marker position={warehouseMarker} icon={{ url: WAREHOUSE_ICON, scaledSize: { width: 40, height: 40 } }} />
-          <Marker position={orderMarker} icon={{ url: HOUSE_ICON, scaledSize: { width: 40, height: 40 } }} />
+        <GoogleMap mapContainerStyle={containerStyle} center={orderMarker} zoom={13}>
+          {/* Almacén */}
+          <Marker
+            position={warehouseMarker}
+            // label="Almacén"
+            icon={{
+              url: WAREHOUSE_ICON,
+              scaledSize: { width: 40, height: 40 }
+            }}
+          />
+          {/* Destino */}
+          <Marker
+            position={orderMarker}
+            // label="Destino"
+            icon={{
+              url: HOUSE_ICON,
+              scaledSize: { width: 40, height: 40 }
+            }}
+          />
+          {/* Delivery */}
           {deliveryPosition && (
-            <Marker position={deliveryPosition} icon={{ url: DELIVERY_ICON, scaledSize: { width: 40, height: 40 } }} />
+            <Marker
+              position={deliveryPosition}
+              label="Repartidor"
+              icon={{
+                url: DELIVERY_ICON,
+                scaledSize: { width: 40, height: 40 }
+              }}
+            />
           )}
+          {/* Ruta */}
           {directions && (
-            <DirectionsRenderer directions={directions} options={{ suppressMarkers: true }} />
+            <DirectionsRenderer
+              directions={directions}
+              options={{ suppressMarkers: true }}
+            />
           )}
         </GoogleMap>
         <div className="order-route-info">

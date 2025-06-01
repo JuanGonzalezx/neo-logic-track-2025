@@ -58,7 +58,7 @@ class OrderService {
       if (data.delivery_id) {
         const user = await findUser({ id: data.delivery_id });
         if (!user) {
-          return res.status(400).json({ message: `User with id ${data.delivery_id} not found` });
+          throw new Error(`User with id ${data.delivery_id} not found`);
         }
       }
 
@@ -69,31 +69,33 @@ class OrderService {
 
         await validateOrderProducts(data.orderProducts, order.id_almacen);
 
+        await prisma.orderProducts.deleteMany({
+          where: { order_id: order_id }
+        });
+
+        await prisma.orderProducts.createMany({
+          data: data.orderProducts.map(product => ({
+            order_id: order_id,
+            product_id: product.product_id,
+            amount: product.amount,
+          }))
+        });
       }
 
-      await prisma.orderProducts.deleteMany({
-        where: { order_id: order_id }
-      });
-
-      await prisma.orderProducts.createMany({
-        data: data.orderProducts.map(product => ({
-          order_id: order_id,
-          product_id: product.product_id,
-          amount: product.amount,
-        }))
-      });
+      // Solo actualizar los campos que realmente vienen en data
+      const updateData = {};
+      if (data.delivery_id !== undefined) updateData.delivery_id = data.delivery_id;
+      if (data.coordinate_id !== undefined) updateData.coordinate_id = data.coordinate_id;
+      if (data.delivery_address !== undefined) updateData.delivery_address = data.delivery_address;
+      if (data.status !== undefined) updateData.status = data.status;
+      if (data.timeEstimated !== undefined) updateData.timeEstimated = data.timeEstimated;
+      if (data.distance !== undefined) updateData.distance = data.distance;
+      if (data.client_id !== undefined) updateData.client_id = data.client_id;
 
       const orderUpdate = await prisma.order.update({
         where: { id: order_id },
-        data: {
-          delivery_id: data.delivery_id,
-          coordinate_id: data.coordinate_id,
-          delivery_address: data.delivery_address,
-          status: data.status,
-          timeEstimated: data.timeEstimated,
-          distance: data.distance,
-          client_id: data.client_id
-        }, include: { OrderProducts: true }
+        data: updateData,
+        include: { OrderProducts: true }
       });
       return orderUpdate;
     }

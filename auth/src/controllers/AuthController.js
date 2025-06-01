@@ -759,7 +759,7 @@ const resetPassword = async (req, res) => {
   try {
     await sendPassVerificationEmail(user.email, resetLink, user.fullname);
 
-    res.status(200).json({ message: 'Reset email sent' });
+    res.status(200).json({ message: 'Correo de recuperacion enviado' });
 
   } catch (error) {
     console.log("Error sending link:", error);

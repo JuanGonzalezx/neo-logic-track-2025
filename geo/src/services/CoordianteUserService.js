@@ -56,21 +56,14 @@ class CoordinateUserService {
     async getByUserId(user_id) {
         const relations = await prisma.coordinates_User.findMany({
             where: { user_id },
-            orderBy: {
-                date: 'desc' // Ordena las coordenadas por fecha descendente
-            },
-            take: 1,
             include: {
                 coordinate: true
-            },
-            // Toma solo el primer resultado (el más reciente)
+            }
         });
-
         if (!relations || relations.length === 0) {
             throw new Error('No se encontraron coordenadas para este usuario');
         }
-
-        return relations[0]; // Retorna el primer (y único) elemento del array
+        return relations;
     }
 
     async getByCoordinateId(coordinate_id) {
