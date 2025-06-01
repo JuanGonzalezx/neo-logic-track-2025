@@ -5,19 +5,21 @@ const AUTH_API_BASE_URL = process.env.AUTH_SERVICE_URL || 'http://localhost:3000
 
 async function findUser(queryParams) {
   try {
-    const data = await axios.get(`${USERS_API_BASE_URL}/${queryParams}`);
+    // Espera un objeto { id: '...' }, pero solo usa el id string
+    const id = typeof queryParams === 'object' && queryParams.id ? queryParams.id : queryParams;
+    const data = await axios.get(`${USERS_API_BASE_URL}/${id}`);
 
     if (!data) {
       throw new Error("no se encontro al usuario");
     }
-    return data
+    return data;
 
   } catch (error) {
     if (error.response && error.response.status === 404) {
-      return data;
+      return null;
     }
     console.error('Error finding user:', error.response ? error.response.data : error.message);
-    return data;
+    return null;
   }
 }
 
