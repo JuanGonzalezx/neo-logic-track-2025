@@ -176,16 +176,20 @@ const ListadoRepartidores = () => {
         const ordersRes = await orderAPI.getAllOrders();
         let pedidosData = [];
         if (ordersRes.status === 200 && Array.isArray(ordersRes.data)) {
-          console.log('Fetched orders from backend:', ordersRes.data); // <-- LOGGING FOR DEBUGGING
-          pedidosData = ordersRes.data.map(o => ({
-            id: o.id,
-            cliente: o.customer_name,
-            direccion: o.delivery_address,
-            ciudad: o.ciudad || (o.coordinate && o.coordinate.city?.nombre) || '',
-            fechaEntrega: o.fecha_entrega || o.fechaEntrega || (o.creation_date && o.creation_date.split('T')[0]) || '',
-            delivery_id: o.delivery_id,
-            status: o.status,
-          }));
+          pedidosData = ordersRes.data
+            .filter(o => o.status !== 'CANCELLED') // Filtrar canceladas
+            .map(o => ({
+              id: o.id,
+              cliente: o.customer_name,
+              direccion: o.delivery_address,
+              ciudad: o.ciudad || (o.coordinate && o.coordinate.city?.nombre) || '',
+              fechaEntrega: o.fecha_entrega || o.fechaEntrega || (o.creation_date && o.creation_date.split('T')[0]) || '',
+              delivery_id: o.delivery_id,
+              delivery_name: o.delivery_name,
+              delivery_email: o.delivery_email,
+              almacen_id: o.id_almacen, // <-- Agrega el id del almacén
+              status: o.status,
+            }));
         }
 
         // Calculate pedidosPendientes and pedidosHoy for each repartidor
@@ -280,15 +284,20 @@ const ListadoRepartidores = () => {
         const ordersRes = await orderAPI.getAllOrders();
         let pedidosData = [];
         if (ordersRes.status === 200 && Array.isArray(ordersRes.data)) {
-          pedidosData = ordersRes.data.map(o => ({
-            id: o.id,
-            cliente: o.customer_name,
-            direccion: o.delivery_address,
-            ciudad: o.ciudad || (o.coordinate && o.coordinate.city?.nombre) || '',
-            fechaEntrega: o.fecha_entrega || o.fechaEntrega || (o.creation_date && o.creation_date.split('T')[0]) || '',
-            delivery_id: o.delivery_id,
-            status: o.status,
-          }));
+          pedidosData = ordersRes.data
+            .filter(o => o.status !== 'CANCELLED') // Filtrar canceladas
+            .map(o => ({
+              id: o.id,
+              cliente: o.customer_name,
+              direccion: o.delivery_address,
+              ciudad: o.ciudad || (o.coordinate && o.coordinate.city?.nombre) || '',
+              fechaEntrega: o.fecha_entrega || o.fechaEntrega || (o.creation_date && o.creation_date.split('T')[0]) || '',
+              delivery_id: o.delivery_id,
+              delivery_name: o.delivery_name,
+              delivery_email: o.delivery_email,
+              almacen_id: o.id_almacen, // <-- Agrega el id del almacén
+              status: o.status,
+            }));
         }
         setPedidosDisponibles(pedidosData);
         setDrawerVisible(false);
@@ -363,9 +372,10 @@ const ListadoRepartidores = () => {
         <p><CalendarOutlined /> <strong>Fecha Entrega:</strong> {pedido.fechaEntrega}</p>
 
         <Divider style={{ margin: '10px 0' }} />
-
         <div style={{ backgroundColor: '#fafafa', padding: '10px', borderRadius: '4px' }}>
-          <p style={{ margin: 0 }}><ShopOutlined /> <strong>Almacén:</strong> {pedido.almacen?.nombre || 'Sin almacén'}</p>
+          <p style={{ margin: 0 }}>
+            <ShopOutlined /> <strong>Almacén ID:</strong> {pedido.almacen_id || 'Sin almacén'}
+          </p>
           <p style={{ margin: 0, fontSize: '12px', color: '#666' }}>
             <PhoneOutlined /> {pedido.almacen?.telefono || ''} • <UserOutlined /> {pedido.almacen?.contacto || ''}
           </p>

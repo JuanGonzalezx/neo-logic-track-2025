@@ -5,44 +5,44 @@ info:
   description: API documentation for the Geo microservice
 
 paths:
-  /coordinate-users:
+  /coordinatesUser:
     get:
-      summary: Get all coordinate-user relations
+      summary: Get all coordinatesUser relations
       tags:
-        - CoordinateUser
+        - CoordinatesUser
       responses:
         '200':
-          description: A list of coordinate-user relations
+          description: A list of coordinatesUser relations
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CoordinateUser'
+                  $ref: '#/components/schemas/CoordinatesUser'
     post:
-      summary: Create a new coordinate-user relation
+      summary: Create a new coordinatesUser relation
       tags:
-        - CoordinateUser
+        - CoordinatesUser
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CoordinateUserInput'
+              $ref: '#/components/schemas/CoordinatesUserInput'
       responses:
         '201':
-          description: Coordinate-user relation created
+          description: coordinatesUser relation created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CoordinateUser'
+                $ref: '#/components/schemas/CoordinatesUser'
         '400':
           description: Invalid input
-  /coordinate-users/{id}:
+  /coordinatesUser/{id}:
     get:
-      summary: Get coordinate-user relation by ID
+      summary: Get coordinatesUser relation by ID
       tags:
-        - CoordinateUser
+        - CoordinatesUser
       parameters:
         - in: path
           name: id
@@ -51,17 +51,17 @@ paths:
             type: string
       responses:
         '200':
-          description: Coordinate-user relation found
+          description: coordinatesUser relation found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CoordinateUser'
+                $ref: '#/components/schemas/CoordinatesUser'
         '404':
           description: Not found
     put:
-      summary: Update coordinate-user relation by ID
+      summary: Update coordinatesUser relation by ID
       tags:
-        - CoordinateUser
+        - CoordinatesUser
       parameters:
         - in: path
           name: id
@@ -73,22 +73,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CoordinateUserInput'
+              $ref: '#/components/schemas/CoordinatesUserInput'
       responses:
         '200':
-          description: Coordinate-user relation updated
+          description: coordinatesUser relation updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CoordinateUser'
+                $ref: '#/components/schemas/CoordinatesUser'
         '400':
           description: Invalid input
         '404':
           description: Not found
     delete:
-      summary: Delete coordinate-user relation by ID
+      summary: Delete coordinatesUser relation by ID
       tags:
-        - CoordinateUser
+        - CoordinatesUser
       parameters:
         - in: path
           name: id
@@ -100,11 +100,11 @@ paths:
           description: Deleted
         '404':
           description: Not found
-  /coordinate-users/user/{id}:
+  /coordinatesUser/user/{id}:
     get:
-      summary: Get all coordinate-user relations by user ID
+      summary: Get all coordinatesUser relations by user ID
       tags:
-        - CoordinateUser
+        - CoordinatesUser
       parameters:
         - in: path
           name: id
@@ -119,14 +119,14 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CoordinateUser'
+                  $ref: '#/components/schemas/CoordinatesUser'
         '404':
           description: Not found
-  /coordinate-users/coordinate/{coordinate_id}:
+  /coordinatesUser/coordinate/{coordinate_id}:
     get:
-      summary: Get all coordinate-user relations by coordinate ID
+      summary: Get all coordinatesUser relations by coordinate ID
       tags:
-        - CoordinateUser
+        - CoordinatesUser
       parameters:
         - in: path
           name: coordinate_id
@@ -141,14 +141,14 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CoordinateUser'
+                  $ref: '#/components/schemas/CoordinatesUser'
         '404':
           description: Not found
-  /coordinate-users/user/{idUser}/coordinate/{idCoordinate}:
+  /coordinatesUser/user/{idUser}/coordinate/{idCoordinate}:
     delete:
-      summary: Delete coordinate-user relation by user and coordinate ID
+      summary: Delete coordinatesUser relation by user and coordinate ID
       tags:
-        - CoordinateUser
+        - CoordinatesUser
       parameters:
         - in: path
           name: idUser
@@ -263,7 +263,7 @@ paths:
 
 components:
   schemas:
-    CoordinateUser:
+    CoordinatesUser:
       type: object
       properties:
         id:
@@ -278,7 +278,7 @@ components:
         updatedAt:
           type: string
           format: date-time
-    CoordinateUserInput:
+    CoordinatesUserInput:
       type: object
       properties:
         userId:
