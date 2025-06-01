@@ -1,0 +1,266 @@
+openapi: 3.0.0
+info:
+  title: Geo API
+  version: 1.0.0
+  description: API documentation for the Geo microservice
+
+paths:
+  /coordinates:
+    get:
+      summary: Get all coordinates
+      tags:
+        - Coordinates
+      responses:
+        '200':
+          description: A list of coordinates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Coordinate'
+    post:
+      summary: Create a new coordinate
+      tags:
+        - Coordinates
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CoordinateInput'
+      responses:
+        '201':
+          description: Coordinate created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Coordinate'
+        '400':
+          description: Invalid input
+  /coordinates/{id}:
+    get:
+      summary: Get coordinate by ID
+      tags:
+        - Coordinates
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Coordinate found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Coordinate'
+        '404':
+          description: Coordinate not found
+    put:
+      summary: Update coordinate by ID
+      tags:
+        - Coordinates
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CoordinateInput'
+      responses:
+        '200':
+          description: Coordinate updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Coordinate'
+        '400':
+          description: Invalid input
+        '404':
+          description: Coordinate not found
+    delete:
+      summary: Delete coordinate by ID
+      tags:
+        - Coordinates
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Coordinate deleted
+        '404':
+          description: Coordinate not found
+
+  /cities:
+    get:
+      summary: Get all cities
+      tags:
+        - Cities
+      responses:
+        '200':
+          description: A list of cities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/City'
+    post:
+      summary: Create a new city
+      tags:
+        - Cities
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CityInput'
+      responses:
+        '201':
+          description: City created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/City'
+        '400':
+          description: Invalid input
+  /cities/{id}:
+    get:
+      summary: Get city by ID
+      tags:
+        - Cities
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: City found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/City'
+        '404':
+          description: City not found
+    put:
+      summary: Update city by ID
+      tags:
+        - Cities
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CityInput'
+      responses:
+        '200':
+          description: City updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/City'
+        '400':
+          description: Invalid input
+        '404':
+          description: City not found
+    delete:
+      summary: Delete city by ID
+      tags:
+        - Cities
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: City deleted
+        '404':
+          description: City not found
+
+components:
+  schemas:
+    Coordinate:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        cityId:
+          type: string
+        street:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    CoordinateInput:
+      type: object
+      properties:
+        userId:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        cityId:
+          type: string
+        street:
+          type: string
+      required:
+        - userId
+        - latitude
+        - longitude
+        - cityId
+        - street
+    City:
+      type: object
+      properties:
+        id:
+          type: string
+        nombre:
+          type: string
+        departamento:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    CityInput:
+      type: object
+      properties:
+        nombre:
+          type: string
+        departamento:
+          type: string
+      required:
+        - nombre
+        - departamento

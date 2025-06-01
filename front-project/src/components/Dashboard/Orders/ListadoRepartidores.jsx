@@ -52,6 +52,7 @@ const ListadoRepartidores = () => {
   const [repartidorSeleccionado, setRepartidorSeleccionado] = useState(null);
   const [activoFilter, setActivoFilter] = useState(null);
   const [entregasHoyFilter, setEntregasHoyFilter] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const columns = [
     {
@@ -101,12 +102,6 @@ const ListadoRepartidores = () => {
           {count}
         </Tag>
       ),
-    },
-    {
-      title: 'Correo',
-      dataIndex: 'correo',
-      key: 'correo',
-      render: (text) => <span>{text}</span>,
     },
     {
       title: 'Acciones',
@@ -162,7 +157,6 @@ const ListadoRepartidores = () => {
               return {
                 id: u.id,
                 nombre: u.fullname,
-                correo: u.email || '',
                 ciudad: ciudadNombre,
                 activo: u.status === 'ACTIVE' || u.activo === true,
                 pedidosPendientes: 0, // Will be calculated below
@@ -213,6 +207,13 @@ const ListadoRepartidores = () => {
   useEffect(() => {
     let filtered = [...repartidores];
 
+    // Filtrado por búsqueda de texto
+    if (searchTerm.trim() !== "") {
+      filtered = filtered.filter(rep => {
+        return [rep.nombre, rep.telefono, rep.ciudad]
+          .some(field => field && field.toLowerCase().includes(searchTerm.toLowerCase()));
+      });
+    }
     // Filtrar por estado activo/inactivo
     if (activoFilter !== null) {
       filtered = filtered.filter(rep => rep.activo === activoFilter);
@@ -228,7 +229,7 @@ const ListadoRepartidores = () => {
     }
 
     setFilteredRepartidores(filtered);
-  }, [repartidores, activoFilter, entregasHoyFilter]);
+  }, [repartidores, activoFilter, entregasHoyFilter, searchTerm]);
 
   // Mostrar Drawer con pedidos disponibles para el repartidor seleccionado
   const showAsignarPedidoDrawer = (repartidor) => {
@@ -262,9 +263,7 @@ const ListadoRepartidores = () => {
     try {
       // Actualizar la orden en backend para asignar el repartidor
       const updateRes = await orderAPI.updateOrder(pedidoSeleccionado.id, {
-        delivery_id: repartidorSeleccionado.id,
-        delivery_name: repartidorSeleccionado.nombre,
-        delivery_email: repartidorSeleccionado.correo
+        delivery_id: repartidorSeleccionado.id
       });
       if (updateRes.status === 200 || updateRes.status === 201) {
         // Refrescar datos desde backend para mantener consistencia
@@ -321,6 +320,7 @@ const ListadoRepartidores = () => {
   const resetFilters = () => {
     setActivoFilter(null);
     setEntregasHoyFilter(null);
+    setSearchTerm("");
   };
 
   const renderPedidoCard = (pedido) => {
@@ -378,7 +378,13 @@ const ListadoRepartidores = () => {
             </Space>
           </Space>
 
-          <Space style={{ marginBottom: '16px' }}>
+          <Space style={{ marginBottom: '16px', width: '100%', flexWrap: 'wrap' }}>
+            <Input.Search
+              placeholder="Buscar repartidor..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              style={{ width: 250 }}
+            />
             <Text strong><FilterOutlined /> Filtros:</Text>
             <Select
               placeholder="Estado"
