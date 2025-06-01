@@ -6,7 +6,8 @@ const CityServiceClient = require('../lib/CityServiceClient');
 class CoordinateService {
 
     async findOrCreate(data) {
-console.log(data);
+
+        let userCoordinate;
 
         if (!data.latitude || !data.longitude || !data.cityId || !data.street) {
             throw new Error("Los campos latitude, longitude, cityId y userId son requeridos.");
@@ -17,7 +18,18 @@ console.log(data);
         });
 
         if (coordinate) {
-           return coordinate;
+            userCoordinate = await prisma.coordinates_User.create({
+                data: {
+                    user_id: data.userId,
+                    coordinate_id: coordinate.id
+                }
+            });
+
+            coordinate = {
+                ...coordinate,
+                userCoordinate: userCoordinate
+            }
+            return coordinate;
         }
 
         const city = await CityServiceClient.findCity(data.cityId);
@@ -34,6 +46,19 @@ console.log(data);
                 postal_code: data.postal_code
             }
         });
+
+        userCoordinate = await prisma.coordinates_User.create({
+            data: {
+                user_id: data.userId,
+                coordinate_id: coordinate.id
+            }
+        });
+
+        coordinate = {
+            ...coordinate,
+            userCoordinate: userCoordinate
+        }
+
         return coordinate;
     }
 

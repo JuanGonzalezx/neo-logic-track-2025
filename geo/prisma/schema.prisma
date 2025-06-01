@@ -28,5 +28,6 @@ model Coordinates_User {
   id            String      @id @unique @default(uuid())
   user_id       String
   coordinate_id String
+  date          DateTime    @default(now())
   coordinate    Coordinates @relation(fields: [coordinate_id], references: [id])
 }

@@ -15,7 +15,7 @@ CREATE TABLE "Coordinates_User" (
     "id" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
     "coordinate_id" TEXT NOT NULL,
-
+    "date"  TIMESTAMP(3) NOT NULL,
     CONSTRAINT "Coordinates_User_pkey" PRIMARY KEY ("id")
 );
 

@@ -79,6 +79,8 @@ const createOrder = async (req, res) => {
       postal_code: req.body.postal_code || "00000"
     }
     const coordinate = await createCoordinate(coordenada)
+    console.log(coordinate);
+    
 
     let repartidor = null;
 

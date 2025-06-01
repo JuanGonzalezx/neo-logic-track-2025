@@ -8,9 +8,19 @@ const CoordinatesService = require('../services/CoordinateService');
 class CoordinatesController {
     async create(req, res, next) {
         try {
-            console.log("Creating coordinates with data:", req.body);
-            
+
             const coordinates = await CoordinatesService.findOrCreate(req.body);
+            req.io.to(req.body.userId).emit("locationUpdate", {
+                userId,
+                coordinate: {
+                    latitude,
+                    longitude,
+                    cityId,
+                    street,
+                    postal_code,
+                },
+                timestamp: new Date().toISOString(),
+            });
             res.status(201).json(coordinates);
         } catch (error) {
             handleServiceError(error, res, next);
