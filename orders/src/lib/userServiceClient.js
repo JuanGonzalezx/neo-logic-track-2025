@@ -70,4 +70,4 @@ async function findRepartidorByCity(city) {
   }
 }
 
-module.exports = { findUser, findDespachadorByCity, findRepartidorByCity, sendEmailOrder };
+module.exports = { findUser, findDespachadorByCity, findRepartidorByCity ,sendEmailOrder, findDespachadorByCity, findRepartidorByCity };

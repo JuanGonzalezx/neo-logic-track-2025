@@ -8,6 +8,8 @@ class CoordinateService {
     async findOrCreate(data) {
 
         let userCoordinate;
+        console.log("findOrCreate data:", data);
+        
 
         if (!data.latitude || !data.longitude || !data.cityId || !data.street) {
             throw new Error("Los campos latitude, longitude, cityId y userId son requeridos.");
@@ -20,7 +22,7 @@ class CoordinateService {
         if (coordinate) {
             userCoordinate = await prisma.coordinates_User.create({
                 data: {
-                    user_id: data.userId,
+                    user_id: data.user_id,
                     coordinate_id: coordinate.id
                 }
             });
@@ -49,7 +51,7 @@ class CoordinateService {
 
         userCoordinate = await prisma.coordinates_User.create({
             data: {
-                user_id: data.userId,
+                user_id: data.user_id,
                 coordinate_id: coordinate.id
             }
         });

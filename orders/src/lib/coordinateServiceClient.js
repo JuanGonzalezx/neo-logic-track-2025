@@ -4,6 +4,8 @@ const COORDINATE_API_BASE_URL = process.env.COORDINATE_SERVICE_URL || 'http://lo
 
 async function createCoordinate(data) {
   try {
+    console.log('Creating coordinate with data:', data);
+    
     const response = await axios.post(`${COORDINATE_API_BASE_URL}`, data);
     return response.data;
   } catch (error) {
@@ -28,4 +30,18 @@ async function findCoordinateById(id) {
   }
 }
 
-module.exports = { createCoordinate, findCoordinateById };
+async function getLastCoordinateByUserId(userId) {
+  try {
+    const response = await axios.get(`${COORDINATE_API_BASE_URL}User/user/${userId}`);
+
+    return response.data;
+  } catch (error) {
+    if (error.response && error.response.status === 404) {
+      return null;
+    }
+    console.error('Error getting last coordinate by user ID:', error.response ? error.response.data : error.message);
+    return null;
+  }
+}
+
+module.exports = { createCoordinate, findCoordinateById, getLastCoordinateByUserId };

@@ -69,10 +69,11 @@ const getRepartidorByCity = async (req, res) => {
   const { id } = req.params
 
   try {
-    const repartidores = await prisma.users.findFirst({
+    const repartidores = await prisma.users.findMany({
       where: {
         roleId: "68146313ef7752d9d59866da",
-        ciudadId: id
+        ciudadId: id,
+        status: "ACTIVE"
       }
     })
     res.status(200).json({ data: repartidores })
