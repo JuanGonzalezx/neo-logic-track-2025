@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   ArrowUpOutlined, 
   ArrowDownOutlined, 
@@ -16,6 +17,8 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
 
   // Estado para mostrar/ocultar modal de confirmación de borrado
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
@@ -82,6 +85,9 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
       </div>
     );
   }
+  const goToTrackingPage = (order) => {
+    navigate(`/dashboard/inventory/orders/${order.id}/tracking`);
+  }
 
   return (
     <div className="table-container">
@@ -121,7 +127,7 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
                   <div className="table-actions">
                     <button
                       className="action-button view"
-                      onClick={() => showDetailModal(order)}
+                      onClick={() => goToTrackingPage(order)}
                       title="View order details"
                     >
                       <EyeOutlined />

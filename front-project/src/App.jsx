@@ -26,6 +26,7 @@ import CategoryForm from "./components/Dashboard/Categories/CategoryForm";
 import WarehouseList from "./components/Dashboard/Warehouses/WarehouseList";
 import OrderList from "./components/Dashboard/Orders/OrderList";
 import Home from "./components/Home/Home";
+import OrderTrackingPage from "./components/Dashboard/Orders/OrderTrackingPanel";
 function App() {
   const navigate = useNavigate();
   let { isAuthenticated } = useSelector((state) => state.auth);
@@ -84,7 +85,9 @@ function App() {
           <Route path="/dashboard/inventory/warehouses" element={<WarehouseList />} /> {/* Lista de almacenes */}
           <Route path="/dashboard/inventory/orders" element={<OrderList />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="/dashboard/inventory/orders/:orderId/tracking" element={<OrderTrackingPage />} />
         </Route>
+        <Route path="/track/:orderId" element={<OrderTrackingPage />} />
       </Routes>
   );
 }
