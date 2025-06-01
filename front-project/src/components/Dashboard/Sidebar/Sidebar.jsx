@@ -312,11 +312,18 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
                       {collapsed ? <Package2 size={20} /> : <span>All Orders</span>}
                     </NavLink>
                   </li>
+                  <li className="sidebar-subnav-item">
+                    <NavLink
+                      to="/dashboard/repartidores"
+                      className={linkClass}
+                      onClick={handleNavLinkClick}
+                    >
+                      {collapsed ? <Users size={20} /> : <span>Listado de Repartidores</span>}
+                    </NavLink>
+                  </li>
                 </ul>
               )}
             </li>
-
-            
 
           </ul>
         </nav>
