@@ -129,10 +129,15 @@ const createOrder = async (req, res) => {
       console.log("Repartidor asignado:", repartidorMasCercano);
       repartidor = repartidorMasCercano.id;
 
+
       status = "ASSIGNED"
     } else {
       status = "PENDING"
       repartidor = "00000000-0000-0000-0000-000000000000"; // Default repartidor
+      repartidorMasCercano = {
+        email: "",
+        fullname: "No asignado"
+      };
     }
 
     const coordenada = {
@@ -155,8 +160,8 @@ const createOrder = async (req, res) => {
         status,
         customer_email,
         customer_name,
-        delivery_email: repartidor.email,
-        delivery_name: repartidor.fullname,
+        delivery_email: repartidorMasCercano.email || "",
+        delivery_name: repartidorMasCercano.fullname || "",
         id_almacen: id_almacen,
         coordinate_id: coordinate.id,
         creation_date: new Date()

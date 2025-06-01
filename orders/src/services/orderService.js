@@ -56,7 +56,7 @@ class OrderService {
       }
 
       if (data.delivery_id) {
-        const user = await findUser({ id: data.delivery_id });
+        const user = await findUser(data.delivery_id);
         if (!user) {
           return res.status(400).json({ message: `User with id ${data.delivery_id} not found` });
         }
@@ -69,19 +69,20 @@ class OrderService {
 
         await validateOrderProducts(data.orderProducts, order.id_almacen);
 
+        await prisma.orderProducts.deleteMany({
+          where: { order_id: order_id }
+        });
+
+        await prisma.orderProducts.createMany({
+          data: data.orderProducts.map(product => ({
+            order_id: order_id,
+            product_id: product.product_id,
+            amount: product.amount,
+          }))
+        });
       }
 
-      await prisma.orderProducts.deleteMany({
-        where: { order_id: order_id }
-      });
 
-      await prisma.orderProducts.createMany({
-        data: data.orderProducts.map(product => ({
-          order_id: order_id,
-          product_id: product.product_id,
-          amount: product.amount,
-        }))
-      });
 
       const orderUpdate = await prisma.order.update({
         where: { id: order_id },
@@ -89,6 +90,8 @@ class OrderService {
           delivery_id: data.delivery_id,
           coordinate_id: data.coordinate_id,
           delivery_address: data.delivery_address,
+          delivery_name: data.delivery_name,
+          delivery_email: data.delivery_email,
           status: data.status,
           timeEstimated: data.timeEstimated,
           distance: data.distance,
