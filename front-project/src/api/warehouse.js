@@ -13,6 +13,18 @@ export class Warehouse {
     const json = await res.json();
     return { status: res.status, data: json };
   } 
+
+  async getById(id) {
+    const res = await fetch(`${INVENTORY_API}${API_ROUTES.ALMACENES}/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    const json = await res.json();
+    return { status: res.status, data: json };
+  }
 }
 
 export const warehouseAPI = new Warehouse();
