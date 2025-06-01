@@ -45,17 +45,18 @@ function App() {
     console.log("Tokensss:", token);
     const user = await getUserFromToken({token});
     console.log("Usuario autenticado:", user);
-    if (user?.rol !== '68146313ef7752d9d59866da') return;
-    console.log("Usuario autenticado:", user);
+    if (user?.role.id !== '68146313ef7752d9d59866da') return;
+    console.log("Usuario autenticado es repartidor:", user);
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
         const lat = position.coords.latitude;
         const lon = position.coords.longitude;
         // Necesitas también cityId y street, podrías obtenerlos de user o pedirlos una vez
-        const cityId = user.cityId || "1"; // Ajusta según tu modelo
-        const street = user.street || "ss";   // Ajusta según tu modelo
-        await updateDeliveryLocation({ userId: user.id , latitude: lat, longitude: lon, cityId, street });
+        const cityId = user.ciudadId || "manizales-1"; // Ajusta según tu modelo
+        const street = user.street || "va en ruta";   // Ajusta según tu modelo
+        const postalCode = user.postalCode || "170001"; // Ajusta según tu modelo
+        await updateDeliveryLocation({ userId: user.id , latitude: lat, longitude: lon, cityId, street,postal_code: postalCode });
       });
     }
   };

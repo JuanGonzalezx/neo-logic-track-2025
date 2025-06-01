@@ -951,6 +951,7 @@ const getUserFromToken = async (req, res, next) => {
       email: user.email,
       telefono: user.number,
       fullname: user.fullname,
+      ciudadId: user.ciudadId,
       role: { id: role.id, name: role.name },
       permissions,
     });

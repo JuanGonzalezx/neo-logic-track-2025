@@ -1,9 +1,7 @@
 // src/api/geoService.js
 import axios from 'axios';
-
-// La URL de tu backend (ajústala según tu entorno)
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
-const GEO_WS_URL = import.meta.env.VITE_GATEWAY_URL || "http://localhost:4002";
+import { ENV } from "../utils";
+const { GEO_API, API_ROUTES } = ENV;
 
 // =================== REST ENDPOINTS ===================
 
@@ -24,8 +22,8 @@ export async function updateDeliveryLocation({ userId, latitude, longitude, city
   // Puedes adaptar el body si tu backend lo requiere diferente
   const token = localStorage.getItem('token');
   return axios.post(
-    `${API_URL}/coordinates`,
-    { userId, latitude, longitude, cityId, street },
+    `${GEO_API}/${API_ROUTES.COORDINATES}`,
+    { user_id: userId, latitude, longitude, cityId, street },
     { headers: { Authorization: `Bearer ${token}` } }
   );
 }

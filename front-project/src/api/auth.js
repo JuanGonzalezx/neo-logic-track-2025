@@ -143,6 +143,7 @@ export async function getUserFromToken({ token }) {
     body: JSON.stringify({ token }),
   });
   const json = await res.json();
+  console.log("Respuesta del servidor:", json);
   return { status: res.status, ...json };
 }
 

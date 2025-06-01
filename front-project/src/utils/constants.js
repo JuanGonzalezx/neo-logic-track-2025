@@ -4,6 +4,7 @@ const SERVER_IP2 = import.meta.env.VITE_DEV_API_URL2;
 const SERVER_IP_INVENTORY = import.meta.env.VITE_DEV_API_INVENTORY_URL;
 const SERVER_IP_ORDER = import.meta.env.VITE_DEV_API_ORDERS_URL;
 const API_VERSION = import.meta.env.VITE_API_VERSION;
+const SERVER_IP_GEO = import.meta.env.VITE_DEV_API_GEO_URL;
 
 export const ENV ={
     BASE_PATH: SERVER_IP,
@@ -11,6 +12,7 @@ export const ENV ={
     BASE_API: `${SERVER_IP}/${API_VERSION}`,
     ORDER_API: `${SERVER_IP_ORDER}/${API_VERSION}`,
     INVENTORY_API: `${SERVER_IP_INVENTORY}/${API_VERSION}`,
+    GEO_API: `${SERVER_IP_GEO}/${API_VERSION}`,
     BASE_API2: `${SERVER_IP2}/${API_VERSION}`,
     API_ROUTES:{
         SIGNUP:"/auth/signup",
@@ -35,5 +37,6 @@ export const ENV ={
         MOVEMENTS: "/movements",
         ORDERS: "/orders",
         GET_USER_FROM_TOKEN: "/auth/getUserByToken",
+        COORDINATES: "coordinates",
     }
 }
