@@ -6,13 +6,14 @@ const bodyParser = require('body-parser');
 
 const http = require('http');
 const { Server } = require('socket.io');
-const setupSwagger = require('./swagger');
+const specs = require('./swagger');
+const swaggerUi = require('swagger-ui-express');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-const port = process.env.PORT || 3004;
+const port = process.env.PORT || 3003;
 
 app.use(bodyParser.json());
 
@@ -36,7 +37,7 @@ app.use((req, res, next) => {
 
 // 4. Rutas
 app.use('/api/v1', routes);
-setupSwagger(app);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 app.get('/', (req, res) => {
   res.status(200).json({ message: 'Microservicio de Inventario activo' });

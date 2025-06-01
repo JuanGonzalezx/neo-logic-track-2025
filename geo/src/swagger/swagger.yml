@@ -5,6 +5,166 @@ info:
   description: API documentation for the Geo microservice
 
 paths:
+  /coordinate-users:
+    get:
+      summary: Get all coordinate-user relations
+      tags:
+        - CoordinateUser
+      responses:
+        '200':
+          description: A list of coordinate-user relations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CoordinateUser'
+    post:
+      summary: Create a new coordinate-user relation
+      tags:
+        - CoordinateUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CoordinateUserInput'
+      responses:
+        '201':
+          description: Coordinate-user relation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoordinateUser'
+        '400':
+          description: Invalid input
+  /coordinate-users/{id}:
+    get:
+      summary: Get coordinate-user relation by ID
+      tags:
+        - CoordinateUser
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Coordinate-user relation found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoordinateUser'
+        '404':
+          description: Not found
+    put:
+      summary: Update coordinate-user relation by ID
+      tags:
+        - CoordinateUser
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CoordinateUserInput'
+      responses:
+        '200':
+          description: Coordinate-user relation updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoordinateUser'
+        '400':
+          description: Invalid input
+        '404':
+          description: Not found
+    delete:
+      summary: Delete coordinate-user relation by ID
+      tags:
+        - CoordinateUser
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: Not found
+  /coordinate-users/user/{id}:
+    get:
+      summary: Get all coordinate-user relations by user ID
+      tags:
+        - CoordinateUser
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of relations for user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CoordinateUser'
+        '404':
+          description: Not found
+  /coordinate-users/coordinate/{coordinate_id}:
+    get:
+      summary: Get all coordinate-user relations by coordinate ID
+      tags:
+        - CoordinateUser
+      parameters:
+        - in: path
+          name: coordinate_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of relations for coordinate
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CoordinateUser'
+        '404':
+          description: Not found
+  /coordinate-users/user/{idUser}/coordinate/{idCoordinate}:
+    delete:
+      summary: Delete coordinate-user relation by user and coordinate ID
+      tags:
+        - CoordinateUser
+      parameters:
+        - in: path
+          name: idUser
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: idCoordinate
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: Not found
   /coordinates:
     get:
       summary: Get all coordinates
@@ -57,7 +217,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Coordinate'
         '404':
-          description: Coordinate not found
+          description: Not found
     put:
       summary: Update coordinate by ID
       tags:
@@ -84,7 +244,7 @@ paths:
         '400':
           description: Invalid input
         '404':
-          description: Coordinate not found
+          description: Not found
     delete:
       summary: Delete coordinate by ID
       tags:
@@ -97,123 +257,52 @@ paths:
             type: string
       responses:
         '204':
-          description: Coordinate deleted
+          description: Deleted
         '404':
-          description: Coordinate not found
-
-  /cities:
-    get:
-      summary: Get all cities
-      tags:
-        - Cities
-      responses:
-        '200':
-          description: A list of cities
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/City'
-    post:
-      summary: Create a new city
-      tags:
-        - Cities
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CityInput'
-      responses:
-        '201':
-          description: City created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/City'
-        '400':
-          description: Invalid input
-  /cities/{id}:
-    get:
-      summary: Get city by ID
-      tags:
-        - Cities
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: City found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/City'
-        '404':
-          description: City not found
-    put:
-      summary: Update city by ID
-      tags:
-        - Cities
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CityInput'
-      responses:
-        '200':
-          description: City updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/City'
-        '400':
-          description: Invalid input
-        '404':
-          description: City not found
-    delete:
-      summary: Delete city by ID
-      tags:
-        - Cities
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-      responses:
-        '204':
-          description: City deleted
-        '404':
-          description: City not found
+          description: Not found
 
 components:
   schemas:
-    Coordinate:
+    CoordinateUser:
       type: object
       properties:
         id:
           type: string
         userId:
           type: string
+        coordinateId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    CoordinateUserInput:
+      type: object
+      properties:
+        userId:
+          type: string
+        coordinateId:
+          type: string
+      required:
+        - userId
+        - coordinateId
+    Coordinate:
+      type: object
+      properties:
+        id:
+          type: string
+        street:
+          type: string
+        cityId:
+          type: string
+        postal_code:
+          type: string
         latitude:
           type: number
         longitude:
           type: number
-        cityId:
-          type: string
-        street:
-          type: string
         createdAt:
           type: string
           format: date-time
@@ -223,44 +312,20 @@ components:
     CoordinateInput:
       type: object
       properties:
-        userId:
+        street:
+          type: string
+        cityId:
+          type: string
+        postal_code:
           type: string
         latitude:
           type: number
         longitude:
           type: number
-        cityId:
-          type: string
-        street:
+        user_id:
           type: string
       required:
-        - userId
+        - cityId
         - latitude
         - longitude
-        - cityId
-        - street
-    City:
-      type: object
-      properties:
-        id:
-          type: string
-        nombre:
-          type: string
-        departamento:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-    CityInput:
-      type: object
-      properties:
-        nombre:
-          type: string
-        departamento:
-          type: string
-      required:
-        - nombre
-        - departamento
+        - user_id
