@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
 import './App.css';
 
 import Login from "./components/Auth/Login";
@@ -28,6 +29,8 @@ import OrderList from "./components/Dashboard/Orders/OrderList";
 import Home from "./components/Home/Home";
 import OrderTrackingPage from "./components/Dashboard/Orders/OrderTrackingPanel";
 import ListadoRepartidores from './components/Dashboard/Orders/ListadoRepartidores';
+import { getUserFromToken } from './api/auth'; // Adjust the path as needed
+
 function App() {
   let { isAuthenticated } = useSelector((state) => state.auth);
 

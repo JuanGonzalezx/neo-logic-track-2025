@@ -7,3 +7,4 @@ export function createGeoSocket() {
     transports: ["websocket"],
   });
 }
+//comentario
