@@ -53,6 +53,7 @@ const OrderTrackingPage = () => {
     lat: parseFloat(warehouse.direccion.latitud),
     lng: parseFloat(warehouse.direccion.longitud)
   };
+  console.log(order)
   const orderMarker = {
     lat: parseFloat(order.coordinate.latitude),
     lng: parseFloat(order.coordinate.longitude)

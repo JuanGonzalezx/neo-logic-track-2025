@@ -133,6 +133,8 @@ export async function changeResetPassword(payload) {
 
 export async function getUserFromToken({ token }) {
   console.log("Token recibido:", token);
+
+  
   const res = await fetch(`${ENV.BASE_API}${API_ROUTES.GET_USER_FROM_TOKEN}`, {
     method: "POST",
     headers: {
