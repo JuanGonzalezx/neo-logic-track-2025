@@ -10,8 +10,9 @@ class CoordinatesController {
         try {
 
             const coordinates = await CoordinatesService.findOrCreate(req.body);
-            req.io.to(req.body.userId).emit("locationUpdate", {
-                userId,
+            let { user_id, latitude, longitude, cityId, street, postal_code } = req.body;
+            req.io.to(req.body.user_id).emit("locationUpdate", {
+                user_id,
                 coordinate: {
                     latitude,
                     longitude,

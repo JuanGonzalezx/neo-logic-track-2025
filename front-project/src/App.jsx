@@ -42,8 +42,9 @@ function App() {
     // const { id: userId } = jwtDecode(token);
 
     // Obtiene el usuario para revisar el rol
-    const user = await getUserFromToken({ token });
-    console.log(user)
+    console.log("Tokensss:", token);
+    const user = await getUserFromToken({token});
+    console.log("Usuario autenticado:", user);
     if (user?.rol !== '68146313ef7752d9d59866da') return;
     console.log("Usuario autenticado:", user);
 
