@@ -11,6 +11,18 @@ class CoordinatesController {
             console.log("Creating coordinates with data:", req.body);
             
             const coordinates = await CoordinatesService.findOrCreate(req.body);
+            let { user_id, latitude, longitude, cityId, street, postal_code } = req.body;
+            req.io.to(req.body.user_id).emit("locationUpdate", {
+                user_id,
+                coordinate: {
+                    latitude,
+                    longitude,
+                    cityId,
+                    street,
+                    postal_code,
+                },
+                timestamp: new Date().toISOString(),
+            });
             res.status(201).json(coordinates);
         } catch (error) {
             handleServiceError(error, res, next);

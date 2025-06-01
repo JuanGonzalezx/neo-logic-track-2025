@@ -3,8 +3,8 @@ const prisma = new PrismaClient();
 
 const { findUser, findRepartidorByCity, sendEmailOrder } = require('../lib/userServiceClient');
 const { findCityByAlmacen } = require('../lib/almacenServiceClient');
-const { validateOrderProducts, updateOrderService, deleteOrders } = require('../services/orderService');
-const { createCoordinate, findCoordinateById } = require('../lib/coordinateServiceClient');
+const { validateOrderProducts, updateOrderService, deleteOrders, calcularDistancia } = require('../services/orderService');
+const { createCoordinate, findCoordinateById, getLastCoordinateByUserId } = require('../lib/coordinateServiceClient');
 
 // Obtener todas las órdenes
 const getAllOrders = async (req, res) => {
@@ -71,33 +71,86 @@ const createOrder = async (req, res) => {
 
     const city = await findCityByAlmacen(id_almacen)
 
-    const coordenada = {
-      latitude,
-      longitude,
-      cityId: city,
-      street: delivery_address,
-      postal_code: req.body.postal_code || "00000"
-    }
-    const coordinate = await createCoordinate(coordenada)
-
     let repartidor = null;
+    let repartidores = null;
+    let repartidorMasCercano = null;
 
     if (auto_assign) {
-      repartidor = await findRepartidorByCity(city)
-      repartidor = repartidor
-      if (!repartidor) {
-        status = "PENDING"
+      repartidores = await findRepartidorByCity(city)
+
+      const repartidoresConCoordenadas = await Promise.all(
+        repartidores.map(async (r) => {
+          try {
+
+            const coord = await getLastCoordinateByUserId(r.id);
+
+            if (coord.coordinate.latitude && coord.coordinate.longitude) {
+              return {
+                ...r,
+                latitude: coord.coordinate.latitude,
+                longitude: coord.coordinate.longitude,
+              };
+            } else {
+              console.warn(`Coordenadas inválidas para repartidor ${r.id}`);
+              return null;
+            }
+          } catch (error) {
+            console.error(`Error obteniendo coordenada para repartidor ${r.id}:`, error);
+            return null;
+          }
+        })
+      );
+
+      // Filtrar coordenadas válidas
+      const repartidoresValidos = repartidoresConCoordenadas.filter(
+        (r) => r && r.latitude && r.longitude
+      );
+
+      if (repartidoresValidos.length === 0) {
+        console.warn("No se encontraron repartidores con coordenadas válidas.");
+        return null;
       }
+
+      // Calcular distancias
+      repartidoresValidos.forEach((r) => {
+        r.distancia = calcularDistancia(
+          latitude,
+          longitude,
+          r.latitude,
+          r.longitude
+        );
+      });
+
+      // Ordenar por distancia
+      repartidoresValidos.sort((a, b) => a.distancia - b.distancia);
+      console.log("Repartidores ordenados por distancia:", repartidoresValidos);
+
+      repartidorMasCercano = repartidoresValidos[0];
+      console.log("Repartidor asignado:", repartidorMasCercano);
+      repartidor = repartidorMasCercano.id;
+
       status = "ASSIGNED"
     } else {
       status = "PENDING"
       repartidor = "00000000-0000-0000-0000-000000000000"; // Default repartidor
     }
 
+    const coordenada = {
+      latitude,
+      longitude,
+      cityId: city,
+      street: delivery_address,
+      user_id: repartidor,
+      postal_code: req.body.postal_code || "00000"
+    }
+    const coordinate = await createCoordinate(coordenada)
+    console.log("Coordenada creada:", coordinate);
+
+
     // Crear la orden
     const order = await prisma.order.create({
       data: {
-        delivery_id: repartidor.id,
+        delivery_id: repartidor,
         delivery_address,
         status,
         customer_email,
