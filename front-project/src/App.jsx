@@ -4,7 +4,7 @@ import { updateDeliveryLocation } from "./api/geoService";
 import { getUserFromToken } from "./api/auth";
 import { useEffect } from "react";
 import './App.css';
-import jwtDecode from 'jwt-decode';
+// import jwtDecode from 'jwt-decode';
 
 import Login from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
@@ -39,11 +39,12 @@ function App() {
   const getAndSendLocation = async () => {
     const token = localStorage.getItem("token");
     if (!token) return;
-    const { id: userId } = jwtDecode(token);
+    // const { id: userId } = jwtDecode(token);
 
     // Obtiene el usuario para revisar el rol
     const user = await getUserFromToken(token);
     if (user?.rol !== '68146313ef7752d9d59866da') return;
+    console.log("Usuario autenticado:", user);
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
@@ -52,7 +53,7 @@ function App() {
         // Necesitas también cityId y street, podrías obtenerlos de user o pedirlos una vez
         const cityId = user.cityId || "1"; // Ajusta según tu modelo
         const street = user.street || "ss";   // Ajusta según tu modelo
-        await updateDeliveryLocation({ userId, latitude: lat, longitude: lon, cityId, street });
+        await updateDeliveryLocation({ userId: user.id , latitude: lat, longitude: lon, cityId, street });
       });
     }
   };
