@@ -68,6 +68,11 @@ const ListadoRepartidores = () => {
       render: (text) => <span><UserOutlined /> {text}</span>,
     },
     {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+    },
+    {
       title: 'Teléfono',
       dataIndex: 'telefono',
       key: 'telefono',
@@ -157,6 +162,7 @@ const ListadoRepartidores = () => {
               return {
                 id: u.id,
                 nombre: u.fullname,
+                email: u.email,
                 ciudad: ciudadNombre,
                 activo: u.status === 'ACTIVE' || u.activo === true,
                 pedidosPendientes: 0, // Will be calculated below
@@ -210,7 +216,7 @@ const ListadoRepartidores = () => {
     // Filtrado por búsqueda de texto
     if (searchTerm.trim() !== "") {
       filtered = filtered.filter(rep => {
-        return [rep.nombre, rep.telefono, rep.ciudad]
+        return [rep.nombre,rep.email, rep.telefono, rep.ciudad]
           .some(field => field && field.toLowerCase().includes(searchTerm.toLowerCase()));
       });
     }
@@ -240,6 +246,7 @@ const ListadoRepartidores = () => {
       });
       return;
     }
+    console.log('Repartidor seleccionado:', repartidor); // <-- LOGGING FOR DEBUGGING
     setRepartidorSeleccionado(repartidor);
     setDrawerVisible(true);
     setPedidoSeleccionado(null); // Limpiar selección anterior
@@ -263,7 +270,10 @@ const ListadoRepartidores = () => {
     try {
       // Actualizar la orden en backend para asignar el repartidor
       const updateRes = await orderAPI.updateOrder(pedidoSeleccionado.id, {
-        delivery_id: repartidorSeleccionado.id
+        delivery_id: repartidorSeleccionado.id,
+        delivery_name: repartidorSeleccionado.nombre,
+        delivery_email: repartidorSeleccionado.email,
+        status: 'ASSIGNED', // O el estado que corresponda
       });
       if (updateRes.status === 200 || updateRes.status === 201) {
         // Refrescar datos desde backend para mantener consistencia

@@ -6,6 +6,7 @@ const CoordinateController = require('../controllers/CoordinateController');
 router.get('/', CoordinateController.getAll);
 router.get('/:id', CoordinateController.getById);
 router.post('/', CoordinateController.create);
+router.post('/order', CoordinateController.createCoordinateForOrder);
 router.put('/:id', CoordinateController.update);
 router.delete('/:id', CoordinateController.delete);
 

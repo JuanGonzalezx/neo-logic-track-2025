@@ -116,7 +116,7 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
                 <td>{order.id.substring(0, 8)}...</td>
                 <td>{formatDateTime(order.creation_date)}</td>
                 <td>{order.delivery_address}</td>
-                <td>{order.delivery_id}</td>
+                <td>{order.delivery_id == "00000000-0000-0000-0000-000000000000" ? "Sin asignar Delivery aun" : order.delivery_id}</td>
                 <td>
                   <span className={`status-badge ${order.status}`}>
                     {order.status}

@@ -28,6 +28,15 @@ class CoordinatesController {
         }
     }
 
+    async createCoordinateForOrder(req, res, next) {
+        try {
+            const coordinates = await CoordinatesService.createCoordinateForOrder(req.body);
+            res.status(201).json(coordinates);
+        } catch (error) {
+            handleServiceError(error, res, next);
+        }
+    }
+
     async getAll(req, res, next) {
         try {
             const allCoordinates = await CoordinatesService.getAll();

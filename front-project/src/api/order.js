@@ -52,6 +52,7 @@ export class Order {
   }
 
   async updateOrder(id, data) {
+    console.log("Updating order with ID:", id, "and data:", data);
     const res = await fetch(`${ORDER_API}${API_ROUTES.ORDERS}/${id}`, {
       method: "PUT",
       headers: {

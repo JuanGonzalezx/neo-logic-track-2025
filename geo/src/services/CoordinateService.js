@@ -64,6 +64,26 @@ class CoordinateService {
         return coordinate;
     }
 
+    async createCoordinateForOrder(data) {
+        if (!data.latitude || !data.longitude || !data.cityId || !data.street) {
+            throw new Error("Falta información para crear una coordenada");
+        }
+
+        let coordinate = await prisma.coordinates.findFirst({
+            where: { latitude: data.latitude, longitude: data.longitude }
+        });
+        if (coordinate) {
+            return coordinate;
+        }
+        const city = await CityServiceClient.findCity(data.cityId);
+        if (!city) {
+            throw new Error("No existe una ciudad con ese id.");
+        }
+        coordinate = await prisma.coordinates.create({
+            data: { latitude: data.latitude, longitude: data.longitude, cityId: data.cityId, street: data.street, postal_code: data.postal_code }
+        });
+        return coordinate;
+    }
 
     async getAll() {
         return prisma.coordinates.findMany();
