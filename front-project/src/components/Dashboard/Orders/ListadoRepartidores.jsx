@@ -1,6 +1,5 @@
 import React from 'react'
 import {
-  Table,
   Card,
   Tag,
   Button,
@@ -28,10 +27,10 @@ import {
   PhoneOutlined,
   EnvironmentOutlined,
   ShoppingCartOutlined,
-  InfoCircleOutlined
+  InfoCircleOutlined,
+  MailOutlined
 } from '@ant-design/icons';
-import { useState } from 'react';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './ListadoRepartidores.module.css';
 import { getAllUsers } from '../../../api/user';
 import { orderAPI } from '../../../api/order';
@@ -53,83 +52,6 @@ const ListadoRepartidores = () => {
   const [activoFilter, setActivoFilter] = useState(null);
   const [entregasHoyFilter, setEntregasHoyFilter] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-
-  const columns = [
-    {
-      title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
-      width: 80,
-    },
-    {
-      title: 'Nombre',
-      dataIndex: 'nombre',
-      key: 'nombre',
-      render: (text) => <span><UserOutlined /> {text}</span>,
-    },
-    {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
-    },
-    {
-      title: 'Teléfono',
-      dataIndex: 'telefono',
-      key: 'telefono',
-    },
-    {
-      title: 'Ciudad',
-      dataIndex: 'ciudad',
-      key: 'ciudad',
-    },
-    {
-      title: 'Estado',
-      dataIndex: 'activo',
-      key: 'activo',
-      render: (activo) => (
-        activo ?
-          <Tag color="green" icon={<CheckCircleOutlined />}>Activo</Tag> :
-          <Tag color="red" icon={<CloseCircleOutlined />}>Inactivo</Tag>
-      ),
-    },
-    {
-      title: 'Pedidos Pendientes',
-      dataIndex: 'pedidosPendientes',
-      key: 'pedidosPendientes',
-      render: (count) => <Tag color={count > 0 ? 'blue' : 'default'}>{count}</Tag>,
-    },
-    {
-      title: 'Entregas Hoy',
-      dataIndex: 'pedidosHoy',
-      key: 'pedidosHoy',
-      render: (count) => (
-        <Tag color={count > 0 ? 'orange' : 'default'} style={{ fontWeight: count > 0 ? 'bold' : 'normal' }}>
-          {count}
-        </Tag>
-      ),
-    },
-    {
-      title: 'Acciones',
-      key: 'acciones',
-      render: (_, record) => (
-        <Space size="small">
-          <Button
-            type="primary"
-            onClick={() => showAsignarPedidoDrawer(record)}
-            disabled={!record.activo}
-          >
-            Asignar Pedido
-          </Button>
-          <Button
-            type={record.activo ? "danger" : "primary"}
-            onClick={() => toggleEstadoRepartidor(record)}
-          >
-            {record.activo ? 'Desactivar' : 'Activar'}
-          </Button>
-        </Space>
-      ),
-    },
-  ];
 
   // Fetch repartidores, orders, and cities from API
   useEffect(() => {
@@ -217,18 +139,16 @@ const ListadoRepartidores = () => {
   useEffect(() => {
     let filtered = [...repartidores];
 
-    // Filtrado por búsqueda de texto
+    // Filtrado por búsqueda de texto SOLO por nombre
     if (searchTerm.trim() !== "") {
-      filtered = filtered.filter(rep => {
-        return [rep.nombre,rep.email, rep.telefono, rep.ciudad]
-          .some(field => field && field.toLowerCase().includes(searchTerm.toLowerCase()));
-      });
+      filtered = filtered.filter(rep =>
+        rep.nombre && rep.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     }
     // Filtrar por estado activo/inactivo
     if (activoFilter !== null) {
       filtered = filtered.filter(rep => rep.activo === activoFilter);
     }
-
     // Filtrar por entregas de hoy
     if (entregasHoyFilter !== null) {
       if (entregasHoyFilter) {
@@ -237,8 +157,9 @@ const ListadoRepartidores = () => {
         filtered = filtered.filter(rep => rep.pedidosHoy === 0);
       }
     }
-
     setFilteredRepartidores(filtered);
+    // Reinicia la página al filtrar
+    setCardPage(1);
   }, [repartidores, activoFilter, entregasHoyFilter, searchTerm]);
 
   // Mostrar Drawer con pedidos disponibles para el repartidor seleccionado
@@ -384,6 +305,74 @@ const ListadoRepartidores = () => {
     );
   };
 
+  // Hook para detectar si es móvil
+  function useIsMobile(breakpoint = 600) {
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= breakpoint);
+    useEffect(() => {
+      const handleResize = () => setIsMobile(window.innerWidth <= breakpoint);
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }, [breakpoint]);
+    return isMobile;
+  }
+
+  const isMobile = useIsMobile();
+
+  // Card para repartidor en móvil
+  const renderRepartidorCard = (rep) => (
+    <Card key={rep.id} style={{ marginBottom: 12, borderRadius: 10, boxShadow: '0 2px 8px #e3e3e3' }}>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8, flexWrap: 'wrap' }}>
+        <UserOutlined style={{ fontSize: 22, color: '#1976d2', marginRight: 10 }} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <b style={{ wordBreak: 'break-all' }}>{rep.nombre}</b>
+          <div style={{ fontSize: 13, color: '#888', wordBreak: 'break-all' }}>{rep.email}</div>
+        </div>
+        {rep.activo ? <Tag color="green">Activo</Tag> : <Tag color="red">Inactivo</Tag>}
+      </div>
+      <div style={{ fontSize: 13, marginBottom: 4, wordBreak: 'break-all' }}>
+        <b>ID:</b> <span style={{ color: '#1976d2' }}>{rep.id}</span><br />
+        <PhoneOutlined /> <b>Tel:</b> {rep.telefono || '-'}<br />
+        <EnvironmentOutlined /> <b>Ciudad:</b> {rep.ciudad || '-'}
+      </div>
+      <div style={{ display: 'flex', gap: 8, margin: '8px 0', flexWrap: 'wrap' }}>
+        <Tag color={rep.pedidosPendientes > 0 ? 'blue' : 'default'}>
+          <ShoppingCartOutlined /> Pendientes: {rep.pedidosPendientes}
+        </Tag>
+        <Tag color={rep.pedidosHoy > 0 ? 'orange' : 'default'}>
+          <CalendarOutlined /> Hoy: {rep.pedidosHoy}
+        </Tag>
+      </div>
+      <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+        <Button
+          type="primary"
+          size="small"
+          onClick={() => showAsignarPedidoDrawer(rep)}
+          disabled={!rep.activo}
+          icon={<ShoppingCartOutlined />}
+          style={{ flex: 1 }}
+        >
+          Asignar
+        </Button>
+        <Button
+          type={rep.activo ? "danger" : "primary"}
+          size="small"
+          onClick={() => toggleEstadoRepartidor(rep)}
+          icon={rep.activo ? <CloseCircleOutlined /> : <CheckCircleOutlined />}
+          style={{ flex: 1 }}
+        >
+          {rep.activo ? 'Desactivar' : 'Activar'}
+        </Button>
+      </div>
+    </Card>
+  );
+
+  // Paginación para cards (ahora en todas las vistas)
+  const [cardPage, setCardPage] = useState(1);
+  // Ajusta la cantidad de cards por página según el tamaño de pantalla
+  const cardPageSize = isMobile ? 6 : 8; // 6 en móvil, 8 en desktop para evitar superposición
+  const paginatedRepartidores = filteredRepartidores.slice((cardPage-1)*cardPageSize, cardPage*cardPageSize);
+  const totalPages = Math.ceil(filteredRepartidores.length / cardPageSize);
+
   return (
     <div className={styles['repartidores-bg']}>
       <Card className={styles['repartidores-card']}>
@@ -428,18 +417,51 @@ const ListadoRepartidores = () => {
             </Select>
           </Space>
 
-          <div className={styles['repartidores-table']} style={{ overflowX: 'auto' }}>
-            <Table
-              columns={columns}
-              dataSource={filteredRepartidores}
-              rowKey="id"
-              pagination={{ pageSize: 5 }}
-              scroll={{ x: 600 }}
-            />
+          <div className={styles['repartidores-table']} style={{ width: '100%', overflow: 'visible' }}>
+            {paginatedRepartidores.length === 0 ? (
+              <Empty description="No hay repartidores" />
+            ) : (
+              <Row gutter={[0, 24]} style={{ width: '100%', margin: 0 }} justify="center" align="top">
+                {paginatedRepartidores.map(rep => (
+                  <Col
+                    key={rep.id}
+                    xs={24}
+                    sm={24}
+                    md={12}
+                    lg={8}
+                    xl={6}
+                    xxl={4}
+                    style={{ display: 'flex', justifyContent: 'center', alignItems: 'stretch', margin: 0, padding: 0, minWidth: 220, maxWidth: 340 }}
+                  >
+                    <div style={{ width: 280, minWidth: 220, maxWidth: 340, flex: 1, display: 'flex', alignItems: 'stretch' }}>
+                      {renderRepartidorCard(rep)}
+                    </div>
+                  </Col>
+                ))}
+              </Row>
+            )}
+            {totalPages > 1 && (
+              <div style={{ display: 'flex', justifyContent: 'center', margin: '16px 0' }}>
+                <Button
+                  size="small"
+                  disabled={cardPage === 1}
+                  onClick={() => setCardPage(cardPage-1)}
+                  style={{ marginRight: 8 }}
+                >Anterior</Button>
+                <span style={{ alignSelf: 'center', fontSize: 13 }}>
+                  Página {cardPage} de {totalPages}
+                </span>
+                <Button
+                  size="small"
+                  disabled={cardPage === totalPages}
+                  onClick={() => setCardPage(cardPage+1)}
+                  style={{ marginLeft: 8 }}
+                >Siguiente</Button>
+              </div>
+            )}
           </div>
         </Space>
       </Card>
-
       <Drawer 
         title={`Asignar Pedido a ${repartidorSeleccionado ? repartidorSeleccionado.nombre : ''}`}
         width={window.innerWidth < 600 ? '100vw' : 650}
