@@ -1,12 +1,28 @@
-const swaggerUi = require('swagger-ui-express');
-const YAML = require('yamljs');
+const swaggerJsdoc = require("swagger-jsdoc");
 const path = require('path');
-const express = require('express');
 
-const swaggerDocument = YAML.load(path.join(__dirname, 'swagger', 'swagger.yml'));
+const options = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Geo API',
+      version: '1.0.0',
+      description: 'API documentation for the Geo microservice',
+      contact: {
+        name: 'Geo Team',
+        email: 'your.email@example.com',
+      },
+    },
+    servers: [
+      {
+        url: 'http://localhost:3003/api/v1',
+        description: 'Development server',
+      },
+    ],
+  },
+  apis: [path.join(__dirname, './swagger/*.yml')],
+};
 
-function setupSwagger(app) {
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-}
+const specs = swaggerJsdoc(options);
 
-module.exports = setupSwagger;
+module.exports = specs;

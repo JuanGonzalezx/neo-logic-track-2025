@@ -263,7 +263,9 @@ const ListadoRepartidores = () => {
     try {
       // Actualizar la orden en backend para asignar el repartidor
       const updateRes = await orderAPI.updateOrder(pedidoSeleccionado.id, {
-        delivery_id: repartidorSeleccionado.id
+        delivery_id: repartidorSeleccionado.id,
+        delivery_name: repartidorSeleccionado.fullname,
+        delivery_email: repartidorSeleccionado.email,
       });
       if (updateRes.status === 200 || updateRes.status === 201) {
         // Refrescar datos desde backend para mantener consistencia
