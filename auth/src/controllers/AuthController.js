@@ -755,7 +755,7 @@ const resetPassword = async (req, res) => {
 
 
   const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-  const resetLink = `http://localhost:5173/changeResetPassword/${token}`;
+  const resetLink = `https://frontend-4cpi.onrender.com/changeResetPassword/${token}`;
   try {
     await sendPassVerificationEmail(user.email, resetLink, user.fullname);
 
