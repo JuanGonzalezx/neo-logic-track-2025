@@ -4,7 +4,7 @@ import { warehouseAPI } from "../../../api/warehouse";
 import { productAPI } from "../../../api/product";
 import { getUserFromToken } from "../../../api/auth";
 import WarehouseItem from "./WarehouseItem";
-import "./warehouse.css";
+import "./Warehouse.css";
 
 const WarehouseList = () => {
   const [warehouses, setWarehouses] = useState([]);
