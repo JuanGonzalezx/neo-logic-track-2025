@@ -11,7 +11,8 @@ const uploadRoutes = require("./routes/uploadRoutes");
 const app = express();
 const port = process.env.PORT || 3005;
 app.use(cors({
-    origin: "https://frontend-4cpi.onrender.com",
+    // origin: "https://frontend-4cpi.onrender.com",
+    origin: "*",
     methods: ["GET", "PUT", "POST", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
 }));
