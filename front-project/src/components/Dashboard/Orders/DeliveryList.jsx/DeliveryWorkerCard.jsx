@@ -72,7 +72,7 @@ export const DeliveryWorkerCard = ({ worker, onAssign, onToggleStatus, onGenerat
           <button 
             className="dl-action-button dl-assign-button"
             onClick={onAssign}
-            disabled={!activo}
+            disabled={!activo || pedidosHoy >= 8}
             aria-label="Asignar pedido"
           >
             <Package size={16} />
