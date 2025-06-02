@@ -319,7 +319,7 @@ const ListadoRepartidores = () => {
   const isMobile = useIsMobile();
 
   // Card para repartidor en móvil
-  const renderRepartidorCard = (rep) => (
+  const renderDeliveryCard = (rep) => (
     <Card key={rep.id} style={{ marginBottom: 12, borderRadius: 10, boxShadow: '0 2px 8px #e3e3e3' }}>
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8, flexWrap: 'wrap' }}>
         <UserOutlined style={{ fontSize: 22, color: '#1976d2', marginRight: 10 }} />
@@ -434,7 +434,7 @@ const ListadoRepartidores = () => {
                     style={{ display: 'flex', justifyContent: 'center', alignItems: 'stretch', margin: 0, padding: 0, minWidth: 220, maxWidth: 340 }}
                   >
                     <div style={{ width: 280, minWidth: 220, maxWidth: 340, flex: 1, display: 'flex', alignItems: 'stretch' }}>
-                      {renderRepartidorCard(rep)}
+                      {renderDeliveryCard(rep)}
                     </div>
                   </Col>
                 ))}

@@ -31,7 +31,7 @@ import WarehouseList from "./components/Dashboard/Warehouses/WarehouseList";
 import OrderList from "./components/Dashboard/Orders/OrderList";
 import Home from "./components/Home/Home";
 import OrderTrackingPage from "./components/Dashboard/Orders/OrderTrackingPanel";
-import ListadoRepartidores from './components/Dashboard/Orders/ListadoRepartidores';
+import ListadoRepartidores from './components/Dashboard/Orders/DeliveryList.jsx/index';
 function App() {
   let { isAuthenticated } = useSelector((state) => state.auth);
 
