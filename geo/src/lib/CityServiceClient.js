@@ -1,7 +1,7 @@
 // src/lib/userServiceClient.js (o una ruta similar)
 const axios = require('axios');
 
-const CITY_API_BASE_URL = process.env.CITY_SERVICE_URL || 'http://localhost:3001/api/v1/ciudades';
+const CITY_API_BASE_URL = process.env.CITY_SERVICE_URL;
 
 /**
  * Busca un usuario (gerente) por varios criterios.

@@ -1031,10 +1031,6 @@
 }
 
 @media (max-width: 480px) {
-  .dl-card-actions {
-    /* flex-direction: column; ya está por defecto */
-    /* gap: 8px; ya está por defecto */
-  }
 
   .dl-card-actions .dl-main-actions {
     flex-direction: column; /* AÑADIDO: Apilar botones principales */

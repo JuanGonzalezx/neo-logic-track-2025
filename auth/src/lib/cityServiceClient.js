@@ -1,7 +1,7 @@
 // src/lib/cityServiceClient.js
 const axios = require('axios');
 
-const CITIES_API_BASE_URL = process.env.CITIES_SERVICE_URL || 'http://localhost:3001/api/v1/cities';
+const CITIES_API_BASE_URL = process.env.CITIES_SERVICE_URL;
 
 /**
  * Busca una ciudad por su ID en el microservicio de inventory.
