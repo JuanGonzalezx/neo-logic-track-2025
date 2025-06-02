@@ -4,7 +4,6 @@ const { BASE_PATH, API_ROUTES } = ENV;
 export class Auth {
 
   async signUp(data) {
-    console.log((`${ENV.BASE_API}${API_ROUTES.SIGNUP}`));
 
     const response = await fetch(`${ENV.BASE_API}${API_ROUTES.SIGNUP}`, {
       method: "POST",
@@ -53,6 +52,8 @@ export class Auth {
 
 
   async signIn(data) {
+    console.log((`${ENV.BASE_API}${API_ROUTES.SIGNIN}`));
+
     const response = await fetch(`${ENV.BASE_API}${API_ROUTES.SIGNIN}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
