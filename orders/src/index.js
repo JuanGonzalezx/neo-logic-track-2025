@@ -8,7 +8,7 @@ const PORT = 3002;
 
 // Middleware para CORS (debe ir antes de las rutas)
 app.use(cors({
-  origin: 'https://frontend-4cpi.onrender.com/'
+  origin: 'https://frontend-4cpi.onrender.com'
 }));
 
 // Middleware para parsear JSON
