@@ -1,7 +1,7 @@
 const axios = require('axios');
 
-const USERS_API_BASE_URL = process.env.USERS_SERVICE_URL || 'http://localhost:3000/api/v1/users';
-const AUTH_API_BASE_URL = process.env.AUTH_SERVICE_URL || 'http://localhost:3000/api/v1/auth';
+const USERS_API_BASE_URL = process.env.USERS_SERVICE_URL;
+const AUTH_API_BASE_URL = process.env.AUTH_SERVICE_URL;
 
 async function findUser(queryParams) {
   try {

@@ -1,10 +1,10 @@
 const axios = require('axios');
 
-const PRODUCTS_API_BASE_URL = process.env.PRODUCTS_SERVICE_URL || 'http://localhost:3001/api/v1/productos';
-const ALMACENPRODUCTS_API_BASE_URL = process.env.ALMACENPRODUCTS_SERVICE_URL || 'http://localhost:3001/api/v1/almacenproductos';
-const MOVEMENTS_API_BASE_URL = process.env.MOVEMENTS_SERVICE_URL || 'http://localhost:3001/api/v1/movements';
-const AUTH_API_BASE_URL = process.env.AUTH_SERVICE_URL || 'http://localhost:3000/api/v1';
-const ALMACENES_API_BASE_URL = process.env.ALMACENES_SERVICE_URL || 'http://localhost:3001/api/v1/almacenes';
+const PRODUCTS_API_BASE_URL = process.env.PRODUCTS_SERVICE_URL;
+const ALMACENPRODUCTS_API_BASE_URL = process.env.ALMACENPRODUCTS_SERVICE_URL;
+const MOVEMENTS_API_BASE_URL = process.env.MOVEMENTS_SERVICE_URL;
+const AUTH_API_BASE_URL = process.env.AUTH_SERVICE_URL;
+const ALMACENES_API_BASE_URL = process.env.ALMACEN_API_BASE_URL;
 
 
 

@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const ALMACEN_API_BASE_URL = process.env.ALMACEN_API_BASE_URL || 'http://localhost:3001/api/v1/almacenes';
+const ALMACEN_API_BASE_URL = process.env.ALMACEN_API_BASE_URL;
 
 async function findCityByAlmacen(almacen_id) {
     try {
