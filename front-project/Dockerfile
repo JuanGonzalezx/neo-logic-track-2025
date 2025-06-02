@@ -1,4 +1,5 @@
-FROM node:20-alpine AS builder
+# Etapa 1: build
+FROM node:18-alpine AS builder
 
 WORKDIR /app
 
@@ -8,10 +9,11 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-FROM nginx:alpine
+# Etapa 2: servidor estático
+FROM nginx:stable-alpine
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-EXPOSE 5173
+EXPOSE 80
 
-CMD sh -c 'echo "Frontend corriendo en http://localhost:3001/" && nginx -g "daemon off;"'
+CMD sh -c 'echo "Frontend corriendo en http://localhost:3001" && nginx -g "daemon off;"'

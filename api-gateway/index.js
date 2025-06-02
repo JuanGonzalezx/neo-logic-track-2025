@@ -11,7 +11,8 @@ dotenv.config();
 const app = express();
 
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || "http://localhost:5173", 
+    // origin: "https://frontend-4cpi.onrender.com",
+    origin: "*",
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], 
   allowedHeaders: ["Content-Type", "Authorization"], 
   credentials: true,

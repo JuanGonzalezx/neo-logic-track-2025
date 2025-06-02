@@ -4,6 +4,7 @@ const { BASE_PATH, API_ROUTES } = ENV;
 export class Auth {
 
   async signUp(data) {
+
     const response = await fetch(`${ENV.BASE_API}${API_ROUTES.SIGNUP}`, {
       method: "POST",
       headers: {
@@ -11,6 +12,7 @@ export class Auth {
       },
       body: JSON.stringify(data),
     });
+
 
     const result = await response.json();
     console.log(result); // sigue viendo { message: "...", token: "..." }
@@ -50,6 +52,8 @@ export class Auth {
 
 
   async signIn(data) {
+    console.log((`${ENV.BASE_API}${API_ROUTES.SIGNIN}`));
+
     const response = await fetch(`${ENV.BASE_API}${API_ROUTES.SIGNIN}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -134,7 +138,7 @@ export async function changeResetPassword(payload) {
 export async function getUserFromToken({ token }) {
   console.log("Token recibido:", token);
 
-  
+
   const res = await fetch(`${ENV.BASE_API}${API_ROUTES.GET_USER_FROM_TOKEN}`, {
     method: "POST",
     headers: {

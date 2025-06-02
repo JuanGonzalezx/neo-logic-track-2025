@@ -62,7 +62,7 @@ function App() {
   };
 
   getAndSendLocation();
-  const interval = setInterval(getAndSendLocation, 30000);
+  const interval = setInterval(getAndSendLocation, 15000);
   return () => clearInterval(interval);
 }, []);
   
