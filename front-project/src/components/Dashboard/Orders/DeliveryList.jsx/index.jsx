@@ -7,7 +7,7 @@ import './styles.css';
  */
 const DeliveryList = () => {
   return (
-    <div className="delivery-list-container">
+    <div className="dl-delivery-list-container">
       <DeliveryWorkerList />
     </div>
   );

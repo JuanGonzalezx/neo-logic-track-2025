@@ -1,9 +1,6 @@
 import React from 'react';
 import { Search, MapPin, UserCheck, Filter } from 'lucide-react';
 
-/**
- * Component for filtering delivery workers
- */
 export const Filters = ({
   nameFilter,
   setNameFilter,
@@ -13,16 +10,16 @@ export const Filters = ({
   setStatusFilter
 }) => {
   return (
-    <div className="filters-container">
-      <div className="filters-header">
+    <div className="dl-filters-container">
+      <div className="dl-filters-header">
         <Filter size={16} />
         <h3>Filtros</h3>
       </div>
       
-      <div className="filters-body">
-        <div className="filter-group">
-          <div className="filter-input">
-            <Search size={16} className="input-icon" />
+      <div className="dl-filters-body">
+        <div className="dl-filter-group">
+          <div className="dl-filter-input">
+            <Search size={16} className="dl-input-icon" />
             <input
               type="text"
               placeholder="Buscar por nombre..."
@@ -32,9 +29,9 @@ export const Filters = ({
           </div>
         </div>
         
-        <div className="filter-group">
-          <div className="filter-input">
-            <MapPin size={16} className="input-icon" />
+        <div className="dl-filter-group">
+          <div className="dl-filter-input">
+            <MapPin size={16} className="dl-input-icon" />
             <input
               type="text"
               placeholder="Filtrar por ciudad..."
@@ -44,23 +41,23 @@ export const Filters = ({
           </div>
         </div>
         
-        <div className="filter-group">
-          <label className="filter-label">Estado:</label>
-          <div className="status-options">
+        <div className="dl-filter-group">
+          <label className="dl-filter-label">Estado:</label>
+          <div className="dl-status-options">
             <button
-              className={`status-option ${statusFilter === null ? 'selected' : ''}`}
+              className={`dl-status-option ${statusFilter === null ? 'selected' : ''}`}
               onClick={() => setStatusFilter(null)}
             >
               Todos
             </button>
             <button
-              className={`status-option ${statusFilter === true ? 'selected' : ''}`}
+              className={`dl-status-option ${statusFilter === true ? 'selected' : ''}`}
               onClick={() => setStatusFilter(true)}
             >
               Activos
             </button>
             <button
-              className={`status-option ${statusFilter === false ? 'selected' : ''}`}
+              className={`dl-status-option ${statusFilter === false ? 'selected' : ''}`}
               onClick={() => setStatusFilter(false)}
             >
               Inactivos

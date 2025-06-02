@@ -14,63 +14,63 @@ export const DeliveryWorkerCard = ({ worker, onAssign, onToggleStatus, onGenerat
   } = worker;
   
   return (
-    <div className={`delivery-worker-card ${!activo ? 'inactive' : ''}`}>
-      <div className="card-header">
-        <div className="worker-avatar">
+    <div className={`dl-delivery-worker-card ${!activo ? 'inactive' : ''}`}>
+      <div className="dl-card-header">
+        <div className="dl-worker-avatar">
           <User size={24} />
         </div>
-        <div className="worker-info">
+        <div className="dl-worker-info">
           <h3>{nombre}</h3>
-          <p className="worker-email">{email}</p>
+          <p className="dl-worker-email">{email}</p>
         </div>
-        <div className="worker-status">
-          <span className={`status-badge ${activo ? 'active' : 'inactive'}`}>
+        <div className="dl-worker-status">
+          <span className={`dl-status-badge ${activo ? 'active' : 'inactive'}`}>
             {activo ? 'Activo' : 'Inactivo'}
           </span>
         </div>
       </div>
       
-      <div className="card-body">
-        <div className="worker-details">
-          <div className="detail-item">
-            <span className="detail-label">ID:</span>
-            <span className="detail-value">{id}</span>
+      <div className="dl-card-body">
+        <div className="dl-worker-details">
+          <div className="dl-detail-item">
+            <span className="dl-detail-label">ID:</span>
+            <span className="dl-detail-value">{id}</span>
           </div>
           
-          <div className="detail-item">
-            <Phone size={16} className="detail-icon" />
-            <span className="detail-value">{telefono || 'No disponible'}</span>
+          <div className="dl-detail-item">
+            <Phone size={16} className="dl-detail-icon" />
+            <span className="dl-detail-value">{telefono || 'No disponible'}</span>
           </div>
           
-          <div className="detail-item">
-            <MapPin size={16} className="detail-icon" />
-            <span className="detail-value">{ciudad || 'No especificada'}</span>
+          <div className="dl-detail-item">
+            <MapPin size={16} className="dl-detail-icon" />
+            <span className="dl-detail-value">{ciudad || 'No especificada'}</span>
           </div>
         </div>
         
-        <div className="order-counts">
-          <div className="count-item">
-            <Package size={16} className="count-icon" />
-            <span className="count-label">Pendientes</span>
-            <span className={`count-value ${pedidosPendientes > 0 ? 'has-orders' : ''}`}>
+        <div className="dl-order-counts">
+          <div className="dl-count-item">
+            <Package size={16} className="dl-count-icon" />
+            <span className="dl-count-label">Pendientes</span>
+            <span className={`dl-count-value ${pedidosPendientes > 0 ? 'has-orders' : ''}`}>
               {pedidosPendientes}
             </span>
           </div>
           
-          <div className="count-item">
-            <Calendar size={16} className="count-icon" />
-            <span className="count-label">Hoy</span>
-            <span className={`count-value ${pedidosHoy > 0 ? 'has-orders' : ''}`}>
+          <div className="dl-count-item">
+            <Calendar size={16} className="dl-count-icon" />
+            <span className="dl-count-label">Hoy</span>
+            <span className={`dl-count-value ${pedidosHoy > 0 ? 'has-orders' : ''}`}>
               {pedidosHoy}
             </span>
           </div>
         </div>
       </div>
       
-      <div className="card-actions">
-        <div className="main-actions">
+      <div className="dl-card-actions">
+        <div className="dl-main-actions">
           <button 
-            className="action-button assign-button"
+            className="dl-action-button dl-assign-button"
             onClick={onAssign}
             disabled={!activo}
             aria-label="Asignar pedido"
@@ -80,7 +80,7 @@ export const DeliveryWorkerCard = ({ worker, onAssign, onToggleStatus, onGenerat
           </button>
           
           <button 
-            className={`action-button toggle-button ${activo ? 'deactivate' : 'activate'}`}
+            className={`dl-action-button dl-toggle-button ${activo ? 'deactivate' : 'activate'}`}
             onClick={onToggleStatus}
             aria-label={activo ? 'Desactivar repartidor' : 'Activar repartidor'}
           >
@@ -90,7 +90,7 @@ export const DeliveryWorkerCard = ({ worker, onAssign, onToggleStatus, onGenerat
         </div>
         
         <button 
-          className="action-button report-button"
+          className="dl-action-button dl-report-button"
           onClick={onGenerateReport}
           aria-label="Generar reporte"
         >

@@ -73,39 +73,39 @@ export const AssignmentDrawer = ({
   if (!isOpen) return null;
   
   return (
-    <div className={`assignment-drawer ${isOpen ? 'open' : ''}`}>
-      <div className="drawer-backdrop" onClick={onClose}></div>
-      <div className="drawer-content">
-        <div className="drawer-header">
+    <div className={`dl-assignment-drawer ${isOpen ? 'open' : ''}`}>
+      <div className="dl-drawer-backdrop" onClick={onClose}></div>
+      <div className="dl-drawer-content">
+        <div className="dl-drawer-header">
           <h2>Asignar Pedido</h2>
-          <button className="close-button" onClick={onClose} aria-label="Cerrar">
+          <button className="dl-close-button" onClick={onClose} aria-label="Cerrar">
             <X size={20} />
           </button>
         </div>
         
-        <div className="worker-summary">
-          <div className="worker-avatar">
+        <div className="dl-worker-summary">
+          <div className="dl-worker-avatar">
             <User size={32} />
           </div>
-          <div className="worker-info">
+          <div className="dl-worker-info">
             <h3>{worker.nombre}</h3>
             <p>{worker.email}</p>
-            <div className="worker-details">
-              <div className="detail-item">
+            <div className="dl-worker-details">
+              <div className="dl-detail-item">
                 <Phone size={14} />
                 <span>{worker.telefono || 'No disponible'}</span>
               </div>
-              <div className="detail-item">
+              <div className="dl-detail-item">
                 <MapPin size={14} />
                 <span>{worker.ciudad || 'No especificada'}</span>
               </div>
             </div>
-            <div className="order-badges">
-              <div className="badge">
+            <div className="dl-order-badges">
+              <div className="dl-badge">
                 <Package size={14} />
                 <span>Pendientes: {worker.pedidosPendientes}</span>
               </div>
-              <div className="badge">
+              <div className="dl-badge">
                 <Calendar size={14} />
                 <span>Hoy: {worker.pedidosHoy}</span>
               </div>
@@ -113,25 +113,25 @@ export const AssignmentDrawer = ({
           </div>
         </div>
         
-        <div className="drawer-divider"></div>
+        <div className="dl-drawer-divider"></div>
         
-        <div className="orders-section">
+        <div className="dl-orders-section">
           <h3>Pedidos Disponibles</h3>
           
           {isLoading ? (
-            <div className="loading-orders">
-              <div className="spinner"></div>
+            <div className="dl-loading-orders">
+              <div className="dl-spinner"></div>
               <span>Cargando pedidos...</span>
             </div>
           ) : (
             <>
               {filteredOrders.length === 0 ? (
-                <div className="no-orders">
+                <div className="dl-no-orders">
                   <ShoppingBag size={32} />
                   <p>No hay pedidos disponibles para asignar</p>
                 </div>
               ) : (
-                <div className="orders-list">
+                <div className="dl-orders-list">
                   {filteredOrders.map(order => {
                     const orderDate = order.fechaEntrega || order.fecha_entrega || 
                       (order.creation_date && order.creation_date.split('T')[0]);
@@ -140,34 +140,34 @@ export const AssignmentDrawer = ({
                     return (
                       <div 
                         key={order.id}
-                        className={`order-card ${selectedOrder?.id === order.id ? 'selected' : ''}`}
+                        className={`dl-order-card ${selectedOrder?.id === order.id ? 'selected' : ''}`}
                         onClick={() => handleSelectOrder(order)}
                       >
-                        <div className="order-header">
-                          <div className="order-id">Pedido #{order.id}</div>
+                        <div className="dl-order-header">
+                          <div className="dl-order-id">Pedido #{order.id}</div>
                           {isTodayOrder && (
-                            <div className="today-badge">HOY</div>
+                            <div className="dl-today-badge">HOY</div>
                           )}
                         </div>
                         
-                        <div className="order-details">
-                          <div className="detail-row">
+                        <div className="dl-order-details">
+                          <div className="dl-detail-row">
                             <User size={14} />
                             <span>{order.customer_name || 'Cliente no especificado'}</span>
                           </div>
                           
-                          <div className="detail-row">
+                          <div className="dl-detail-row">
                             <MapPin size={14} />
                             <span>{order.delivery_address || 'Dirección no especificada'}</span>
                           </div>
                           
-                          <div className="detail-row">
+                          <div className="dl-detail-row">
                             <Clock size={14} />
                             <span>Fecha: {formatDate(orderDate)}</span>
                           </div>
                           
                           {order.id_almacen && (
-                            <div className="detail-row">
+                            <div className="dl-detail-row">
                               <Truck size={14} />
                               <span>Almacén: {order.id_almacen}</span>
                             </div>
@@ -182,12 +182,12 @@ export const AssignmentDrawer = ({
           )}
         </div>
         
-        <div className="drawer-actions">
-          <button className="cancel-button" onClick={onClose}>
+        <div className="dl-drawer-actions">
+          <button className="dl-cancel-button" onClick={onClose}>
             Cancelar
           </button>
           <button 
-            className="assign-button"
+            className="dl-assign-button"
             onClick={handleAssign}
             disabled={!selectedOrder}
           >

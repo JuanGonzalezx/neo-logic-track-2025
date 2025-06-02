@@ -285,98 +285,98 @@ export const DeliveryWorkerList = () => {
   );
   
   return (
-    <div className="delivery-workers-container">
-      <div className="delivery-workers-header">
-        <h1>Gestión de Repartidores</h1>
-        <button 
-          className="refresh-button"
-          onClick={handleResetFilters}
-          aria-label="Resetear filtros"
-        >
-          <RefreshCw size={16} />
-          <span>Resetear Filtros</span>
-        </button>
-      </div>
-      
-      <Filters 
-        nameFilter={nameFilter}
-        setNameFilter={setNameFilter}
-        cityFilter={cityFilter}
-        setCityFilter={setCityFilter}
-        statusFilter={statusFilter}
-        setStatusFilter={setStatusFilter}
-      />
-      
-      {isLoading ? (
-        <Loading />
-      ) : (
-        <>
-          {filteredRepartidores.length === 0 ? (
-            <div className="no-results">
-              <p>No se encontraron repartidores con los filtros seleccionados</p>
-            </div>
-          ) : (
-            <>
-              <div className="delivery-workers-grid">
-                {paginatedWorkers.map(worker => (
-                  <DeliveryWorkerCard 
-                    key={worker.id}
-                    worker={worker}
-                    onAssign={() => handleOpenAssignDrawer(worker)}
-                    onToggleStatus={() => handleToggleStatus(worker)}
-                    onGenerateReport={() => handleOpenReportMenu(worker)}
-                  />
-                ))}
-              </div>
-              
-              {totalPages > 1 && (
-                <div className="pagination">
-                  <button 
-                    className="pagination-button"
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage(prev => prev - 1)}
-                  >
-                    Anterior
-                  </button>
-                  <span className="pagination-info">
-                    Página {currentPage} de {totalPages}
-                  </span>
-                  <button 
-                    className="pagination-button"
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage(prev => prev + 1)}
-                  >
-                    Siguiente
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-        </>
-      )}
-      
-      {/* Assignment Drawer */}
-      {selectedRepartidor && (
-        <AssignmentDrawer 
-          isOpen={drawerVisible}
-          onClose={() => setDrawerVisible(false)}
-          worker={selectedRepartidor}
-          orders={pedidosDisponibles}
-          selectedOrder={pedidoSeleccionado}
-          setSelectedOrder={setPedidoSeleccionado}
-          onAssign={handleAssignOrder}
-        />
-      )}
-      
-      {/* Report Menu */}
-      {reportWorker && (
-        <ReportMenu 
-          isOpen={reportMenuVisible}
-          onClose={() => setReportMenuVisible(false)}
-          worker={reportWorker}
-          orders={pedidosDisponibles}
-        />
-      )}
+  <div className="dl-delivery-workers-container">
+    <div className="dl-delivery-workers-header">
+      <h1>Gestión de Repartidores</h1>
+      <button 
+        className="dl-refresh-button"
+        onClick={handleResetFilters}
+        aria-label="Resetear filtros"
+      >
+        <RefreshCw size={16} />
+        <span>Resetear Filtros</span>
+      </button>
     </div>
-  );
-};
+    
+    <Filters 
+      nameFilter={nameFilter}
+      setNameFilter={setNameFilter}
+      cityFilter={cityFilter}
+      setCityFilter={setCityFilter}
+      statusFilter={statusFilter}
+      setStatusFilter={setStatusFilter}
+    />
+    
+    {isLoading ? (
+      <Loading />
+    ) : (
+      <>
+        {filteredRepartidores.length === 0 ? (
+          <div className="dl-no-results">
+            <p>No se encontraron repartidores con los filtros seleccionados</p>
+          </div>
+        ) : (
+          <>
+            <div className="dl-delivery-workers-grid">
+              {paginatedWorkers.map(worker => (
+                <DeliveryWorkerCard 
+                  key={worker.id}
+                  worker={worker}
+                  onAssign={() => handleOpenAssignDrawer(worker)}
+                  onToggleStatus={() => handleToggleStatus(worker)}
+                  onGenerateReport={() => handleOpenReportMenu(worker)}
+                />
+              ))}
+            </div>
+            
+            {totalPages > 1 && (
+              <div className="dl-pagination">
+                <button 
+                  className="dl-pagination-button"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(prev => prev - 1)}
+                >
+                  Anterior
+                </button>
+                <span className="dl-pagination-info">
+                  Página {currentPage} de {totalPages}
+                </span>
+                <button 
+                  className="dl-pagination-button"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage(prev => prev + 1)}
+                >
+                  Siguiente
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </>
+    )}
+    
+    {/* Assignment Drawer */}
+    {selectedRepartidor && (
+      <AssignmentDrawer 
+        isOpen={drawerVisible}
+        onClose={() => setDrawerVisible(false)}
+        worker={selectedRepartidor}
+        orders={pedidosDisponibles}
+        selectedOrder={pedidoSeleccionado}
+        setSelectedOrder={setPedidoSeleccionado}
+        onAssign={handleAssignOrder}
+      />
+    )}
+    
+    {/* Report Menu */}
+    {reportWorker && (
+      <ReportMenu 
+        isOpen={reportMenuVisible}
+        onClose={() => setReportMenuVisible(false)}
+        worker={reportWorker}
+        orders={pedidosDisponibles}
+      />
+    )}
+  </div>
+);
+}

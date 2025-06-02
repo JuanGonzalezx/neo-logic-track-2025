@@ -6,10 +6,10 @@ import { Package } from 'lucide-react';
  */
 export const Loading = () => {
   return (
-    <div className="loading-container">
-      <div className="loading-content">
-        <Package size={32} className="loading-icon" />
-        <div className="spinner"></div>
+    <div className="dl-loading-container">
+      <div className="dl-loading-content">
+        <Package size={32} className="dl-loading-icon" />
+        <div className="dl-spinner"></div>
         <p>Cargando repartidores...</p>
       </div>
     </div>
