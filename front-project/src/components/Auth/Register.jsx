@@ -190,39 +190,39 @@ const Register = ({ isOpen, onClose }) => {
 
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
-                    <label htmlFor="fullname">Fullname</label>
+                    <label htmlFor="fullname">Nombre completo</label>
                     <input
                         type="text"
                         id="fullname"
                         name="fullname"
                         value={formData.fullname}
-                        placeholder="Enter your fullname"
+                        placeholder="Ingresa tu nombre completo"
                         onChange={handleChange}
                     />
                     {errors.fullname && <span className="field-error">{errors.fullname}</span>}
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="email">Email</label>
+                    <label htmlFor="email">Correo electrónico</label>
                     <input
                         type="email"
                         id="email"
                         name="email"
                         value={formData.email}
-                        placeholder="Enter your email"
+                        placeholder="Ingresa tu correo electrónico"
                         onChange={handleChange}
                     />
                     {errors.email && <span className="field-error">{errors.email}</span>}
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="current_password">Password</label>
+                    <label htmlFor="current_password">Contraseña</label>
                     <input
                         type="password"
                         id="current_password"
                         name="current_password"
                         value={formData.current_password}
-                        placeholder="Enter your password"
+                        placeholder="Crea una contraseña"
                         onChange={handleChange}
                     />
                     {errors.current_password && (
@@ -231,13 +231,13 @@ const Register = ({ isOpen, onClose }) => {
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="number">Number</label>
+                    <label htmlFor="number">Teléfono</label>
                     <input
                         type="text"
                         id="number"
                         name="number"
                         value={formData.number}
-                        placeholder="Enter your number"
+                        placeholder="Ingresa tu número de teléfono"
                         onChange={handleChange}
                     />
                     {errors.number && <span className="field-error">{errors.number}</span>}
@@ -268,7 +268,7 @@ const Register = ({ isOpen, onClose }) => {
                 </div>
 
                 <button type="submit" className="login-button" disabled={loading}>
-                    {loading ? <Spin /> : "Create"}
+                    {loading ? <Spin /> : "Registrarse"}
                 </button>
             </form>
 {/* 

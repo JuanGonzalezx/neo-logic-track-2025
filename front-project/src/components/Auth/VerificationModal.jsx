@@ -39,36 +39,36 @@ const VerificationModal = ({ isOpen, onClose, contactMethod, onVerificationSucce
         </button>
 
         <h2 className="verification-title">
-          Identity Verification
+          Verificación de Identidad
         </h2>
 
         <p className="verification-description">
-          We have sent a code to your {contactMethod}. Enter it to continue.
+          Te hemos enviado un código a tu {contactMethod}. Ingresa el código para continuar.
         </p>
 
         <form onSubmit={handleSubmit}>
           <div className="verification-form-group">
-            <label className="verification-label">Code Verification</label>
+            <label className="verification-label">Código de verificación</label>
             <input
               className="verification-input"
               type="text"
               value={verificationCode}
               onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              placeholder="6 digits"
+              placeholder="6 dígitos"
               maxLength={6}
             />
             {error && <span className="verification-error">{error}</span>}
           </div>
 
           <button type="submit" className="verification-submit-btn">
-            Verificate
+            Verificar
           </button>
         </form>
 
         <div className="verification-resend-text">
-          ¿Did you not receive the code?{" "}
+          ¿No recibiste el código?{' '}
           <button onClick={handleResend} className="verification-resend-link">
-            Resend
+            Reenviar
           </button>
         </div>
         {resendMessage && (

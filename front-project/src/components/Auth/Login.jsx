@@ -170,23 +170,23 @@ const Login = () => {
         <form onSubmit={handleSubmit}>
           {/* Input de email */}
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">Correo electrónico</label>
             <input
               name="email"
               value={formData.email}
-              placeholder="Enter your email"
+              placeholder="Ingresa tu correo electrónico"
               onChange={handleChange}
             />
             {errors.email && <span className="field-error">{errors.email}</span>}
           </div>
           {/* input de password */}
           <div className="form-group">
-            <label htmlFor="current_password">Password</label>
+            <label htmlFor="current_password">Contraseña</label>
             <input
               type="password"
               name="current_password"
               value={formData.current_password}
-              placeholder="Enter your password"
+              placeholder="Ingresa tu contraseña"
               onChange={handleChange}
             />
             {errors.current_password && (
@@ -202,7 +202,7 @@ const Login = () => {
               onChange={handleChange}
             >
               <option value="sms">SMS</option>
-              <option value="email">Email</option>
+              <option value="email">Correo electrónico</option>
             </select>
             {errors.methodContact && (
               <span className="field-error">{errors.methodContact}</span>
@@ -210,14 +210,14 @@ const Login = () => {
           </div>
 
           <button type="submit" className="login-button" disabled={loading}>
-            {loading ? <Spin /> : "Login"}
+            {loading ? <Spin /> : "Iniciar Sesión"}
           </button>
         </form>
 
         {/* Forgot Password Button */}
         <div style={{ marginTop: 16, textAlign: "center" }}>
           <button onClick={handleForgot} className="verification-resend-link">
-            Forgot Password?
+            ¿Olvidaste tu contraseña?
           </button>
         </div>
 

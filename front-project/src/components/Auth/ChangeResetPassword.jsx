@@ -15,7 +15,7 @@ export default function ChangeResetPassword() {
   e.preventDefault();
 
   if (!password || password !== confirm) {
-    setAlert({ type: 'error', message: 'Passwords do not match' });
+    setAlert({ type: 'error', message: 'Las contraseñas no coinciden' });
     return;
   }
 
@@ -32,28 +32,28 @@ export default function ChangeResetPassword() {
       setTimeout(() => navigate('/'), 3000);
     }
   } catch (err) {
-    setAlert({ type: 'error', message: 'Server error' });
+    setAlert({ type: 'error', message: 'Error en el servidor' });
   }
 };
   return (
     <div style={{ maxWidth: 400, margin: '50px auto' }}>
-      <Card title="Reset Your Password">
+      <Card title="Cambiar Contraseña">
         {alert && <Alert style={{ marginBottom: 16 }} type={alert.type} message={alert.message} />}
         <form onSubmit={handleSubmit}>
           <Input.Password
-            placeholder="New password"
+            placeholder="Nueva contraseña"
             value={password}
             onChange={e => setPassword(e.target.value)}
             style={{ marginBottom: 16 }}
           />
           <Input.Password
-            placeholder="Confirm password"
+            placeholder="Confirmar nueva contraseña"
             value={confirm}
             onChange={e => setConfirm(e.target.value)}
             style={{ marginBottom: 16 }}
           />
           <Button type="primary" block htmlType="submit">
-            Change Password
+            Cambiar contraseña
           </Button>
         </form>
       </Card>
