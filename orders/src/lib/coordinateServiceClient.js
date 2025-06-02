@@ -34,7 +34,9 @@ async function createCoordinateForOrder(data) {
 
 async function findCoordinateById(id) {
   try {
+    console.log('Finding coordinate by ID:', id);
     const response = await axios.get(`${COORDINATE_API_BASE_URL}/${id}`);
+    console.log('Coordinate found:', response.data);
     return response.data;
   } catch (error) {
     if (error.response && error.response.status === 404) {

@@ -15,6 +15,7 @@ export class Order {
   }
 
   async getOrderById(id) {
+    console.log("Fetching order with ID:", id);
     const res = await fetch(`${ORDER_API}${API_ROUTES.ORDERS}/${id}`, {
       method: "GET",
       headers: {

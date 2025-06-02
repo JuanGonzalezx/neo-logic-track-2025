@@ -30,7 +30,9 @@ const getOrderById = async (req, res) => {
 
     let coordinate = null;
     if(order.coordinate_id) {
+      console.log("Fetching coordinate for order:", order.coordinate_id);
       coordinate = await findCoordinateById(order.coordinate_id);
+      console.log("Coordinate found:", coordinate);
       if (!coordinate) {
         console.warn(`Coordinate with ID ${order.coordinate_id} not found`); 
      }
