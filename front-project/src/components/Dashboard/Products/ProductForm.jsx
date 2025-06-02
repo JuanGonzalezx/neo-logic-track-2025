@@ -352,8 +352,8 @@ const ProductForm = () => {
         } else {
           setApiResponse({ type: "error", message: "Error loading categories" });
         }
-      } catch (error) {
-        setApiResponse({ type: "error", message: "Connection error" });
+      } catch {
+        setApiResponse({ type: "error", message: "Error de conexión" });
       } finally {
         setLoadingCategories(false);
       }
@@ -383,8 +383,8 @@ const ProductForm = () => {
             setApiResponse({ type: "error", message: "Product not found" });
             navigate("/dashboard/inventory");
           }
-        } catch (error) {
-          setApiResponse({ type: "error", message: "Connection error" });
+        } catch {
+          setApiResponse({ type: "error", message: "Error de conexión" });
         } finally {
           setLoading(false);
         }
@@ -416,28 +416,23 @@ const ProductForm = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    
-    if (!formData.id_producto.trim()) newErrors.id_producto = "Product ID is required";
-    if (!formData.nombre_producto.trim()) newErrors.nombre_producto = "Product name is required";
-    if (!formData.categoria_id) newErrors.categoria_id = "Category is required";
-    if (!formData.sku.trim()) newErrors.sku = "SKU is required";
-    
+    if (!formData.id_producto.trim()) newErrors.id_producto = "El ID del producto es obligatorio";
+    if (!formData.nombre_producto.trim()) newErrors.nombre_producto = "El nombre del producto es obligatorio";
+    if (!formData.categoria_id) newErrors.categoria_id = "La categoría es obligatoria";
+    if (!formData.sku.trim()) newErrors.sku = "El SKU es obligatorio";
     if (!formData.codigo_barras) {
-      newErrors.codigo_barras = "Barcode is required";
+      newErrors.codigo_barras = "El código de barras es obligatorio";
     }
-    
     if (!formData.precio_unitario) {
-      newErrors.precio_unitario = "Price is required";
+      newErrors.precio_unitario = "El precio es obligatorio";
     } else if (isNaN(formData.precio_unitario) || parseFloat(formData.precio_unitario) <= 0) {
-      newErrors.precio_unitario = "Price must be a positive number";
+      newErrors.precio_unitario = "El precio debe ser un número positivo";
     }
-    
     if (!formData.peso_kg) {
-      newErrors.peso_kg = "Weight is required";
+      newErrors.peso_kg = "El peso es obligatorio";
     } else if (isNaN(formData.peso_kg) || parseFloat(formData.peso_kg) <= 0) {
-      newErrors.peso_kg = "Weight must be a positive number";
+      newErrors.peso_kg = "El peso debe ser un número positivo";
     }
-    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -468,23 +463,21 @@ const ProductForm = () => {
       if (response.status === 200 || response.status === 201) {
         setApiResponse({
           type: "success",
-          message: isEditing ? "Product updated successfully" : "Product created successfully"
+          message: isEditing ? "Producto actualizado correctamente" : "Producto creado correctamente"
         });
-        
-        // Redirect after a short delay
         setTimeout(() => {
           navigate("/dashboard/inventory");
         }, 1500);
       } else {
         setApiResponse({
           type: "error",
-          message: response.message || "Error saving product"
+          message: response.message || "Error al guardar el producto"
         });
       }
     } catch (error) {
       setApiResponse({
         type: "error",
-        message: error.message || "Server error"
+        message: error.message || "Error del servidor"
       });
     } finally {
       setSubmitting(false);
@@ -494,14 +487,14 @@ const ProductForm = () => {
   if (loading) {
     return (
       <div className="product-form-container">
-        <Spin tip="Loading product..." />
+        <Spin tip="Cargando producto..." />
       </div>
     );
   }
 
   return (
     <div className="product-form-container">
-      <h1>{isEditing ? "Edit Product" : "Create New Product"}</h1>
+      <h1>{isEditing ? "Editar producto" : "Crear nuevo producto"}</h1>
 
       {apiResponse && (
         <Alert
@@ -517,7 +510,7 @@ const ProductForm = () => {
       <form className="form" onSubmit={handleSubmit}>
         <div className="form-row">
           <div className="form-group">
-            <label>Product ID</label>
+            <label>ID del producto</label>
             <input
               name="id_producto"
               value={formData.id_producto}
@@ -529,7 +522,7 @@ const ProductForm = () => {
           </div>
 
           <div className="form-group">
-            <label>Product Name</label>
+            <label>Nombre del producto</label>
             <input
               name="nombre_producto"
               value={formData.nombre_producto}
@@ -542,7 +535,7 @@ const ProductForm = () => {
 
         <div className="form-row">
           <div className="form-group">
-            <label>Category</label>
+            <label>Categoría</label>
             {loadingCategories ? (
               <Spin />
             ) : (
@@ -552,7 +545,7 @@ const ProductForm = () => {
                 onChange={handleChange}
                 className={errors.categoria_id ? "input-error" : ""}
               >
-                <option value="">Select a category</option>
+                <option value="">Seleccione una categoría</option>
                 {categories.map(category => (
                   <option key={category.id} value={category.id}>
                     {category.nombre}
@@ -578,7 +571,7 @@ const ProductForm = () => {
                 className="button button-secondary"
                 onClick={() => setFormData(f => ({ ...f, sku: generateSKU() }))}
               >
-                Generate
+                Generar
               </button>
             </div>
             {errors.sku && <span className="error-message">{errors.sku}</span>}
@@ -587,7 +580,7 @@ const ProductForm = () => {
 
         <div className="form-row">
           <div className="form-group">
-            <label>Barcode</label>
+            <label>Código de barras</label>
             <input
               name="codigo_barras"
               value={formData.codigo_barras}
@@ -598,7 +591,7 @@ const ProductForm = () => {
           </div>
 
           <div className="form-group">
-            <label>Unit Price</label>
+            <label>Precio unitario</label>
             <input
               name="precio_unitario"
               type="number"
@@ -613,7 +606,7 @@ const ProductForm = () => {
 
         <div className="form-row">
           <div className="form-group">
-            <label>Weight (kg)</label>
+            <label>Peso (kg)</label>
             <input
               name="peso_kg"
               type="number"
@@ -626,12 +619,12 @@ const ProductForm = () => {
           </div>
 
           <div className="form-group">
-            <label>Dimensions (cm)</label>
+            <label>Dimensiones (cm)</label>
             <input
               name="dimensiones_cm"
               value={formData.dimensiones_cm}
               onChange={handleChange}
-              placeholder="e.g. 10x20x30"
+              placeholder="por ejemplo: 10x20x30"
             />
           </div>
         </div>
@@ -645,7 +638,7 @@ const ProductForm = () => {
                 checked={formData.es_fragil}
                 onChange={handleChange}
               />
-              Is Fragile
+              Es frágil
             </label>
           </div>
 
@@ -657,7 +650,7 @@ const ProductForm = () => {
                 checked={formData.requiere_refrigeracion}
                 onChange={handleChange}
               />
-              Requires Refrigeration
+              Requiere refrigeración
             </label>
           </div>
 
@@ -669,13 +662,13 @@ const ProductForm = () => {
                 checked={formData.estado}
                 onChange={handleChange}
               />
-              Active
+              Activo
             </label>
           </div>
         </div>
 
         <div className="form-group">
-          <label>Description</label>
+          <label>Descripción</label>
           <textarea
             name="descripcion"
             value={formData.descripcion}
@@ -690,14 +683,14 @@ const ProductForm = () => {
             className="button button-secondary"
             onClick={() => navigate("/dashboard/inventory")}
           >
-            Cancel
+            Cancelar
           </button>
           <button
             type="submit"
             className="button button-primary"
             disabled={submitting || loadingCategories}
           >
-            {submitting ? <Spin /> : (isEditing ? "Update Product" : "Create Product")}
+            {submitting ? <Spin /> : (isEditing ? "Actualizar producto" : "Crear producto")}
           </button>
         </div>
       </form>

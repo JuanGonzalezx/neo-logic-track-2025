@@ -82,3 +82,4 @@ const OrderRouteMap = ({ warehouseMarker, orderMarker, deliveryUserId, initialDe
 };
 
 export default OrderRouteMap;
+// No hay textos visibles para traducir en el mapa, pero si hay tooltips o mensajes, traducirlos aquí si aparecen en el futuro.

@@ -103,10 +103,10 @@ const PermissionList = () => {
                 />
             )}
             <div className="page-header">
-                <h1>Permission Management</h1>
+                <h1>Gestión de Permisos</h1>
                 <Link to="/dashboard/permissions/create" className="button button-primary">
                     <span className="button-icon add"></span>
-                    Add Permission
+                    Agregar Permiso
                 </Link>
             </div>
 
@@ -114,7 +114,7 @@ const PermissionList = () => {
                 <div className="search-field">
                     <input
                         type="text"
-                        placeholder="Search permissions..."
+                        placeholder="Buscar permisos..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -131,7 +131,7 @@ const PermissionList = () => {
                                 <div className="permission-actions">
                                     <button
                                         className="action-button edit"
-                                        title="Edit Permission"
+                                        title="Editar permiso"
                                         onClick={() => {
                                             setEditingPermission(true)
                                             setPermission(permission)
@@ -142,7 +142,7 @@ const PermissionList = () => {
                                     </button>
                                     <button
                                         className="action-button delete"
-                                        title="Delete Permission"
+                                        title="Eliminar permiso"
                                         onClick={() => {
                                             setDeletingPermissionId(permission.id);
                                             setDeleteModalVisible(true);
@@ -156,13 +156,13 @@ const PermissionList = () => {
                             <p className="permission-description">{permission.description}</p>
 
                             <div className="permission-meta">
-                                <span className="method">Method: <strong>{permission.method}</strong></span>
+                                <span className="method">Método: <strong>{permission.method}</strong></span>
                                 <span className="url">URL: <strong>{permission.url}</strong></span>
                             </div>
                         </div>
                     ))
                 ) : (
-                    <div className="no-results">No permissions found matching your criteria</div>
+                    <div className="no-results">No se encontraron permisos que coincidan con tu criterio</div>
                 )}
             </div>
 
@@ -178,7 +178,7 @@ const PermissionList = () => {
                 okText="Eliminar"
                 cancelText="Cancelar"
             >
-                <p>¿Estás seguro de que quieres eliminar este permiso?</p>
+                <p>¿Está seguro de que desea eliminar este permiso?</p>
                 <p>Esta acción no se puede deshacer.</p>
             </Modal>
         </div>

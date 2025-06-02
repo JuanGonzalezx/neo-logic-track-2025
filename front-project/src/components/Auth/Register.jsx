@@ -57,21 +57,21 @@ const Register = ({ isOpen, onClose }) => {
 
     const validateForm = () => {
         const newErrors = {};
-        if (!formData.fullname) newErrors.fullname = "Fullname is required";
+        if (!formData.fullname) newErrors.fullname = "El nombre completo es obligatorio";
         else if (formData.fullname.length < 3)
-            newErrors.fullname = "Fullname must be at least 3 characters";
+            newErrors.fullname = "El nombre completo debe tener al menos 3 caracteres";
 
-        if (!formData.email) newErrors.email = "Email is required";
+        if (!formData.email) newErrors.email = "El correo es obligatorio";
         else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
-            newErrors.email = "Invalid email format";
+            newErrors.email = "Formato de correo inválido";
 
-        if (!formData.current_password) newErrors.current_password = "Password is required";
+        if (!formData.current_password) newErrors.current_password = "La contraseña es obligatoria";
         else if (formData.current_password.length < 6)
-            newErrors.current_password = "Password must be at least 6 characters";
+            newErrors.current_password = "La contraseña debe tener al menos 6 caracteres";
 
-        if (!formData.number) newErrors.number = "Number is required";
+        if (!formData.number) newErrors.number = "El teléfono es obligatorio";
         else if (formData.number.length < 10)
-            newErrors.number = "Number must be at least 10 characters";
+            newErrors.number = "El teléfono debe tener al menos 10 dígitos";
 
         if (!formData.ciudadId) newErrors.ciudadId = "Debes seleccionar una ciudad";
 

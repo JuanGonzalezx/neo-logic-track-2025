@@ -15,25 +15,24 @@ const OrderDetailsPanel = ({ order, warehouse, productsDetails }) => {
             <div className="order-details-section">
                 <h3>Información de la Orden</h3>
                 <div className="details-grid">
-                    <div className="detail-item"><strong>Order ID:</strong><br />{order.id}</div>
-                    <div className="detail-item"><strong>Fecha creación:</strong><br />{formatDateTime(order.creation_date)}</div>
-                    <div className="detail-item">
-                        <strong>Status:</strong><br />
+                    <div className="detail-item"><strong>ID de Orden:</strong><br />{order.id}</div>
+                    <div className="detail-item"><strong>Fecha de creación:</strong><br />{formatDateTime(order.creation_date)}</div>
+                    <div className="detail-item"><strong>Estado:</strong><br />
                         <span className={`status-badge ${order.status}`}>{order.status}</span>
                     </div>
                     <div className="detail-item"><strong>Cliente:</strong><br />{order.customer_name}</div>
-                    <div className="detail-item"><strong>Email cliente:</strong><br />{order.customer_email}</div>
-                    <div className="detail-item"><strong>Destino:</strong><br />{order.delivery_address}</div>
+                    <div className="detail-item"><strong>Correo del cliente:</strong><br />{order.customer_email}</div>
+                    <div className="detail-item"><strong>Dirección de entrega:</strong><br />{order.delivery_address}</div>
                 </div>
-                <h3>Información del Almacen</h3>
+                <h3>Información del Almacén</h3>
                 <div className="details-grid">
                     <div className="detail-item"><strong>Almacén:</strong><br />{warehouse.nombre_almacen}</div>
-                    <div className="detail-item"><strong>Dirección almacén:</strong><br />{warehouse.direccion?.calle}</div>
+                    <div className="detail-item"><strong>Dirección del almacén:</strong><br />{warehouse.direccion?.calle}</div>
                 </div>
                 <h3>Información del Repartidor</h3>
                 <div className="details-grid">
                     <div className="detail-item"><strong>Nombre:</strong><br />{order.delivery_name}</div>
-                    <div className="detail-item"><strong>Email:</strong><br />{order.delivery_email}</div>
+                    <div className="detail-item"><strong>Correo electrónico:</strong><br />{order.delivery_email}</div>
                 </div>
             </div>
             <div className="order-products-section">

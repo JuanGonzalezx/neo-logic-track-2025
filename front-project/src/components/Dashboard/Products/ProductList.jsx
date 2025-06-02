@@ -103,7 +103,7 @@ const ProductList = () => {
 
   const getCategoryName = (categoryId, categories) => {
     const category = categories.find(c => c.id === categoryId);
-    return category ? category.nombre : 'Uncategorized';
+    return category ? category.nombre : 'Sin categoría';
   };
 
   const hasPermission = (permissionId) => permissions.includes(permissionId);
@@ -113,14 +113,14 @@ const ProductList = () => {
     try {
       const response = await productAPI.deleteProduct(deletingProductId);
       if (response.status === 200) {
-        setApiResponse({ type: "success", message: "Product deleted successfully" });
+        setApiResponse({ type: "success", message: "Producto eliminado correctamente." });
         setProducts(products.filter(p => p.id_producto !== deletingProductId));
       } else {
-        setApiResponse({ type: "error", message: response.message || "Error deleting product" });
+        setApiResponse({ type: "error", message: response.message || "Error al eliminar el producto." });
       }
     } catch (error) {
       console.error("Error deleting product:", error);
-      setApiResponse({ type: "error", message: "Connection error" });
+      setApiResponse({ type: "error", message: "Error de conexión" });
     } finally {
       setDeleting(false);
       setDeleteModalVisible(false);
@@ -164,12 +164,12 @@ const ProductList = () => {
       )}
 
       <div className="page-header">
-        <h1>Productos</h1>
+        <h1>Inventario</h1>
         <div className="header-actions">
           {hasPermission('682a67071c1036d90c0b923a') && (
             <Link to="/dashboard/inventory/add" className="button button-primary">
               <span className="button-icon add" />
-              <span className="button-text">Add product</span>
+              <span className="button-text">Agregar producto</span>
             </Link>
           )}
 
@@ -180,7 +180,7 @@ const ProductList = () => {
               style={{ marginLeft: 0 }}
             >
               <span className="button-icon add" />
-              <span className="button-text">Bulk Import</span>
+              <span className="button-text">Importación masiva</span>
             </Link>
           )}
         </div>
@@ -191,7 +191,7 @@ const ProductList = () => {
           <span className="search-icon"></span>
           <input
             type="text"
-            placeholder="Search products..."
+            placeholder="Buscar productos..."
             onChange={(e) => {
               setSearchTerm(e.target.value);
               setCurrentPage(1);
@@ -206,7 +206,7 @@ const ProductList = () => {
               setCurrentPage(1);
             }}
           >
-            <option value="">All Categories</option>
+            <option value="">Todas las categorías</option>
             {categories.map(category => (
               <option key={category.id} value={category.id}>
                 {category.nombre}
@@ -220,9 +220,9 @@ const ProductList = () => {
               setCurrentPage(1);
             }}
           >
-            <option value="">All Statuses</option>
-            <option value="true">Active</option>
-            <option value="false">Inactive</option>
+            <option value="">Todos los estados</option>
+            <option value="true">Activo</option>
+            <option value="false">Inactivo</option>
           </select>
         </div>
       </div>
@@ -230,7 +230,7 @@ const ProductList = () => {
       {loading ? (
         <div className="loading-container">
           <Spin />
-          <div style={{ marginTop: 8, textAlign: "center" }}>Loading products...</div>
+          <div style={{ marginTop: 8, textAlign: "center" }}>Cargando productos...</div>
         </div>
       ) : (
         <>
@@ -239,11 +239,11 @@ const ProductList = () => {
               <thead>
                 <tr>
                   <th>SKU</th>
-                  <th>Product Name</th>
-                  <th>Category</th>
-                  <th>Price</th>
-                  <th>Status</th>
-                  <th>Actions</th>
+                  <th>Nombre del producto</th>
+                  <th>Categoría</th>
+                  <th>Precio</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -256,7 +256,7 @@ const ProductList = () => {
                       <td>${product.precio_unitario.toLocaleString()}</td>
                       <td>
                         <span className={`status-badge ${product.estado ? 'active' : 'inactive'}`}>
-                          {product.estado ? 'Active' : 'Inactive'}
+                          {product.estado ? 'Activo' : 'Inactivo'}
                         </span>
                       </td>
                       <td>
@@ -264,7 +264,7 @@ const ProductList = () => {
                           <Link to={`/dashboard/inventory/${product.id_producto}`}>
                             <Button
                               icon={<EyeOutlined />}
-                              title="View product"
+                              title="Ver producto"
                               className="action-button"
                             />
                           </Link>
@@ -274,6 +274,7 @@ const ProductList = () => {
                             disabled={!hasPermission('682a67231c1036d90c0b923b')}
                             className={!hasPermission('682a67231c1036d90c0b923b') ? 'disabled' : ''}
                             style={{ marginRight: 8 }}
+                            title="Editar producto"
                           />
                           <Button
                             danger
@@ -284,6 +285,7 @@ const ProductList = () => {
                             }}
                             disabled={!hasPermission('682a67381c1036d90c0b923c')}
                             className={!hasPermission('682a67381c1036d90c0b923c') ? 'disabled' : ''}
+                            title="Eliminar producto"
                           />
                         </div>
                       </td>
@@ -292,7 +294,7 @@ const ProductList = () => {
                 ) : (
                   <tr>
                     <td colSpan="6" className="no-results">
-                      No products found
+                      No se encontraron productos
                     </td>
                   </tr>
                 )}
@@ -307,7 +309,7 @@ const ProductList = () => {
                 onClick={() => setCurrentPage(currentPage - 1)}
                 disabled={currentPage === 1}
               >
-                Previous
+                Anterior
               </button>
               <div className="pagination-pages">
                 {getPageNumbers(currentPage, totalPages).map((page, index) =>
@@ -331,7 +333,7 @@ const ProductList = () => {
                 onClick={() => setCurrentPage(currentPage + 1)}
                 disabled={currentPage === totalPages}
               >
-                Next
+                Siguiente
               </button>
             </div>
           )}
@@ -339,16 +341,16 @@ const ProductList = () => {
       )}
 
       <Modal
-        title="Confirm Deletion"
+        title="Confirmar eliminación"
         open={isDeleteModalVisible}
         onCancel={() => setDeleteModalVisible(false)}
         onOk={handleDeleteProduct}
-        okText="Delete"
-        cancelText="Cancel"
+        okText="Eliminar"
+        cancelText="Cancelar"
         confirmLoading={deleting}
       >
-        <p>Are you sure you want to delete this product?</p>
-        <p>This action cannot be undone.</p>
+        <p>¿Está seguro de que desea eliminar este producto?</p>
+        <p>Esta acción no se puede deshacer.</p>
       </Modal>
     </div>
   );

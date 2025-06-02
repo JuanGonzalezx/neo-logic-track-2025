@@ -40,17 +40,17 @@ const Login = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.email) newErrors.email = "Email is required";
+    if (!formData.email) newErrors.email = "El correo es obligatorio";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
-      newErrors.email = "Invalid email format";
+      newErrors.email = "Formato de correo inválido";
 
     if (!formData.current_password)
-      newErrors.current_password = "Password is required";
+      newErrors.current_password = "La contraseña es obligatoria";
     else if (formData.current_password.length < 6)
-      newErrors.current_password = "Password must be at least 6 characters";
+      newErrors.current_password = "La contraseña debe tener al menos 6 caracteres";
 
     if (!formData.methodContact) {
-      newErrors.methodContact = "The method contact is required";
+      newErrors.methodContact = "El método de envío es obligatorio";
     }
 
     setErrors(newErrors);
@@ -62,7 +62,7 @@ const Login = () => {
     setApiResponse(null);
     if (!validateForm()) return;
 
-    console.log(formData);
+    // console.log(formData);
 
     dispatch(setLoading(true));
     try {
@@ -210,7 +210,7 @@ const Login = () => {
           </div>
 
           <button type="submit" className="login-button" disabled={loading}>
-            {loading ? <Spin /> : "Iniciar Sesión"}
+            {loading ? <Spin /> : "Iniciar sesión"}
           </button>
         </form>
 
@@ -241,3 +241,12 @@ const Login = () => {
 };
 
 export default Login;
+
+// Traducción de textos y mensajes a español
+// 1. Títulos, botones y mensajes en RequestReset.jsx
+// 2. Traducción completa de NewPassword.jsx
+// 3. Traducción de todos los textos y mensajes en SecondFA.jsx
+// 4. Traducción de FileUploadPage.jsx, FileUpload.jsx, DataTable.jsx, LogViewer.jsx
+// 5. Traducción de DashboardHome.jsx y WarehouseProductList.jsx
+//
+// (Las ediciones específicas se aplicarán archivo por archivo en los siguientes pasos)

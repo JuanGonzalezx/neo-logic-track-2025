@@ -5,9 +5,9 @@ import OrdersTable from './OrdersTable';
 import AddOrderModal from './AddOrderModal';
 
 const EstadoAlmacenLabel = {
-  ACTIVO: { label: 'Active', className: 'status-badge active' },
-  MANTENIMIENTO: { label: 'Maintenance', className: 'status-badge warning' },
-  INACTIVO: { label: 'Inactive', className: 'status-badge inactive' },
+  ACTIVO: { label: 'Activo', className: 'status-badge active' },
+  MANTENIMIENTO: { label: 'Mantenimiento', className: 'status-badge warning' },
+  INACTIVO: { label: 'Inactivo', className: 'status-badge inactive' },
 };
 
 const WarehouseOrderItem = ({
@@ -31,12 +31,12 @@ const WarehouseOrderItem = ({
     const departamentoNombre = warehouse.direccion.ciudad?.departamento?.nombre || '';
 
     const parts = [calle, ciudadNombre, departamentoNombre].filter(Boolean);
-    return parts.join(', ');
+    return parts.join(', ') || 'Sin dirección';
   };
 
   const handleAddOrderSuccess = () => {
     setAddOrderModalVisible(false);
-    onApiResponse({ type: 'success', message: 'Order created successfully' });
+    onApiResponse({ type: 'success', message: 'Orden creada exitosamente' });
   };
 
   return (
@@ -64,7 +64,7 @@ const WarehouseOrderItem = ({
               setAddOrderModalVisible(true);
             }}
           >
-            <PlusOutlined style={{ marginRight: '8px' }} /> Add Order
+            <PlusOutlined style={{ marginRight: '8px' }} /> Agregar orden
           </button>
         </div>
       </div>
@@ -73,7 +73,7 @@ const WarehouseOrderItem = ({
         <div className="order-content">
           {orders === null ? (
             <div className="loading-orders">
-              <Spin size="small" /> Loading orders...
+              <Spin size="small" /> Cargando órdenes...
             </div>
           ) : orders.length > 0 ? (
             <OrdersTable
@@ -84,7 +84,7 @@ const WarehouseOrderItem = ({
               onApiResponse={onApiResponse}
             />
           ) : (
-            <div className="no-results">No orders for this warehouse</div>
+            <div className="no-results">Sin órdenes para este almacén</div>
           )}
         </div>
       )}

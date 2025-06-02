@@ -32,19 +32,19 @@ const Profile = () => {
             .toUpperCase();
     };
 
-    if (loading) return <div>Loading...</div>;
-    if (!user) return <div>No user data found.</div>;
+    if (loading) return <div>Cargando...</div>;
+    if (!user) return <div>No se encontraron datos de usuario.</div>;
 
     return (
         <div className="profile-container">
             <div className="page-header">
-                <h1>User Profile</h1>
+                <h1>Perfil de usuario</h1>
                 <button
                     className="button button-primary"
                     onClick={() => setIsPasswordModalOpen(true)}
                 >
                     <KeyRound size={16} className="mr-2" />
-                     Change Password
+                    Cambiar contraseña
                 </button>
             </div>
 
@@ -56,34 +56,34 @@ const Profile = () => {
                     <div className="profile-title">
                         <h2>{user.fullname}</h2>
                         <span className={`status-badge active`}>
-                            Active
+                            Activo
                         </span>
                     </div>
                 </div>
 
                 <div className="info-section">
-                    <h3>Personal Information</h3>
+                    <h3>Información personal</h3>
                     <div className="info-grid">
                         <div className="info-item">
-                            <div className="info-label">Name</div>
+                            <div className="info-label">Nombre</div>
                             <div>{user.fullname}</div>
                         </div>
                         <div className="info-item">
-                            <div className="info-label">Email</div>
+                            <div className="info-label">Correo electrónico</div>
                             <div>{user.email}</div>
                         </div>
                         <div className="info-item">
-                            <div className="info-label">Phone</div>
+                            <div className="info-label">Teléfono</div>
                             <div>{user.telefono}</div>
                         </div>
                         <div className="info-item">
-                            <div className="info-label">Role</div>
+                            <div className="info-label">Rol</div>
                             <div>{user.role?.name}</div>
                         </div>
                         <div className="info-item">
-                            <div className="info-label">Status</div>
+                            <div className="info-label">Estado</div>
                             <div className="info-value">
-                                <div>Active</div>
+                                <div>Activo</div>
                             </div>
                         </div>
                     </div>

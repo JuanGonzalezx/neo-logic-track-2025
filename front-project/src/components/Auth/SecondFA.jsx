@@ -12,7 +12,7 @@ const SecondFA = ({ isOpen, onClose, contactMethod, onVerificationSuccess, id })
   const handleSubmit = (e) => {
     e.preventDefault();
     if (authenticationCode.length !== 6) {
-      setError('Enter a valid 6 digit code');
+      setError('Ingresa un código válido de 6 dígitos');
       return;
     }
     setError('');
@@ -27,29 +27,29 @@ const SecondFA = ({ isOpen, onClose, contactMethod, onVerificationSuccess, id })
         </button>
 
         <h2 className="authentication-title">
-          Code Authentication
+          Autenticación por código
         </h2>
 
         <p className="authentication-description">
-          We have sent a code to your {contactMethod}. Enter it to continue.
+          Hemos enviado un código a tu {contactMethod}. Ingresa el código para continuar.
         </p>
 
         <form onSubmit={handleSubmit}>
           <div className="authentication-form-group">
-            <label className="authentication-label">Code Authentication</label>
+            <label className="authentication-label">Código de autenticación</label>
             <input
               className="authentication-input"
               type="text"
               value={authenticationCode}
               onChange={(e) => setAuthenticationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              placeholder="6 digits"
+              placeholder="6 dígitos"
               maxLength={6}
             />
             {error && <span className="authentication-error">{error}</span>}
           </div>
 
           <button type="submit" className="authentication-submit-btn">
-            Authenticate
+            Autenticar
           </button>
         </form>
       </div>

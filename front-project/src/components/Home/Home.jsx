@@ -45,7 +45,7 @@ const Home = () => {
           
           <div className="tracking-section">
             <h1>Rastreo de pedidos en tiempo real</h1>
-            <p>Monitoree el estado y ubicación de sus pedidos con tecnología de geolocalización avanzada</p>
+            <p>Monitorea el estado y la ubicación de tus pedidos con tecnología de geolocalización avanzada</p>
             <TrackingInput onSubmit={handleTrackOrder} />
           </div>
 
@@ -60,7 +60,7 @@ const Home = () => {
                   className={`auth-tab ${authMode === 'login' ? 'active' : ''}`}
                   onClick={() => setAuthMode('login')}
                 >
-                  Iniciar Sesión
+                  Iniciar sesión
                 </button>
                 <button 
                   className={`auth-tab ${authMode === 'register' ? 'active' : ''}`}
@@ -103,7 +103,7 @@ const Home = () => {
                   className={`auth-tab ${authMode === 'login' ? 'active' : ''}`}
                   onClick={() => setAuthMode('login')}
                 >
-                  Iniciar Sesión
+                  Iniciar sesión
                 </button>
                 <button 
                   className={`auth-tab ${authMode === 'register' ? 'active' : ''}`}

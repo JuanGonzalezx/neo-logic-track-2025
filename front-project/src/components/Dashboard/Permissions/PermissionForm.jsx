@@ -35,9 +35,9 @@ const PermissionForm = ({ editMode = false, permissionData = null }) => {
 
     const validateForm = () => {
         const newErrors = {};
-        if (!formData.name.trim()) newErrors.name = "Nombre requerido";
-        if (!formData.url.trim()) newErrors.url = "URL requerida";
-        if (!formData.description.trim()) newErrors.method = "Descripción requerida";
+        if (!formData.name.trim()) newErrors.name = "El nombre es obligatorio";
+        if (!formData.url.trim()) newErrors.url = "La URL es obligatoria";
+        if (!formData.description.trim()) newErrors.method = "La descripción es obligatoria";
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -63,14 +63,14 @@ const PermissionForm = ({ editMode = false, permissionData = null }) => {
                     const { status, message } = await permissionAPI.updatePermission(formData.id, payload);
                     setApiResponse({
                         type: status === 200 ? "success" : "error",
-                        message: message || (status === 200 ? "Permission successfully updated" : "Error to update")
+                        message: message || (status === 200 ? "Permiso actualizado correctamente" : "Error al actualizar")
                     });
                 } else {
                     console.log(payload);
                     const { status, message } = await permissionAPI.createPermission(payload);
                     setApiResponse({
                         type: status === 200 ? "success" : "error",
-                        message: message || (status === 200 ? "Permission successfully created" : "Error to create")
+                        message: message || (status === 200 ? "Permiso creado correctamente" : "Error al crear")
                     });
                 }
             }
@@ -87,7 +87,7 @@ const PermissionForm = ({ editMode = false, permissionData = null }) => {
 
     return (
         <div className="permission-form-container">
-            <Title level={3}>{isEdit ? 'Edit Permission' : 'Create New Permission'}</Title>
+            <Title level={3}>{isEdit ? 'Editar Permiso' : 'Crear Nuevo Permiso'}</Title>
 
             {apiResponse && (
                 <Alert
@@ -103,7 +103,7 @@ const PermissionForm = ({ editMode = false, permissionData = null }) => {
             <form className="form" onSubmit={handleSubmit}>
                 <div className="form-row">
                     <div className="form-group">
-                        <label>Permission Name</label>
+                        <label>Nombre del Permiso</label>
                         <input
                             name="name"
                             value={formData.name}
@@ -126,7 +126,7 @@ const PermissionForm = ({ editMode = false, permissionData = null }) => {
                     </div>
 
                     <div className="form-group">
-                        <label>Method</label>
+                        <label>Método</label>
                         <select
                             name="method"
                             value={formData.method}
@@ -143,7 +143,7 @@ const PermissionForm = ({ editMode = false, permissionData = null }) => {
                     </div>
 
                     <div className="form-group">
-                        <label>Description</label>
+                        <label>Descripción</label>
                         <textarea
                             name="description"
                             value={formData.description}
@@ -154,7 +154,7 @@ const PermissionForm = ({ editMode = false, permissionData = null }) => {
                 </div>
 
                 <div className="form-group">
-                    <label>Category</label>
+                    <label>Categoría</label>
                     <input
                         name="category"
                         value={formData.category}
@@ -167,14 +167,14 @@ const PermissionForm = ({ editMode = false, permissionData = null }) => {
 
                 <div className="form-actions">
                     <button type="button" className="button button-secondary" onClick={handleCancel}>
-                        Cancel
+                        Cancelar
                     </button>
                     <button
                         type="submit"
                         className="button button-primary"
                         disabled={submitting}
                     >
-                        {isEdit ? "Update Permission" : "Create Permission"}
+                        {isEdit ? "Actualizar Permiso" : "Crear Permiso"}
                     </button>
                 </div>
             </form>

@@ -56,7 +56,7 @@ export default function NewPassword() {
     return (
         <div className="register-container" style={{ maxWidth: 400, margin: '50px auto' }}>
             <Card>
-                <Title level={3} style={{ textAlign: 'center' }}>Restablecer Contraseña</Title>
+                <Title level={3} style={{ textAlign: 'center' }}>Restablecer contraseña</Title>
 
                 {alert && (
                     <Alert
@@ -71,7 +71,7 @@ export default function NewPassword() {
 
                 <form onSubmit={onSubmit}>
                     <div className="form-group">
-                        <label>Nueva Contraseña</label>
+                        <label>Nueva contraseña</label>
                         <Input.Password
                             placeholder="Mínimo 6 caracteres"
                             minLength={6}
@@ -82,7 +82,7 @@ export default function NewPassword() {
                     </div>
 
                     <div className="form-group">
-                        <label>Confirmar Contraseña</label>
+                        <label>Confirmar contraseña</label>
                         <Input.Password
                             placeholder="Repite tu contraseña"
                             minLength={6}

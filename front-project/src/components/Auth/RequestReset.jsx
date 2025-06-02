@@ -18,7 +18,7 @@ export default function RequestReset() {
         e.preventDefault();
         setAlert(null);
         if (!email) {
-            setAlert({ type: 'error', message: 'Email is required' });
+            setAlert({ type: 'error', message: 'El correo electrónico es obligatorio' });
             return;
         }
 
@@ -33,7 +33,7 @@ export default function RequestReset() {
             // }
 
         } catch (err) {
-            setAlert({ type: 'error', message: err.message || 'Network error' });
+            setAlert({ type: 'error', message: err.message || 'Error de red' });
         } finally {
             setLoading(false);
         }
@@ -44,13 +44,13 @@ export default function RequestReset() {
             <Card>
                 <Button 
                     type="link"
-                    icon={<ArrowLeftOutlined />}
-                    onClick={() => navigate('/')}
+                    icon={<ArrowLeftOutlined />} 
+                    onClick={() => navigate('/')} 
                     style={{ padding: 0, marginBottom: 16 }}
                 >
-                    Back to login
+                  Volver al inicio
                 </Button>
-                <Title level={3} style={{ textAlign: 'center' }}>Reset Password</Title>
+                <Title level={3} style={{ textAlign: 'center' }}>Restablecer contraseña</Title>
 
                 {alert && (
                     <Alert
@@ -64,24 +64,24 @@ export default function RequestReset() {
                 )}
 
                 <form onSubmit={handleSendEmail}>
-                    <div className="form-group">
-                        <label>Email</label>
-                        <Input
-                            type="email"
-                            placeholder="Enter your email"
-                            value={email}
-                            onChange={e => setEmail(e.target.value)}
-                        />
-                    </div>
-                    <Button className="reset-button"
-                        block
-                        type="primary"
-                        htmlType="submit"
-                        disabled={loading}
-                        style={{ marginTop: 16 }}
-                    >
-                        {loading ? <Spin /> : 'Send Reset Link'}
-                    </Button>
+                  <div className="form-group">
+                    <label>Correo electrónico</label>
+                    <Input
+                      type="email"
+                      placeholder="Ingresa tu correo electrónico"
+                      value={email}
+                      onChange={e => setEmail(e.target.value)}
+                    />
+                  </div>
+                  <Button className="reset-button"
+                      block
+                      type="primary"
+                      htmlType="submit"
+                      disabled={loading}
+                      style={{ marginTop: 16 }}
+                  >
+                    {loading ? <Spin /> : 'Enviar enlace de restablecimiento'}
+                  </Button>
                 </form>
             </Card>
         </div>

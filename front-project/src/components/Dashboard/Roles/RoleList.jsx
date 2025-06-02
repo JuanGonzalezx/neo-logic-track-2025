@@ -130,25 +130,23 @@ const RoleList = () => {
         />
       )}
       <div className="page-header">
-        <h1>Role Management</h1>
+        <h1>Gestión de Roles</h1>
         <Link to="/dashboard/roles/create" className="button button-primary">
           <span className="button-icon add"></span>
-          Add Role
+          Agregar Rol
         </Link>
       </div>
-
       <div className="filter-bar">
         <div className="search-field">
           <input
             type="text"
-            placeholder="Search roles..."
+            placeholder="Buscar roles..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <span className="search-icon"></span>
         </div>
       </div>
-
       <div className="role-cards">
         {filteredRoles.length > 0 ? (
           filteredRoles.map(role => (
@@ -159,7 +157,7 @@ const RoleList = () => {
                   {hasPermission('681537dff816d03835e5dab0') && (
                     <button
                       className="action-button edit"
-                      title="Edit Role"
+                      title="Editar rol"
                       onClick={() => {
                         setEditingRole(true);
                         setRole(role);
@@ -172,7 +170,7 @@ const RoleList = () => {
                   {hasPermission('681437fbfbaec847ba2ecc05') && (
                     <button
                       className="action-button delete"
-                      title="Delete Role"
+                      title="Eliminar rol"
                       onClick={() => {
                         setDeletingRoleId(role.id);
                         setDeleteModalVisible(true);
@@ -183,31 +181,27 @@ const RoleList = () => {
                   )}
                 </div>
               </div>
-
               <p className="role-description">{role.description}</p>
-
               <div className="role-meta">
                 <span className="users-count">
                   <span className="users-icon"></span>
-                  {role.usersCount} Users
+                  {role.usersCount} Usuarios
                 </span>
                 <span className="permissions-count">
                   <span className="permissions-icon"></span>
-                  {role.permissions.length} Permissions
+                  {role.permissions.length} Permisos
                 </span>
               </div>
-
               <button
                 className={`toggle-details ${expandedRole === role.id ? 'active' : ''}`}
                 onClick={() => toggleRoleDetails(role.id)}
               >
-                {expandedRole === role.id ? 'Hide Details' : 'View Details'}
+                {expandedRole === role.id ? 'Ocultar detalles' : 'Ver detalles'}
                 <span className="toggle-arrow"></span>
               </button>
-
               {expandedRole === role.id && (
                 <div className="role-details">
-                  <h4>Permissions</h4>
+                  <h4>Permisos</h4>
                   <ul className="permission-list">
                     {role.permissions.map((permission, index) => (
                       <li key={index} className="permission-item">
@@ -221,7 +215,7 @@ const RoleList = () => {
             </div>
           ))
         ) : (
-          <div className="no-results">No roles found matching your criteria</div>
+          <div className="no-results">No se encontraron roles que coincidan con tu criterio</div>
         )}
       </div>
       <Modal
@@ -236,7 +230,7 @@ const RoleList = () => {
         okText="Eliminar"
         cancelText="Cancelar"
       >
-        <p>¿Estás seguro de que quieres eliminar este rol?</p>
+        <p>¿Está seguro de que desea eliminar este rol?</p>
         <p>Esta acción no se puede deshacer.</p>
       </Modal>
     </div>

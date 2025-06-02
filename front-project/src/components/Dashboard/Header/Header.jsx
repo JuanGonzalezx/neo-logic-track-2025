@@ -45,7 +45,7 @@ const Header = ({ toggleSidebar, toggleMobileMenu, onLogout }) => {
           <input 
             type="text" 
             className="search-input" 
-            placeholder="Search..." 
+            placeholder="Buscar..." 
             onFocus={() => setSearchActive(true)}
             onBlur={() => setSearchActive(false)}
           />
@@ -69,7 +69,7 @@ const Header = ({ toggleSidebar, toggleMobileMenu, onLogout }) => {
             <div className="profile-avatar">
               {currentUser?.username?.[0] || 'U'}
             </div>
-            <span className="profile-name">{currentUser?.username || 'User'}</span>
+            <span className="profile-name">{currentUser?.username || 'Usuario'}</span>
             <span className={`dropdown-arrow ${profileOpen ? 'open' : ''}`}></span>
           </button>
           
@@ -82,20 +82,20 @@ const Header = ({ toggleSidebar, toggleMobileMenu, onLogout }) => {
                   onClick={handleMyProfile}
                   >
                     <User size={20} className="profile-menu-icon" />
-                    <span>My Profile</span>
+                    <span>Mi perfil</span>
                   </button>
                 </li>
                 <li>
                   <button className="profile-menu-item">
                     <Settings size={20} className="profile-menu-icon" />
-                    <span>Settings</span>
+                    <span>Configuración</span>
                   </button>
                 </li>
                 <li className="divider"></li>
                 <li>
                   <button className="profile-menu-item logout" onClick={onLogout}>
                     <LogOut size={20} className="profile-menu-icon" />
-                    <span>Logout</span>
+                    <span>Cerrar sesión</span>
                   </button>
                 </li>
               </ul>

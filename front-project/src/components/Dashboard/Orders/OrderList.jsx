@@ -49,16 +49,16 @@ const OrderList = () => {
         if (warehousesResponse.status === 200) {
           setWarehouses(warehousesResponse.data);
         } else {
-          setApiResponse({ type: "error", message: "Error loading warehouses" });
+          setApiResponse({ type: "error", message: "Error al cargar los almacenes" });
         }
 
         if (ordersResponse.status === 200) {
           setOrders(ordersResponse.data);
         } else {
-          setApiResponse({ type: "error", message: "Error loading orders" });
+          setApiResponse({ type: "error", message: "Error al cargar las órdenes" });
         }
       } catch (error) {
-        setApiResponse({ type: "error", message: "Connection error" });
+        setApiResponse({ type: "error", message: "Error de conexión" });
         console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
@@ -155,10 +155,10 @@ const OrderList = () => {
     return (
       <div className="order-list-container">
         <div className="page-header">
-          <h1>Order Management</h1>
+          <h1>Gestión de Órdenes</h1>
         </div>
         <div className="loading-container">
-          <Spin tip="Loading data..." />
+          <Spin tip="Cargando datos..." />
         </div>
       </div>
     );
@@ -167,18 +167,11 @@ const OrderList = () => {
   return (
     <div className="order-list-container">
       {apiResponse && (
-        <Alert
-          type={apiResponse.type}
-          message={apiResponse.message}
-          showIcon
-          closable
-          onClose={() => setApiResponse(null)}
-          style={{ marginBottom: 16 }}
-        />
+        <Alert message={apiResponse?.message} type={apiResponse?.type} showIcon style={{ marginBottom: 16 }} />
       )}
 
       <div className="page-header">
-        <h1>Order Management</h1>
+        <h1>Gestión de Órdenes</h1>
       </div>
 
       <div className="tabs-container">
@@ -186,13 +179,13 @@ const OrderList = () => {
           className={`tab ${viewMode === "warehouses" ? "active" : ""}`}
           onClick={() => setViewMode("warehouses")}
         >
-          Warehouses
+          Ver por almacén
         </div>
         <div
           className={`tab ${viewMode === "orders" ? "active" : ""}`}
           onClick={() => setViewMode("orders")}
         >
-          All Orders
+          Ver todas las órdenes
         </div>
       </div>
 
@@ -203,8 +196,8 @@ const OrderList = () => {
             type="text"
             placeholder={
               viewMode === "warehouses"
-                ? "Search warehouses by name or location..."
-                : "Search orders by ID, address, or status..."
+                ? "Buscar almacenes por nombre o ubicación..."
+                : "Buscar por cliente, correo o dirección..."
             }
             value={searchTerm}
             onChange={handleSearch}
@@ -249,8 +242,8 @@ const OrderList = () => {
           ) : (
             <div className="no-results">
               {searchTerm
-                ? `No warehouses found matching "${searchTerm}"`
-                : "No warehouses available"}
+                ? `No se encontraron almacenes que coincidan con "${searchTerm}"`
+                : "No hay almacenes disponibles"}
             </div>
           )}
         </div>

@@ -9,11 +9,11 @@ const TrackingInput = ({ onSubmit }) => {
     e.preventDefault();
     
     if (!trackingId.trim()) {
-      setError('Por favor, ingrese un número de seguimiento');
+      setError('Por favor, ingresa un número de seguimiento');
       return;
     }
     
-    // Basic validation for tracking ID format (could be customized)
+    // Validación básica para el formato del número de seguimiento
     const trackingRegex = /^[A-Za-z0-9-]{6,}$/;
     if (!trackingRegex.test(trackingId)) {
       setError('El número de seguimiento debe tener al menos 6 caracteres alfanuméricos');
@@ -35,12 +35,12 @@ const TrackingInput = ({ onSubmit }) => {
               setTrackingId(e.target.value);
               if (error) setError('');
             }}
-            placeholder="Ingrese su número de seguimiento"
+            placeholder="Ingresa tu número de seguimiento"
             className={`tracking-input ${error ? 'error' : ''}`}
             aria-label="Número de seguimiento"
           />
           <button type="submit" className="tracking-button">
-            Rastrear Pedido
+            Rastrear pedido
           </button>
         </div>
         {error && <p className="error-message">{error}</p>}
@@ -49,7 +49,9 @@ const TrackingInput = ({ onSubmit }) => {
       <div className="tracking-help">
         <p>
           <span className="help-icon">?</span>
-          <span className="help-text">¿No tiene un número de seguimiento? <a href="#">Contacte con soporte</a></span>
+          <span className="help-text">
+            ¿No tienes un número de seguimiento? <a href="#">Contacta con soporte</a>
+          </span>
         </p>
       </div>
     </div>

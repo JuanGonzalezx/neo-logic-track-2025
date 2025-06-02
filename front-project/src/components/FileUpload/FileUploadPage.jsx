@@ -35,7 +35,6 @@ const FileUploadPage = () => {
       if (response.message) {
         addLog(`✅ ${response.message}`);
       }
-      
       if (response.resumen) {
         const { creadas, existentes, fallidas } = response.resumen;
         addLog(`✅ Ciudades creadas: ${creadas}`);

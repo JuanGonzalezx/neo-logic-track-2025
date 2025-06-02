@@ -37,7 +37,7 @@ export default function ChangeResetPassword() {
 };
   return (
     <div style={{ maxWidth: 400, margin: '50px auto' }}>
-      <Card title="Cambiar Contraseña">
+      <Card title="Cambiar contraseña">
         {alert && <Alert style={{ marginBottom: 16 }} type={alert.type} message={alert.message} />}
         <form onSubmit={handleSubmit}>
           <Input.Password

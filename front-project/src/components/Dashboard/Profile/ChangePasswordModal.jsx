@@ -16,21 +16,21 @@ const ChangePasswordModal = ({ onClose, onSubmit }) => {
         const newErrors = {};
 
         if (!formData.currentPassword) {
-            newErrors.currentPassword = "Is required"
+            newErrors.currentPassword = "La contraseña actual es obligatoria";
         }
 
         if (!formData.newPassword) {
-            newErrors.newPassword = 'New password is required';
+            newErrors.newPassword = 'La nueva contraseña es obligatoria';
         } else if (formData.newPassword.length < 6) {
-            newErrors.newPassword = 'Password must be at least 6 characters';
+            newErrors.newPassword = 'La contraseña debe tener al menos 6 caracteres';
         } else if (formData.currentPassword == formData.newPassword) {
-            newErrors.newPassword = 'The current and new password are the same, change please';
+            newErrors.newPassword = 'La contraseña actual y la nueva son iguales, por favor cámbiala';
         }
 
         if (!formData.confirmNewPassword) {
-            newErrors.confirmNewPassword = 'Please confirm your new password';
+            newErrors.confirmNewPassword = 'Por favor confirma tu nueva contraseña';
         } else if (formData.newPassword !== formData.confirmNewPassword) {
-            newErrors.confirmNewPassword = 'Passwords do not match';
+            newErrors.confirmNewPassword = 'Las contraseñas no coinciden';
         }
 
         setErrors(newErrors);
@@ -80,7 +80,7 @@ const ChangePasswordModal = ({ onClose, onSubmit }) => {
         <div className="modal-overlay">
             <div className="modal">
                 <div className="modal-header">
-                    <h3>Change Password</h3>
+                    <h3>Cambiar contraseña</h3>
                     <button className="modal-close" onClick={onClose}>
                         <X size={20} />
                     </button>
@@ -88,13 +88,13 @@ const ChangePasswordModal = ({ onClose, onSubmit }) => {
                 <div className="modal-body">
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">
-                            <label htmlFor="currentPassword">Current Password</label>
+                            <label htmlFor="currentPassword">Contraseña actual</label>
                             <input
-                                type="currentPassword"
+                                type="password"
                                 id="currentPassword"
                                 name="currentPassword"
                                 value={formData.currentPassword}
-                                placeholder="Enter your actual password"
+                                placeholder="Ingresa tu contraseña actual"
                                 onChange={handleChange}
                             />
                             {errors.currentPassword && <span className="field-error">{errors.currentPassword}</span>}
@@ -102,13 +102,13 @@ const ChangePasswordModal = ({ onClose, onSubmit }) => {
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="newPassword">New Password</label>
+                            <label htmlFor="newPassword">Nueva contraseña</label>
                             <input
                                 type="password"
                                 id="newPassword"
                                 name="newPassword"
                                 value={formData.newPassword}
-                                placeholder="Enter your new password"
+                                placeholder="Ingresa tu nueva contraseña"
                                 onChange={handleChange}
                             />
                             {errors.newPassword && (
@@ -117,13 +117,13 @@ const ChangePasswordModal = ({ onClose, onSubmit }) => {
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="confirmNewPassword">Confirm New Password</label>
+                            <label htmlFor="confirmNewPassword">Confirmar nueva contraseña</label>
                             <input
                                 type="password"
                                 id="confirmNewPassword"
                                 name="confirmNewPassword"
                                 value={formData.confirmNewPassword}
-                                placeholder="Confirm the new password"
+                                placeholder="Confirma la nueva contraseña"
                                 onChange={handleChange}
                             />
                             {errors.confirmNewPassword && (
@@ -137,13 +137,13 @@ const ChangePasswordModal = ({ onClose, onSubmit }) => {
                                 className="button button-secondary"
                                 onClick={onClose}
                             >
-                                Cancel
+                                Cancelar
                             </button>
                             <button
                                 type="submit"
                                 className="button button-primary"
                                 onClick={validateForm}                            >
-                                Update Password
+                                Actualizar contraseña
                             </button>
                         </div>
                     </form>

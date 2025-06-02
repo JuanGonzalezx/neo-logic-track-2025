@@ -52,7 +52,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
       <aside className={`sidebar ${collapsed ? 'collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-header">
           <h1 className="sidebar-title">
-            {collapsed ? "IM" : "Inventory Manager"}
+            {collapsed ? "IM" : "Gestor de Inventario"}
           </h1>
         </div>
 
@@ -66,7 +66,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
                 onClick={handleNavLinkClick}
               >
                 <LayoutDashboard size={20} className="sidebar-icon" />
-                {!collapsed && <span>Dashboard</span>}
+                {!collapsed && <span>Panel</span>}
               </NavLink>
             </li>
 
@@ -78,7 +78,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
                 >
                   <div className="section-content">
                     <Users size={20} className="sidebar-icon" />
-                    {!collapsed && <span>Users</span>}
+                    {!collapsed && <span>Usuarios</span>}
                   </div>
                   {!collapsed && (
                     <ChevronDown
@@ -97,7 +97,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
                           className={linkClass}
                           onClick={handleNavLinkClick}
                         >
-                          {collapsed ? <Users size={20} /> : <span>All Users</span>}
+                          {collapsed ? <Users size={20} /> : <span>Todos los usuarios</span>}
                         </NavLink>
                       </li>
                     )}
@@ -109,7 +109,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
                           className={linkClass}
                           onClick={handleNavLinkClick}
                         >
-                          {collapsed ? <Plus size={20} /> : <span>Add User</span>}
+                          {collapsed ? <Plus size={20} /> : <span>Agregar usuario</span>}
                         </NavLink>
                       </li>
                     )}
@@ -145,7 +145,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
                           className={linkClass}
                           onClick={handleNavLinkClick}
                         >
-                          {collapsed ? <Shield size={20} /> : <span>All Roles</span>}
+                          {collapsed ? <Shield size={20} /> : <span>Todos los roles</span>}
                         </NavLink>
                       </li>
                     )}
@@ -157,7 +157,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
                           className={linkClass}
                           onClick={handleNavLinkClick}
                         >
-                          {collapsed ? <Plus size={20} /> : <span>Add Role</span>}
+                          {collapsed ? <Plus size={20} /> : <span>Agregar rol</span>}
                         </NavLink>
                       </li>
                     )}
@@ -174,7 +174,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
               >
                 <div className="section-content">
                   <Shield size={20} className="sidebar-icon" />
-                  {!collapsed && <span>Permissions</span>}
+                  {!collapsed && <span>Permisos</span>}
                 </div>
                 {!collapsed && (
                   <ChevronDown
@@ -192,7 +192,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
                       className={linkClass}
                       onClick={handleNavLinkClick}
                     >
-                      {collapsed ? <Shield size={20} /> : <span>All Permissions</span>}
+                      {collapsed ? <Shield size={20} /> : <span>Todos los permisos</span>}
                     </NavLink>
                   </li>
                   <li className="sidebar-subnav-item">
@@ -202,7 +202,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
                       className={linkClass}
                       onClick={handleNavLinkClick}
                     >
-                      {collapsed ? <Plus size={20} /> : <span>Add Permission</span>}
+                      {collapsed ? <Plus size={20} /> : <span>Agregar permiso</span>}
                     </NavLink>
                   </li>
                 </ul>
@@ -218,7 +218,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
               >
                 <div className="section-content">
                   <Package2 size={20} className="sidebar-icon" />
-                  {!collapsed && <span>Inventory</span>}
+                  {!collapsed && <span>Inventario</span>}
                 </div>
                 {!collapsed && (
                   <ChevronDown
@@ -236,7 +236,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
                       className={linkClass}
                       onClick={handleNavLinkClick}
                     >
-                      {collapsed ? <Package2 size={20} /> : <span>All Products</span>}
+                      {collapsed ? <Package2 size={20} /> : <span>Todos los productos</span>}
                     </NavLink>
                   </li>
                   <li className="sidebar-subnav-item">
@@ -246,7 +246,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
                       className={linkClass}
                       onClick={handleNavLinkClick}
                     >
-                      {collapsed ? <Plus size={20} /> : <span>Add Product</span>}
+                      {collapsed ? <Plus size={20} /> : <span>Agregar producto</span>}
                     </NavLink>
                   </li>
                   <li className="sidebar-subnav-item">
@@ -256,7 +256,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
                       className={linkClass}
                       onClick={handleNavLinkClick}
                     >
-                      {collapsed ? <Plus size={20} /> : <span>All Categories</span>}
+                      {collapsed ? <Plus size={20} /> : <span>Todas las categorías</span>}
                     </NavLink>
                   </li>
                   <li className="sidebar-subnav-item">
@@ -266,7 +266,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
                       className={linkClass}
                       onClick={handleNavLinkClick}
                     >
-                      {collapsed ? <Plus size={20} /> : <span>Add Category</span>}
+                      {collapsed ? <Plus size={20} /> : <span>Agregar categoría</span>}
                     </NavLink>
                   </li>
                   <li className="sidebar-subnav-item">
@@ -276,7 +276,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
                       className={linkClass}
                       onClick={handleNavLinkClick}
                     >
-                      {collapsed ? <Plus size={20} /> : <span>All Warehouses</span>}
+                      {collapsed ? <Plus size={20} /> : <span>Todos los almacenes</span>}
                     </NavLink>
                   </li>
                 </ul>
@@ -291,7 +291,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
               >
                 <div className="section-content">
                   <Package2 size={20} className="sidebar-icon" />
-                  {!collapsed && <span>Orders</span>}
+                  {!collapsed && <span>Órdenes</span>}
                 </div>
                 {!collapsed && (
                   <ChevronDown
@@ -309,7 +309,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
                       className={linkClass}
                       onClick={handleNavLinkClick}
                     >
-                      {collapsed ? <Package2 size={20} /> : <span>All Orders</span>}
+                      {collapsed ? <Package2 size={20} /> : <span>Todas las órdenes</span>}
                     </NavLink>
                   </li>
                   <li className="sidebar-subnav-item">
@@ -318,7 +318,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
                       className={linkClass}
                       onClick={handleNavLinkClick}
                     >
-                      {collapsed ? <Users size={20} /> : <span>Listado de Repartidores</span>}
+                      {collapsed ? <Users size={20} /> : <span>Listado de repartidores</span>}
                     </NavLink>
                   </li>
                 </ul>
@@ -329,7 +329,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
         </nav>
 
         <div className="sidebar-footer">
-          {!collapsed && <p>© 2025 Inventory Manager</p>}
+          {!collapsed && <p>© 2025 Gestor de Inventario</p>}
         </div>
       </aside>
       {mobileOpen && <div className="sidebar-backdrop" onClick={closeMobileMenu}></div>}

@@ -59,10 +59,10 @@ const AddOrderModal = ({ visible, onCancel, warehouse, onSuccess, onError }) => 
           }));
         }
       } else {
-        onError('Error loading warehouse products');
+        onError('Error al cargar los productos del almacén');
       }
     } catch (error) {
-      onError('Connection error when loading products');
+      onError('Error de conexión al cargar los productos');
     } finally {
       setProductLoading(false);
     }
@@ -112,11 +112,11 @@ const AddOrderModal = ({ visible, onCancel, warehouse, onSuccess, onError }) => 
 
   const addProductToList = () => {
     if (!selectedProduct.product_id) {
-      setFormErrors(prev => ({ ...prev, product_id: 'Please select a product' }));
+      setFormErrors(prev => ({ ...prev, product_id: 'Por favor selecciona un producto' }));
       return;
     }
     if (!selectedProduct.amount || selectedProduct.amount <= 0) {
-      setFormErrors(prev => ({ ...prev, amount: 'Please enter a valid amount' }));
+      setFormErrors(prev => ({ ...prev, amount: 'Por favor ingresa una cantidad válida' }));
       return;
     }
     const index = formData.orderProducts.findIndex(p => p.product_id === selectedProduct.product_id);
@@ -145,11 +145,11 @@ const AddOrderModal = ({ visible, onCancel, warehouse, onSuccess, onError }) => 
 
   const validateForm = () => {
     const errors = {};
-    if (!formData.customer_name) errors.customer_name = 'Customer name is required';
-    if (!formData.customer_email || !formData.customer_email.includes('@')) errors.customer_email = 'Valid email is required';
-    if (!formData.delivery_address) errors.delivery_address = 'Delivery address is required';
-    if (!formData.status) errors.status = 'Status is required';
-    if (formData.orderProducts.length === 0) errors.orderProducts = 'Add at least one product';
+    if (!formData.customer_name) errors.customer_name = 'El nombre del cliente es obligatorio';
+    if (!formData.customer_email || !formData.customer_email.includes('@')) errors.customer_email = 'Se requiere un correo electrónico válido';
+    if (!formData.delivery_address) errors.delivery_address = 'La dirección de entrega es obligatoria';
+    if (!formData.status) errors.status = 'El estado es obligatorio';
+    if (formData.orderProducts.length === 0) errors.orderProducts = 'Agrega al menos un producto';
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -164,10 +164,10 @@ const AddOrderModal = ({ visible, onCancel, warehouse, onSuccess, onError }) => 
         resetForm();
         onCancel();
       } else {
-        onError(response.message || 'Error creating order');
+        onError(response.message || 'Error al crear la orden');
       }
     } catch (error) {
-      onError(error.message || 'Server error');
+      onError(error.message || 'Error del servidor');
     } finally {
       setLoading(false);
     }
@@ -201,13 +201,13 @@ const AddOrderModal = ({ visible, onCancel, warehouse, onSuccess, onError }) => 
 
   return (
     <Modal
-      title={`Create Order for ${warehouse?.nombre_almacen || 'Warehouse'}`}
+      title="Crear nueva orden"
       open={visible}
       onCancel={handleCancel}
       footer={[
-        <Button key="cancel" onClick={handleCancel} disabled={loading}>Cancel</Button>,
+        <Button key="cancel" onClick={handleCancel} disabled={loading}>Cancelar</Button>,
         <Button key="submit" type="primary" onClick={handleSubmit} disabled={loading}>
-          {loading ? <Spin size="small" /> : 'Create Order'}
+          {loading ? <Spin size="small" /> : 'Crear orden'}
         </Button>
       ]}
       width={800}
@@ -215,28 +215,28 @@ const AddOrderModal = ({ visible, onCancel, warehouse, onSuccess, onError }) => 
       <div className="order-form">
         <div className="form-row">
           <div className="form-group">
-            <label>Customer Name*</label>
+            <label>Nombre del cliente*</label>
             <input
               type="text"
               name="customer_name"
               value={formData.customer_name}
               onChange={handleFormChange}
               className={formErrors.customer_name ? 'input-error' : ''}
-              placeholder="Enter customer name"
+              placeholder="Ingrese el nombre del cliente"
               disabled={loading}
             />
             {formErrors.customer_name && <span className="error-message">{formErrors.customer_name}</span>}
           </div>
 
           <div className="form-group">
-            <label>Customer Email*</label>
+            <label>Correo del cliente*</label>
             <input
               type="email"
               name="customer_email"
               value={formData.customer_email}
               onChange={handleFormChange}
               className={formErrors.customer_email ? 'input-error' : ''}
-              placeholder="Enter customer email"
+              placeholder="Ingrese el correo del cliente"
               disabled={loading}
             />
             {formErrors.customer_email && <span className="error-message">{formErrors.customer_email}</span>}
@@ -244,7 +244,7 @@ const AddOrderModal = ({ visible, onCancel, warehouse, onSuccess, onError }) => 
         </div>
 
         <div className="form-group">
-          <label>Delivery Address*</label>
+          <label>Dirección de entrega*</label>
           {isLoaded ? (
             <Autocomplete onLoad={ac => autocompleteRef.current = ac} onPlaceChanged={handlePlaceChanged}>
               <input
@@ -253,7 +253,7 @@ const AddOrderModal = ({ visible, onCancel, warehouse, onSuccess, onError }) => 
                 value={formData.delivery_address}
                 onChange={handleFormChange}
                 className={formErrors.delivery_address ? 'input-error' : ''}
-                placeholder="Enter delivery address"
+                placeholder="Ingrese la dirección de entrega"
                 disabled={loading}
               />
             </Autocomplete>
@@ -264,7 +264,7 @@ const AddOrderModal = ({ visible, onCancel, warehouse, onSuccess, onError }) => 
               value={formData.delivery_address}
               onChange={handleFormChange}
               className={formErrors.delivery_address ? 'input-error' : ''}
-              placeholder="Enter delivery address"
+              placeholder="Ingrese la dirección de entrega"
               disabled={loading}
             />
           )}
@@ -278,12 +278,12 @@ const AddOrderModal = ({ visible, onCancel, warehouse, onSuccess, onError }) => 
           disabled={loading}
           style={{ marginBottom: '1rem' }}
         >
-          Assign delivery automatically based on proximity
+          Asignar entrega automáticamente según proximidad
         </Checkbox>
 
         <div className="product-selector">
           <div className="form-group">
-            <label>Product*</label>
+            <label>Producto*</label>
             <select
               name="product_id"
               value={selectedProduct.product_id}
@@ -291,7 +291,7 @@ const AddOrderModal = ({ visible, onCancel, warehouse, onSuccess, onError }) => 
               className={formErrors.product_id ? 'input-error' : ''}
               disabled={loading || warehouseProducts.length === 0}
             >
-              <option value="">Select a product</option>
+              <option value="">Selecciona un producto</option>
               {warehouseProducts.map(product => (
                 <option key={product.id_producto} value={product.id_producto}>
                   {product.nombre_producto} - Stock: {product.cantidad_stock}
@@ -302,7 +302,7 @@ const AddOrderModal = ({ visible, onCancel, warehouse, onSuccess, onError }) => 
           </div>
 
           <div className="form-group">
-            <label>Amount*</label>
+            <label>Cantidad*</label>
             <input
               type="number"
               name="amount"
@@ -311,7 +311,7 @@ const AddOrderModal = ({ visible, onCancel, warehouse, onSuccess, onError }) => 
               className={formErrors.amount ? 'input-error' : ''}
               min="1"
               step="1"
-              placeholder="Enter amount"
+              placeholder="Ingrese la cantidad"
               disabled={loading}
             />
             {formErrors.amount && <span className="error-message">{formErrors.amount}</span>}
@@ -323,7 +323,7 @@ const AddOrderModal = ({ visible, onCancel, warehouse, onSuccess, onError }) => 
             onClick={addProductToList}
             disabled={loading || warehouseProducts.length === 0}
           >
-            Add
+            Agregar producto
           </Button>
         </div>
 
@@ -336,9 +336,9 @@ const AddOrderModal = ({ visible, onCancel, warehouse, onSuccess, onError }) => 
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Product</th>
-                  <th>Quantity</th>
-                  <th>Actions</th>
+                  <th>Producto</th>
+                  <th>Cantidad</th>
+                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -361,7 +361,7 @@ const AddOrderModal = ({ visible, onCancel, warehouse, onSuccess, onError }) => 
             </table>
           </div>
         ) : (
-          <div className="no-results">No products added to this order yet</div>
+          <div className="no-results">No se han agregado productos a esta orden aún</div>
         )}
 
         {isLoaded && latitude && longitude && (
@@ -378,7 +378,7 @@ const AddOrderModal = ({ visible, onCancel, warehouse, onSuccess, onError }) => 
         )}
 
         <div className="form-note">
-          <p><small>* Required fields</small></p>
+          <p><small>* Campos obligatorios</small></p>
         </div>
       </div>
     </Modal>

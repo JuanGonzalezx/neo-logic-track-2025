@@ -55,10 +55,10 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
           }));
         }
       } else {
-        onError('Error loading warehouse products');
+        onError('Error al cargar los productos del almacén');
       }
     } catch (error) {
-      onError('Connection error when loading products');
+      onError('Error de conexión al cargar los productos');
       console.error('Error fetching warehouse products:', error);
     } finally {
       setProductLoading(false);
@@ -81,12 +81,12 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
 
   const addProductToList = () => {
     if (!selectedProduct.product_id) {
-      setFormErrors((prev) => ({ ...prev, product_id: 'Please select a product' }));
+      setFormErrors((prev) => ({ ...prev, product_id: 'Por favor seleccione un producto' }));
       return;
     }
 
     if (!selectedProduct.amount || selectedProduct.amount <= 0) {
-      setFormErrors((prev) => ({ ...prev, amount: 'Please enter a valid amount' }));
+      setFormErrors((prev) => ({ ...prev, amount: 'Por favor ingrese una cantidad válida' }));
       return;
     }
 
@@ -133,19 +133,19 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
     const errors = {};
 
     if (!formData.location_id) {
-      errors.location_id = 'Location ID is required';
+      errors.location_id = 'El ID de ubicación es obligatorio';
     }
 
     if (!formData.delivery_address) {
-      errors.delivery_address = 'Delivery address is required';
+      errors.delivery_address = 'La dirección de entrega es obligatoria';
     }
 
     if (!formData.status) {
-      errors.status = 'Status is required';
+      errors.status = 'El estado es obligatorio';
     }
 
     if (formData.orderProducts.length === 0) {
-      errors.orderProducts = 'At least one product must be added to the order';
+      errors.orderProducts = 'Se debe agregar al menos un producto a la orden';
     }
 
     setFormErrors(errors);
@@ -168,12 +168,12 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
       const response = await orderAPI.updateOrder(order.id, payload);
 
       if (response.status === 200) {
-        onSuccess('Order updated successfully');
+        onSuccess('Orden actualizada con éxito');
       } else {
-        onError(response.message || 'Error updating order');
+        onError(response.message || 'Error al actualizar la orden');
       }
     } catch (error) {
-      onError(error.message || 'Server error');
+      onError(error.message || 'Error del servidor');
     } finally {
       setLoading(false);
     }
@@ -189,12 +189,12 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
 
   return (
     <Modal
-      title="Edit Order"
+      title="Editar Orden"
       open={visible}
       onCancel={onCancel}
       footer={[
         <Button key="cancel" onClick={onCancel} disabled={loading}>
-          Cancel
+          Cancelar
         </Button>,
         <Button
           key="submit"
@@ -203,7 +203,7 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
           disabled={loading}
           className="button button-primary"
         >
-          {loading ? <Spin size="small" /> : 'Update Order'}
+          {loading ? <Spin size="small" /> : 'Guardar cambios'}
         </Button>,
       ]}
       width={700}
@@ -211,14 +211,14 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
       <div className="order-form">
         <div className="form-row" style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
           <div className="form-group" style={{ flex: '1 1 45%' }}>
-            <label>Location ID*</label>
+            <label>ID de Ubicación*</label>
             <input
               type="text"
               name="location_id"
               value={formData.location_id}
               onChange={handleFormChange}
               className={formErrors.location_id ? 'input-error' : ''}
-              placeholder="Enter location ID"
+              placeholder="Ingrese el ID de ubicación"
               disabled={loading}
             />
             {formErrors.location_id && (
@@ -227,14 +227,14 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
           </div>
 
           <div className="form-group" style={{ flex: '1 1 45%' }}>
-            <label>Delivery Address*</label>
+            <label>Dirección de Entrega*</label>
             <input
               type="text"
               name="delivery_address"
               value={formData.delivery_address}
               onChange={handleFormChange}
               className={formErrors.delivery_address ? 'input-error' : ''}
-              placeholder="Enter delivery address"
+              placeholder="Ingrese la dirección de entrega"
               disabled={loading}
             />
             {formErrors.delivery_address && (
@@ -245,7 +245,7 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
 
         <div className="form-row" style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
           <div className="form-group" style={{ flex: '1 1 45%' }}>
-            <label>Status*</label>
+            <label>Estado*</label>
             <select
               name="status"
               value={formData.status}
@@ -253,11 +253,11 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
               className={formErrors.status ? 'input-error' : ''}
               disabled={loading}
             >
-              <option value="PENDING">PENDING</option>
-              <option value="ASSIGNED">ASSIGNED</option>
-              <option value="ON_ROUTE">ON_ROUTE</option>
-              <option value="DELIVERED">DELIVERED</option>
-              <option value="CANCELLED">CANCELLED</option>
+              <option value="PENDING">PENDIENTE</option>
+              <option value="ASSIGNED">ASIGNADO</option>
+              <option value="ON_ROUTE">EN RUTA</option>
+              <option value="DELIVERED">ENTREGADO</option>
+              <option value="CANCELLED">CANCELADO</option>
             </select>
             {formErrors.status && (
               <span className="error-message">{formErrors.status}</span>
@@ -265,7 +265,7 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
           </div>
 
           <div className="form-group" style={{ flex: '1 1 45%' }}>
-            <label>Warehouse ID</label>
+            <label>ID de Almacén</label>
             <input
               type="text"
               value={order.id_almacen}
@@ -277,10 +277,10 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
 
         <div className="form-divider"></div>
 
-        <h3>Order Products</h3>
+        <h3>Productos de la Orden</h3>
         {productLoading ? (
           <div className="loading-container">
-            <Spin tip="Loading products..." />
+            <Spin tip="Cargando productos..." />
           </div>
         ) : (
           <>
@@ -289,9 +289,9 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
                 <table className="data-table">
                   <thead>
                     <tr>
-                      <th>Product</th>
-                      <th>Quantity</th>
-                      <th>Actions</th>
+                      <th>Producto</th>
+                      <th>Cantidad</th>
+                      <th>Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -314,15 +314,15 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
                 </table>
               </div>
             ) : (
-              <div className="no-results">No products in this order</div>
+              <div className="no-results">No hay productos en esta orden</div>
             )}
 
             <div className="form-divider"></div>
-            <h3>Add Products</h3>
+            <h3>Agregar Productos</h3>
 
             <div className="product-selector" style={{ display: 'flex', gap: '12px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
               <div className="form-group" style={{ flex: '1 1 45%' }}>
-                <label>Product*</label>
+                <label>Producto*</label>
                 <select
                   name="product_id"
                   value={selectedProduct.product_id}
@@ -330,7 +330,7 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
                   className={formErrors.product_id ? 'input-error' : ''}
                   disabled={loading || warehouseProducts.length === 0}
                 >
-                  <option value="">Select a product</option>
+                  <option value="">Seleccione un producto</option>
                   {warehouseProducts.map((product) => (
                     <option key={product.id_producto} value={product.id_producto}>
                       {product.nombre_producto || product.id_producto} - Stock: {product.cantidad_stock}
@@ -343,14 +343,14 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
               </div>
 
               <div className="form-group" style={{ flex: '1 1 25%' }}>
-                <label>Amount*</label>
+                <label>Cantidad*</label>
                 <input
                   type="number"
                   name="amount"
                   value={selectedProduct.amount}
                   onChange={handleProductFormChange}
                   className={formErrors.amount ? 'input-error' : ''}
-                  placeholder="Enter amount"
+                  placeholder="Ingrese la cantidad"
                   min="1"
                   step="1"
                   disabled={loading}
@@ -368,7 +368,7 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
                   disabled={loading || warehouseProducts.length === 0}
                   style={{ width: '100%' }}
                 >
-                  Add
+                  Agregar
                 </Button>
               </div>
             </div>
@@ -381,7 +381,7 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
 
         <div className="form-note">
           <p>
-            <small>* Required fields</small>
+            <small>* Campos obligatorios</small>
           </p>
         </div>
       </div>

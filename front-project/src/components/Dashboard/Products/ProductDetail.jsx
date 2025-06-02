@@ -13,7 +13,7 @@ const ProductDetail = () => {
   
   const [product, setProduct] = useState(null);
   const [category, setCategory] = useState(null);
-  const [stock, setStock] = useState([]);
+  const [stock] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -36,7 +36,7 @@ const ProductDetail = () => {
         }
 
         // Fetch stock information
-        const stockRes = 100
+        // const stockRes = 100
         // if (stockRes.status === 200) {
         //   setStock(stockRes.data);
         // }
@@ -53,7 +53,7 @@ const ProductDetail = () => {
   if (loading) {
     return (
       <div className="product-detail-container" style={{ textAlign: "center", padding: "50px" }}>
-        <Spin size="large" tip="Loading product details..." />
+        <Spin size="large" tip="Cargando detalles del producto..." />
       </div>
     );
   }
@@ -63,7 +63,7 @@ const ProductDetail = () => {
       <div className="product-detail-container">
         <Alert
           message="Error"
-          description={error || "Product not found"}
+          description={error || "Producto no encontrado"}
           type="error"
           showIcon
           action={
@@ -71,7 +71,7 @@ const ProductDetail = () => {
               className="button button-primary" 
               onClick={() => navigate("/dashboard/inventory")}
             >
-              Back to Products
+              Volver a Productos
             </button>
           }
         />
@@ -88,15 +88,15 @@ const ProductDetail = () => {
             onClick={() => navigate("/dashboard/inventory")}
             style={{ marginRight: "16px" }}
           >
-            <ArrowLeftOutlined /> Back
+            <ArrowLeftOutlined /> Volver
           </button>
-          <h1>Product Details</h1>
+          <h1>Detalles del producto</h1>
         </div>
         <Link 
           to={`/dashboard/inventory/edit/${id}`} 
           className="button button-primary"
         >
-          <EditOutlined /> Edit Product
+          <EditOutlined /> Editar producto
         </Link>
       </div>
 
@@ -109,7 +109,7 @@ const ProductDetail = () => {
             </div>
             <Badge 
               status={product.status ? "success" : "error"} 
-              text={product.status ? "Active" : "Inactive"} 
+              text={product.status ? "Activo" : "Inactivo"} 
             />
           </div>
 
@@ -117,38 +117,38 @@ const ProductDetail = () => {
 
           <Descriptions bordered column={{ xs: 1, sm: 2, md: 3 }}>
             <Descriptions.Item label="SKU">{product.sku}</Descriptions.Item>
-            <Descriptions.Item label="Barcode">{product.codigo_barras}</Descriptions.Item>
-            <Descriptions.Item label="Category">{category?.nombre || "Unknown"}</Descriptions.Item>
-            <Descriptions.Item label="Price">${product.precio_unitario.toLocaleString()}</Descriptions.Item>
-            <Descriptions.Item label="Weight">{product.peso_kg} kg</Descriptions.Item>
-            <Descriptions.Item label="Dimensions">{product.dimensiones_cm}</Descriptions.Item>
+            <Descriptions.Item label="Código de barras">{product.codigo_barras}</Descriptions.Item>
+            <Descriptions.Item label="Categoría">{category?.nombre || "Desconocida"}</Descriptions.Item>
+            <Descriptions.Item label="Precio">${product.precio_unitario.toLocaleString()}</Descriptions.Item>
+            <Descriptions.Item label="Peso">{product.peso_kg} kg</Descriptions.Item>
+            <Descriptions.Item label="Dimensiones">{product.dimensiones_cm}</Descriptions.Item>
           </Descriptions>
 
           <div className="product-attributes" style={{ marginTop: "24px" }}>
             <Tag color={product.es_fragil ? "volcano" : "green"}>
-              {product.es_fragil ? "Fragile" : "Not Fragile"}
+              {product.es_fragil ? "Frágil" : "No frágil"}
             </Tag>
             <Tag color={product.requiere_refrigeracion ? "blue" : "green"}>
-              {product.requiere_refrigeracion ? "Refrigeration Required" : "No Refrigeration"}
+              {product.requiere_refrigeracion ? "Requiere refrigeración" : "Sin refrigeración"}
             </Tag>
           </div>
 
           <div className="product-description" style={{ marginTop: "24px" }}>
-            <h3>Description</h3>
-            <p>{product.descripcion || "No description available"}</p>
+            <h3>Descripción</h3>
+            <p>{product.descripcion || "Sin descripción disponible"}</p>
           </div>
         </Card>
 
-        <Card title="Stock Information" className="stock-info-card" style={{ marginTop: "24px" }}>
+        <Card title="Información de stock" className="stock-info-card" style={{ marginTop: "24px" }}>
           {stock.length > 0 ? (
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Warehouse</th>
-                  <th>Stock Quantity</th>
-                  <th>Reorder Level</th>
-                  <th>Last Restocked</th>
-                  <th>Expiry Date</th>
+                  <th>Almacén</th>
+                  <th>Cantidad en stock</th>
+                  <th>Nivel de reorden</th>
+                  <th>Última reposición</th>
+                  <th>Fecha de vencimiento</th>
                 </tr>
               </thead>
               <tbody>
@@ -161,14 +161,14 @@ const ProductDetail = () => {
                     <td>
                       {item.fecha_vencimiento 
                         ? new Date(item.fecha_vencimiento).toLocaleDateString() 
-                        : "N/A"}
+                        : "N/D"}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           ) : (
-            <div className="no-results">No stock information available</div>
+            <div className="no-results">No hay información de stock disponible</div>
           )}
         </Card>
       </div>

@@ -130,15 +130,15 @@ const RoleForm = ({ editMode = false, roleData = null }) => {
     const newErrors = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Role name is required';
+      newErrors.name = 'El nombre del rol es obligatorio';
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = 'Description is required';
+      newErrors.description = 'La descripción es obligatoria';
     }
 
     if (formData.permissions.length === 0) {
-      newErrors.permissions = 'At least one permission must be selected';
+      newErrors.permissions = 'Debes seleccionar al menos un permiso';
     }
 
     setErrors(newErrors);
@@ -197,15 +197,15 @@ const RoleForm = ({ editMode = false, roleData = null }) => {
   return (
     <div className="role-form-container">
       <div className="page-header">
-        <h1>{isEdit ? 'Edit Role' : 'Create New Role'}</h1>
+        <h1>{isEdit ? 'Editar rol' : 'Crear nuevo rol'}</h1>
       </div>
 
       <form className="form" onSubmit={handleSubmit}>
         <div className="form-section">
-          <h2 className="form-section-title">Role Information</h2>
+          <h2 className="form-section-title">Información del rol</h2>
 
           <div className="form-group">
-            <label htmlFor="name">Role Name</label>
+            <label htmlFor="name">Nombre del rol</label>
             <input
               type="text"
               id="name"
@@ -218,7 +218,7 @@ const RoleForm = ({ editMode = false, roleData = null }) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="description">Description</label>
+            <label htmlFor="description">Descripción</label>
             <textarea
               id="description"
               name="description"
@@ -232,7 +232,7 @@ const RoleForm = ({ editMode = false, roleData = null }) => {
         </div>
 
         <div className="form-section">
-          <h2 className="form-section-title">Permissions</h2>
+          <h2 className="form-section-title">Permisos</h2>
           {errors.permissions && <span className="error-message">{errors.permissions}</span>}
 
           <div className="permissions-container">
@@ -246,8 +246,8 @@ const RoleForm = ({ editMode = false, roleData = null }) => {
                     onClick={() => handleSelectAll(category)}
                   >
                     {permissions.every(p => formData.permissions.includes(p.id))
-                      ? 'Deselect All'
-                      : 'Select All'}
+                      ? 'Deseleccionar todo'
+                      : 'Seleccionar todo'}
                   </button>
                 </div>
 
@@ -272,10 +272,10 @@ const RoleForm = ({ editMode = false, roleData = null }) => {
 
         <div className="form-actions">
           <button type="button" className="button button-secondary" onClick={handleCancel}>
-            Cancel
+            Cancelar
           </button>
           <button type="submit" className="button button-primary">
-            {isEdit ? 'Update Role' : 'Create Role'}
+            {isEdit ? 'Actualizar rol' : 'Crear rol'}
           </button>
         </div>
       </form>

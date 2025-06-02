@@ -46,7 +46,7 @@ const WarehouseProductList = ({
     if (!formData.cantidad_stock || !formData.nivel_reorden) {
       onApiResponse({ 
         type: 'error', 
-        message: 'Please fill in all required fields' 
+        message: 'Por favor, complete todos los campos requeridos' 
       });
       return;
     }
@@ -67,20 +67,20 @@ const WarehouseProductList = ({
       if (response.status === 200) {
         onApiResponse({ 
           type: 'success', 
-          message: 'Product updated successfully' 
+          message: 'Producto actualizado con éxito' 
         });
         setEditingProduct(null);
         onRefresh();
       } else {
         onApiResponse({ 
           type: 'error', 
-          message: response.message || 'Error updating product' 
+          message: response.message || 'Error al actualizar el producto' 
         });
       }
     } catch (error) {
       onApiResponse({ 
         type: 'error', 
-        message: error.message || 'Server error' 
+        message: error.message || 'Error del servidor' 
       });
     } finally {
       setSubmitting(false);
@@ -94,7 +94,7 @@ const WarehouseProductList = ({
   if (loading) {
     return (
       <div className="warehouse-stock loading-stock">
-        <Spin size="small" /> Loading inventory...
+        <Spin size="small" /> Cargando inventario...
       </div>
     );
   }
@@ -102,7 +102,7 @@ const WarehouseProductList = ({
   if (!products || products.length === 0) {
     return (
       <div className="warehouse-stock">
-        <div className="no-results">No products in this warehouse</div>
+        <div className="no-results">No hay productos en este almacén</div>
       </div>
     );
   }
@@ -112,12 +112,12 @@ const WarehouseProductList = ({
       <table className="data-table">
         <thead>
           <tr>
-            <th>Product</th>
-            <th>Stock Quantity</th>
-            <th>Reorder Level</th>
-            <th>Last Restocked</th>
-            <th>Expiry Date</th>
-            <th>Actions</th>
+            <th>Producto</th>
+            <th>Cantidad en stock</th>
+            <th>Nivel de reorden</th>
+            <th>Última reposición</th>
+            <th>Fecha de vencimiento</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -161,14 +161,14 @@ const WarehouseProductList = ({
                         onClick={handleSubmitEdit}
                         disabled={submitting}
                       >
-                        {submitting ? 'Saving...' : 'Save'}
+                        {submitting ? 'Guardando...' : 'Guardar'}
                       </button>
                       <button 
                         className="button button-secondary button-small" 
                         onClick={handleCancelEdit}
                         disabled={submitting}
                       >
-                        Cancel
+                        Cancelar
                       </button>
                     </div>
                   </td>

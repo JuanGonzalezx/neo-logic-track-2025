@@ -66,12 +66,12 @@ const OrderDetailModal = ({ visible, order, onCancel }) => {
 
   return (
     <Modal
-      title="Order Details"
+      title="Detalles de la Orden"
       open={visible}
       onCancel={onCancel}
       footer={[
         <Button key="close" onClick={onCancel}>
-          Close
+          Cerrar
         </Button>
       ]}
       width={700}
@@ -79,52 +79,52 @@ const OrderDetailModal = ({ visible, order, onCancel }) => {
     >
       {loading ? (
         <div className="loading-container" style={{ textAlign: 'center', padding: 20 }}>
-          <Spin tip="Loading order details..." />
+          <Spin tip="Cargando detalles de la orden..." />
         </div>
       ) : (
         <div className="order-details-container">
           <div className="order-details-section" style={{ marginBottom: 24 }}>
-            <h3>Order Information</h3>
+            <h3>Información de la Orden</h3>
             <div className="details-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
               <div className="detail-item">
-                <strong>Order ID:</strong> <br /> <span>{order.id}</span>
+                <strong>ID de Orden:</strong> <br /> <span>{order.id}</span>
               </div>
               <div className="detail-item">
-                <strong>Creation Date:</strong> <br /> <span>{formatDateTime(order.creation_date)}</span>
+                <strong>Fecha de Creación:</strong> <br /> <span>{formatDateTime(order.creation_date)}</span>
               </div>
               <div className="detail-item">
-                <strong>Status:</strong> <br />
+                <strong>Estado:</strong> <br />
                 <span className={`status-badge ${order.status}`}>
                   {order.status}
                 </span>
               </div>
               <div className="detail-item">
-                <strong>Warehouse:</strong> <br /> <span>{order.id_almacen}</span>
+                <strong>Almacén:</strong> <br /> <span>{order.id_almacen}</span>
               </div>
               <div className="detail-item">
-                <strong>Location ID:</strong> <br /> <span>{order.location_id}</span>
+                <strong>ID de Ubicación:</strong> <br /> <span>{order.location_id}</span>
               </div>
               <div className="detail-item">
-                <strong>Delivery Address:</strong> <br /> <span>{order.delivery_address}</span>
+                <strong>Dirección de Entrega:</strong> <br /> <span>{order.delivery_address}</span>
               </div>
               {orderDetails?.deliveryUser && (
                 <div className="detail-item">
-                  <strong>Delivery Person:</strong> <br /> <span>{orderDetails.deliveryUser.fullname}</span>
+                  <strong>Persona de Entrega:</strong> <br /> <span>{orderDetails.deliveryUser.fullname}</span>
                 </div>
               )}
             </div>
           </div>
 
           <div className="order-products-section">
-            <h3>Order Products</h3>
+            <h3>Productos de la Orden</h3>
             {order.OrderProducts && order.OrderProducts.length > 0 ? (
               <div style={{ overflowX: 'auto' }}>
                 <table className="data-table" style={{ minWidth: 500 }}>
                   <thead>
                     <tr>
-                      <th style={{ maxWidth: 100, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Product ID</th>
-                      <th style={{ maxWidth: 250, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Product Name</th>
-                      <th style={{ maxWidth: 100 }}>Quantity</th>
+                      <th style={{ maxWidth: 100, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>ID de Producto</th>
+                      <th style={{ maxWidth: 250, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Nombre del Producto</th>
+                      <th style={{ maxWidth: 100 }}>Cantidad</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -132,7 +132,7 @@ const OrderDetailModal = ({ visible, order, onCancel }) => {
                       <tr key={product.id}>
                         <td style={{ maxWidth: 100, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{product.product_id}</td>
                         <td style={{ maxWidth: 250, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {productsDetails.find(p => p.id === product.id)?.details?.nombre_producto || 'Product name not available'}
+                          {productsDetails.find(p => p.id === product.id)?.details?.nombre_producto || 'Nombre del producto no disponible'}
                         </td>
                         <td style={{ maxWidth: 100 }}>{product.amount}</td>
                       </tr>
@@ -141,7 +141,7 @@ const OrderDetailModal = ({ visible, order, onCancel }) => {
                 </table>
               </div>
             ) : (
-              <div className="no-results">No products in this order</div>
+              <div className="no-results">No hay productos en esta orden</div>
             )}
           </div>
         </div>

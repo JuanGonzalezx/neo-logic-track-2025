@@ -13,7 +13,7 @@ const VerificationModal = ({ isOpen, onClose, contactMethod, onVerificationSucce
   const handleSubmit = (e) => {
     e.preventDefault();
     if (verificationCode.length !== 6) {
-      setError('Enter a valid 6 digit code');
+      setError('Ingresa un código válido de 6 dígitos');
       return;
     }
     setError('');
@@ -25,9 +25,9 @@ const VerificationModal = ({ isOpen, onClose, contactMethod, onVerificationSucce
       const response = await auth.resend(email);
       const result = await response.json();
 
-      setResendMessage(result.message || "Resend code");
+      setResendMessage(result.message || "Código reenviado");
     } catch (err) {
-      setResendMessage("Failed to resend code");
+      setResendMessage("Error al reenviar el código");
     }
   };
 
@@ -39,7 +39,7 @@ const VerificationModal = ({ isOpen, onClose, contactMethod, onVerificationSucce
         </button>
 
         <h2 className="verification-title">
-          Verificación de Identidad
+          Verificación de identidad
         </h2>
 
         <p className="verification-description">

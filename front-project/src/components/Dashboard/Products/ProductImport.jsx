@@ -18,7 +18,7 @@ const ProductImport = () => {
     if (fileList.length === 0) {
       setApiResponse({
         type: "error",
-        message: "Please select a CSV file to upload"
+        message: "Por favor, seleccione un archivo CSV para subir"
       });
       return;
     }
@@ -33,7 +33,7 @@ const ProductImport = () => {
       if (response.status === 200) {
         setApiResponse({
           type: "success",
-          message: "Products uploaded successfully"
+          message: "Productos subidos con éxito"
         });
         
         // Set results if provided by the API
@@ -47,13 +47,13 @@ const ProductImport = () => {
       } else {
         setApiResponse({
           type: "error",
-          message: response.message || "Error uploading products"
+          message: response.message || "Error al subir productos"
         });
       }
-    } catch (error) {
+    } catch {
       setApiResponse({
         type: "error",
-        message: "Server error while uploading file"
+        message: "Error del servidor al subir el archivo"
       });
     } finally {
       setUploading(false);
@@ -69,7 +69,7 @@ const ProductImport = () => {
       if (!isCsv) {
         setApiResponse({
           type: "error",
-          message: "You can only upload CSV files!"
+          message: "¡Solo se pueden subir archivos CSV!"
         });
         return Upload.LIST_IGNORE;
       }
@@ -103,12 +103,12 @@ const ProductImport = () => {
   return (
     <div className="product-import-container">
       <div className="page-header">
-        <h1>Bulk Import Products</h1>
+        <h1>Importación masiva de productos</h1>
       </div>
 
       {apiResponse && (
         <Alert
-          message={apiResponse.type === "success" ? "Success" : "Error"}
+          message={apiResponse.type === "success" ? "Éxito" : "Error"}
           description={apiResponse.message}
           type={apiResponse.type}
           showIcon
@@ -124,7 +124,7 @@ const ProductImport = () => {
           onClick={downloadTemplate}
           style={{ marginBottom: 16 }}
         >
-          Download CSV Template
+          Descargar plantilla CSV
         </Button>
         
         <div className="upload-container">
@@ -132,9 +132,9 @@ const ProductImport = () => {
             <p className="ant-upload-drag-icon">
               <InboxOutlined />
             </p>
-            <p className="ant-upload-text">Click or drag file to this area to upload</p>
+            <p className="ant-upload-text">Haga clic o arrastre el archivo a esta área para subirlo</p>
             <p className="ant-upload-hint">
-              Support for CSV files only. Make sure your file follows the template format.
+              Solo se admiten archivos CSV. Asegúrese de que su archivo siga el formato de la plantilla.
             </p>
           </Dragger>
         </div>
@@ -145,7 +145,7 @@ const ProductImport = () => {
             onClick={() => navigate("/dashboard/inventory")}
             style={{ marginRight: 8 }}
           >
-            Cancel
+            Cancelar
           </Button>
           <Button
             type="primary"
@@ -153,28 +153,28 @@ const ProductImport = () => {
             disabled={fileList.length === 0}
             loading={uploading}
           >
-            {uploading ? "Uploading" : "Upload"}
+            {uploading ? "Subiendo" : "Subir"}
           </Button>
         </div>
       </div>
 
       {uploadResults && (
         <div className="upload-results" style={{ marginTop: 24 }}>
-          <h2>Upload Results</h2>
+          <h2>Resultados de la importación</h2>
           <div className="results-summary">
             <div className="result-item success">
-              <span className="result-label">Successfully Imported:</span>
+              <span className="result-label">Importados correctamente:</span>
               <span className="result-value">{uploadResults.successful}</span>
             </div>
             <div className="result-item failed">
-              <span className="result-label">Failed:</span>
+              <span className="result-label">Fallidos:</span>
               <span className="result-value">{uploadResults.failed}</span>
             </div>
           </div>
 
           {uploadResults.errors.length > 0 && (
             <div className="error-list">
-              <h3>Errors</h3>
+              <h3>Errores</h3>
               <ul>
                 {uploadResults.errors.map((error, index) => (
                   <li key={index}>{error}</li>

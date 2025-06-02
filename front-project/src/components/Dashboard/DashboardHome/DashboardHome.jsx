@@ -52,14 +52,14 @@ const DashboardHome = () => {
   };
 
   const stats = [
-    { label: 'Total Usuarios', value: users.length, icon: 'users', trend: '+12%', trendDirection: 'up' },
+    { label: 'Total de usuarios', value: users.length, icon: 'users', trend: '+12%', trendDirection: 'up' },
     { label: 'Roles', value: roles.length, icon: 'roles', trend: '+2', trendDirection: 'up' },
-    { label: 'Usuarios Activos', value: users.filter(u => u.status === 'ACTIVE').length, icon: 'active', trend: '85%', trendDirection: 'neutral' },
+    { label: 'Usuarios activos', value: users.filter(u => u.status === 'ACTIVE').length, icon: 'active', trend: '85%', trendDirection: 'neutral' },
   ];
 
   return (
     <div className="dashboard-home">
-      <h1 className="dashboard-title">Dashboard</h1>
+      <h1 className="dashboard-title">Panel de control</h1>
 
       {apiResponse && (
         <Alert
@@ -89,7 +89,7 @@ const DashboardHome = () => {
       <div className="dashboard-row">
         <div className="dashboard-card user-activity">
           <div className="card-header">
-            <h2>Acceso Rápido</h2>
+            <h2>Acceso rápido</h2>
           </div>
           <div className="tabs">
             <button
@@ -121,7 +121,7 @@ const DashboardHome = () => {
                           <th>Nombre</th>
                           <th>Email</th>
                           <th>Rol</th>
-                          <th>Fecha Registro</th>
+                          <th>Fecha de registro</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -145,7 +145,7 @@ const DashboardHome = () => {
                         <tr>
                           <th>Nombre</th>
                           <th>Descripción</th>
-                          <th>Usuarios Asignados</th>
+                          <th>Usuarios asignados</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -167,26 +167,26 @@ const DashboardHome = () => {
 
         <div className="dashboard-card system-info">
           <div className="card-header">
-            <h2>Estado del Sistema</h2>
+            <h2>Estado del sistema</h2>
           </div>
           <div className="info-list">
             <div className="info-item">
-              <span className="info-label">Versión del Sistema</span>
+              <span className="info-label">Versión del sistema</span>
               <span className="info-value">1.0.0</span>
             </div>
             <div className="info-item">
-              <span className="info-label">Última Actualización</span>
+              <span className="info-label">Última actualización</span>
               <span className="info-value">{new Date().toLocaleDateString()}</span>
             </div>
             <div className="info-item">
-              <span className="info-label">Estado de la Base de Datos</span>
+              <span className="info-label">Estado de la base de datos</span>
               <span className="info-value">
                 <span className="status-indicator online"></span>
                 Conectado
               </span>
             </div>
             <div className="info-item">
-              <span className="info-label">Usuarios Registrados</span>
+              <span className="info-label">Usuarios registrados</span>
               <span className="info-value">{users.length}</span>
             </div>
           </div>

@@ -11,12 +11,12 @@ const Footer = () => {
         </div>
         
         <div className="footer-section links">
-          <h3>Enlaces Rápidos</h3>
+          <h3>Enlaces rápidos</h3>
           <ul>
             <li><a href="#">Inicio</a></li>
             <li><a href="#">Servicios</a></li>
-            <li><a href="#">Rastreo de Pedidos</a></li>
-            <li><a href="#">Sobre Nosotros</a></li>
+            <li><a href="#">Rastreo de pedidos</a></li>
+            <li><a href="#">Sobre nosotros</a></li>
             <li><a href="#">Contacto</a></li>
           </ul>
         </div>
@@ -29,10 +29,10 @@ const Footer = () => {
         </div>
         
         <div className="footer-section newsletter">
-          <h3>Boletín Informativo</h3>
-          <p>Suscríbase para recibir las últimas noticias y actualizaciones.</p>
+          <h3>Boletín informativo</h3>
+          <p>Suscríbete para recibir las últimas noticias y actualizaciones.</p>
           <form className="newsletter-form">
-            <input type="email" placeholder="Su correo electrónico" required />
+            <input type="email" placeholder="Tu correo electrónico" required />
             <button type="submit">Suscribirse</button>
           </form>
         </div>
@@ -42,9 +42,9 @@ const Footer = () => {
         <div className="footer-bottom-content">
           <p>&copy; {new Date().getFullYear()} NeoLogicTrack. Todos los derechos reservados.</p>
           <div className="legal-links">
-            <a href="#">Términos de Servicio</a>
+            <a href="#">Términos de servicio</a>
             <span className="separator">|</span>
-            <a href="#">Política de Privacidad</a>
+            <a href="#">Política de privacidad</a>
           </div>
         </div>
       </div>

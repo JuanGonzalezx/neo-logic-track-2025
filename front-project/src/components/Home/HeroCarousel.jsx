@@ -4,29 +4,29 @@ import './HeroCarousel.css';
 const HeroCarousel = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   
-  // Carousel images related to logistics, delivery, and tracking
+  // Imágenes del carrusel relacionadas con logística, entregas y rastreo
   const carouselImages = [
     {
       url: 'https://images.pexels.com/photos/1427541/pexels-photo-1427541.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      alt: 'Logistics warehouse with packages',
+      alt: 'Almacén logístico con paquetes',
       title: 'Gestión logística inteligente',
       subtitle: 'Optimiza tus operaciones de almacén con geolocalización avanzada'
     },
     {
       url: 'https://images.pexels.com/photos/7706458/pexels-photo-7706458.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      alt: 'Delivery person with package',
+      alt: 'Repartidor con paquete',
       title: 'Entregas eficientes',
       subtitle: 'Seguimiento en tiempo real para cada paquete'
     },
     {
       url: 'https://images.pexels.com/photos/3183183/pexels-photo-3183183.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      alt: 'Team working with logistics technology',
+      alt: 'Equipo trabajando con tecnología logística',
       title: 'Soluciones empresariales',
       subtitle: 'Tecnología avanzada para tus necesidades logísticas'
     }
   ];
 
-  // Auto-advance carousel
+  // Avance automático del carrusel
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % carouselImages.length);
@@ -35,7 +35,7 @@ const HeroCarousel = () => {
     return () => clearInterval(interval);
   }, [carouselImages.length]);
 
-  // Manual navigation
+  // Navegación manual
   const goToSlide = (index) => {
     setCurrentSlide(index);
   };
@@ -80,7 +80,7 @@ const HeroCarousel = () => {
             key={index} 
             className={`indicator ${index === currentSlide ? 'active' : ''}`}
             onClick={() => goToSlide(index)}
-            aria-label={`Slide ${index + 1}`}
+            aria-label={`Diapositiva ${index + 1}`}
           />
         ))}
       </div>
