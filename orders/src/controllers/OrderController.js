@@ -147,11 +147,8 @@ const createOrder = async (req, res) => {
       });
 
       // Ordenar por distancia
-      repartidoresValidos.sort(async (a, b) => {
-        const distanciaA = await a.distancia;
-        const distanciaB = await b.distancia;
-        return distanciaA - distanciaB;
-      });
+      repartidoresValidos.sort((a, b) => a.distancia - b.distancia);
+
       console.log("Repartidores ordenados por distancia:", repartidoresValidos);
 
       repartidorMasCercano = repartidoresValidos[0];
