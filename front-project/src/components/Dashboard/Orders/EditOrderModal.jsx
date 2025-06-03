@@ -342,7 +342,7 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
                   <option value="">Selecione un producto</option>
                   {warehouseProducts.map(p => (
                     <option key={p.id_producto} value={p.id_producto}>
-                      {p.nombre_producto} - Stock: {p.cantidad_stock}
+                      {(p.nombre || p.id_producto)} - Stock: {p.cantidad_stock}
                     </option>
                   ))}
                 </select>
