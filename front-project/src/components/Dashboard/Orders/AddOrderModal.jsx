@@ -50,6 +50,7 @@ const AddOrderModal = ({ visible, onCancel, warehouse, onSuccess, onError }) => 
     setProductLoading(true);
     try {
       const response = await almacenProductAPI.getStockByWarehouseId(warehouse.id_almacen);
+      console.log(response);
       if (response.status === 200) {
         setWarehouseProducts(response.data);
         if (response.data.length > 0) {
@@ -191,7 +192,7 @@ const AddOrderModal = ({ visible, onCancel, warehouse, onSuccess, onError }) => 
 
   const getProductName = (id) => {
     const product = warehouseProducts.find(p => p.id_producto === id);
-    return product?.nombre_producto || id;
+    return product?.nombre || id;
   };
 
   const handleCancel = () => {
@@ -294,7 +295,7 @@ const AddOrderModal = ({ visible, onCancel, warehouse, onSuccess, onError }) => 
               <option value="">Selecciona un producto</option>
               {warehouseProducts.map(product => (
                 <option key={product.id_producto} value={product.id_producto}>
-                  {product.nombre_producto} - Stock: {product.cantidad_stock}
+                  {product.nombre || product.id_producto} - Stock: {product.cantidad_stock}
                 </option>
               ))}
             </select>

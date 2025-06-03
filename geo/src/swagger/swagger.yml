@@ -268,26 +268,23 @@ components:
       properties:
         id:
           type: string
-        userId:
+        user_id:
           type: string
-        coordinateId:
+        coordinate_id:
           type: string
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
+        date:
           type: string
           format: date-time
     CoordinatesUserInput:
       type: object
       properties:
-        userId:
+        user_id:
           type: string
-        coordinateId:
+        coordinate_id:
           type: string
       required:
-        - userId
-        - coordinateId
+        - user_id
+        - coordinate_id
     Coordinate:
       type: object
       properties:
