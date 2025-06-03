@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { GoogleMap, Marker, DirectionsRenderer, useJsApiLoader } from "@react-google-maps/api";
 import { createGeoSocket } from "../../../api/socket";
 
@@ -16,7 +16,6 @@ const OrderRouteMap = ({ warehouseMarker, orderMarker, deliveryUserId, initialDe
   const [deliveryPosition, setDeliveryPosition] = useState(initialDeliveryPosition);
   const [directions, setDirections] = useState(null);
   const [routeInfo, setRouteInfo] = useState({ distance: "", duration: "" });
-  const socketRef = useRef(null);
 
   useEffect(() => {
   if (!deliveryUserId) return;

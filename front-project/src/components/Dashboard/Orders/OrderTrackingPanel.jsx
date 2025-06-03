@@ -36,7 +36,7 @@ const OrderTrackingPage = () => {
           };
         });
         setProductsDetails(await Promise.all(productPromises));
-      } catch (e) {
+      } catch {
         setOrder(null);
         setWarehouse(null);
       } finally {

@@ -20,6 +20,7 @@
     background-color: #fff;
     color: #333;
     position: relative;
+    z-index: 30;
   }
   
   .authentication-close-button {

@@ -115,6 +115,7 @@
     border: none;
     text-decoration: underline;
     margin-left: 4px;
+    text-decoration: none;
   }
   
   .verification-success-message {

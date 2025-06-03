@@ -287,17 +287,16 @@ export const DeliveryWorkerList = () => {
   return (
   <div className="dl-delivery-workers-container">
     <div className="dl-delivery-workers-header">
-      <h1>Gestión de Repartidores</h1>
+      <h1>Gestión de repartidores</h1>
       <button 
         className="dl-refresh-button"
         onClick={handleResetFilters}
         aria-label="Resetear filtros"
       >
         <RefreshCw size={16} />
-        <span>Resetear Filtros</span>
+        <span>Resetear filtros</span>
       </button>
     </div>
-    
     <Filters 
       nameFilter={nameFilter}
       setNameFilter={setNameFilter}
@@ -306,7 +305,6 @@ export const DeliveryWorkerList = () => {
       statusFilter={statusFilter}
       setStatusFilter={setStatusFilter}
     />
-    
     {isLoading ? (
       <Loading />
     ) : (
@@ -328,7 +326,6 @@ export const DeliveryWorkerList = () => {
                 />
               ))}
             </div>
-            
             {totalPages > 1 && (
               <div className="dl-pagination">
                 <button 
@@ -354,7 +351,6 @@ export const DeliveryWorkerList = () => {
         )}
       </>
     )}
-    
     {/* Assignment Drawer */}
     {selectedRepartidor && (
       <AssignmentDrawer 
@@ -367,7 +363,6 @@ export const DeliveryWorkerList = () => {
         onAssign={handleAssignOrder}
       />
     )}
-    
     {/* Report Menu */}
     {reportWorker && (
       <ReportMenu 

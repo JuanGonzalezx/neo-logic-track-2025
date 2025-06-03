@@ -12,7 +12,7 @@ const OrderDetailModal = ({ visible, order, onCancel }) => {
     if (visible && order) {
       fetchOrderDetails();
     }
-  }, [visible, order]);
+  }, [visible, order, fetchOrderDetails]);
 
   const fetchOrderDetails = async () => {
     if (!order) return;

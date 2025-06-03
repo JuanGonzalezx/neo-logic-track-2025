@@ -119,7 +119,7 @@ export const AssignmentDrawer = ({
       <div className="dl-drawer-backdrop" onClick={onClose}></div>
       <div className="dl-drawer-content">
         <div className="dl-drawer-header">
-          <h2>Asignar Pedido</h2>
+          <h2>Asignar pedido</h2>
           <button className="dl-close-button" onClick={onClose} aria-label="Cerrar">
             <X size={20} />
           </button>
@@ -158,7 +158,7 @@ export const AssignmentDrawer = ({
         <div className="dl-drawer-divider"></div>
         
         <div className="dl-orders-section">
-          <h3>Pedidos Disponibles</h3>
+          <h3>Pedidos disponibles</h3>
           
           {isLoading ? (
             <div className="dl-loading-orders">
@@ -234,7 +234,7 @@ export const AssignmentDrawer = ({
             disabled={!selectedOrder}
           >
             <Truck size={16} />
-            <span>Asignar Pedido</span>
+            <span>Asignar pedido</span>
           </button>
         </div>
       </div>

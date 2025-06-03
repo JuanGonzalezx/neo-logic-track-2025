@@ -70,7 +70,7 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  z-index: 5;
+  z-index: 5
 }
 
 .carousel-control:hover {
@@ -98,7 +98,7 @@
   right: 16px;
   display: flex;
   gap: 8px;
-  z-index: 5;
+  z-index: 0;
 }
 
 .indicator {

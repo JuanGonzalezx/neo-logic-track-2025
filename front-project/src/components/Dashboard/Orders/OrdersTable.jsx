@@ -103,13 +103,13 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
           <thead>
             <tr>
               <th onClick={() => onSort('id')}>
-                Order ID {getSortIcon('id')}
+                ID de Orden {getSortIcon('id')}
               </th>
               <th onClick={() => onSort('creation_date')}>
-                Date {getSortIcon('creation_date')}
+                Fecha {getSortIcon('creation_date')}
               </th>
-              <th>Delivery Address</th>
-              <th>Delivery ID</th>
+              <th>Dirección de Entrega</th>
+              <th>ID de Repartidor</th>
               <th onClick={() => onSort('status')}>
                 Status {getSortIcon('status')}
               </th>
@@ -137,21 +137,21 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
                     <button
                       className="action-button view"
                       onClick={() => goToTrackingPage(order)}
-                      title="View order details"
+                      title="Ver detalles de la orden"
                     >
                       <EyeOutlined />
                     </button>
                     <button
                       className="action-button edit"
                       onClick={() => showEditModal(order)}
-                      title="Edit order"
+                      title="Editar orden"
                     >
                       <EditOutlined />
                     </button>
                     <button
                       className="action-button delete"
                       onClick={() => showDeleteModal(order)}
-                      title="Delete order"
+                      title="Eliminar orden"
                       disabled={deleting}
                     >
                       <DeleteOutlined />
@@ -163,7 +163,7 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
           </tbody>
         </table>
       ) : (
-        <div className="no-results">No orders found</div>
+        <div className="no-results">No se encontraron órdenes</div>
       )}
 
       <EditOrderModal

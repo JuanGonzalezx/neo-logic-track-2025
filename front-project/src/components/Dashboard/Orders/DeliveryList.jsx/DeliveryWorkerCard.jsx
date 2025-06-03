@@ -36,12 +36,10 @@ export const DeliveryWorkerCard = ({ worker, onAssign, onToggleStatus, onGenerat
             <span className="dl-detail-label">ID:</span>
             <span className="dl-detail-value">{id}</span>
           </div>
-          
           <div className="dl-detail-item">
             <Phone size={16} className="dl-detail-icon" />
             <span className="dl-detail-value">{telefono || 'No disponible'}</span>
           </div>
-          
           <div className="dl-detail-item">
             <MapPin size={16} className="dl-detail-icon" />
             <span className="dl-detail-value">{ciudad || 'No especificada'}</span>
