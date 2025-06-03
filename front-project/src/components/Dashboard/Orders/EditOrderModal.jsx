@@ -205,9 +205,9 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
       open={visible}
       onCancel={onCancel}
       footer={[
-        <Button key="cancel" onClick={onCancel} disabled={loading}>Cancel</Button>,
+        <Button key="cancel" onClick={onCancel} disabled={loading}>Cancelar</Button>,
         <Button key="submit" type="primary" onClick={handleSubmit} disabled={loading}>
-          {loading ? <Spin size="small" /> : 'Update Order'}
+          {loading ? <Spin size="small" /> : 'Actualizar orden'}
         </Button>
       ]}
       width={800}
@@ -215,35 +215,35 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
       <div className="order-form">
         <div className="form-row" style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
           <div className="form-group" style={{ flex: '1 1 30%' }}>
-            <label>Delivery Name*</label>
+            <label>Nombre del delivery*</label>
             <input
               type="text"
               name="delivery_name"
               value={formData.delivery_name}
               onChange={handleFormChange}
               className={formErrors.delivery_name ? 'input-error' : ''}
-              placeholder="Enter delivery recipient name"
+              placeholder="Introduce el nombre del delivery"
               disabled={loading}
             />
             {formErrors.delivery_name && <span className="error-message">{formErrors.delivery_name}</span>}
           </div>
 
           <div className="form-group" style={{ flex: '1 1 30%' }}>
-            <label>Delivery Email*</label>
+            <label>Correo del delivery*</label>
             <input
               type="email"
               name="delivery_email"
               value={formData.delivery_email}
               onChange={handleFormChange}
               className={formErrors.delivery_email ? 'input-error' : ''}
-              placeholder="Enter delivery recipient email"
+              placeholder="Introduce el correo del delivery"
               disabled={loading}
             />
             {formErrors.delivery_email && <span className="error-message">{formErrors.delivery_email}</span>}
           </div>
 
           <div className="form-group" style={{ flex: '1 1 30%' }}>
-            <label>Status*</label>
+            <label>Estatus*</label>
             <select
               name="status"
               value={formData.status}
@@ -251,19 +251,19 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
               className={formErrors.status ? 'input-error' : ''}
               disabled={loading}
             >
-              <option value="">Select status</option>
-              <option value="PENDING">PENDING</option>
-              <option value="ASSIGNED">ASSIGNED</option>
-              <option value="ON_ROUTE">ON_ROUTE</option>
-              <option value="DELIVERED">DELIVERED</option>
-              <option value="CANCELLED">CANCELLED</option>
+              <option value="">Selecciona el estatus</option>
+              <option value="PENDING">PENDIENTE</option>
+              <option value="ASSIGNED">ASIGNADO</option>
+              <option value="ON_ROUTE">EN RUTA</option>
+              <option value="DELIVERED">ENTREGADO</option>
+              <option value="CANCELLED">CANCELALDO</option>
             </select>
             {formErrors.status && <span className="error-message">{formErrors.status}</span>}
           </div>
         </div>
 
         <div className="form-group" style={{ marginTop: 16 }}>
-          <label>Delivery Address*</label>
+          <label>Direccion del delivery*</label>
           {isLoaded ? (
             <Autocomplete onLoad={ac => autocompleteRef.current = ac} onPlaceChanged={handlePlaceChanged}>
               <input
@@ -272,7 +272,7 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
                 value={formData.delivery_address}
                 onChange={handleFormChange}
                 className={formErrors.delivery_address ? 'input-error' : ''}
-                placeholder="Enter delivery address"
+                placeholder="Dirección del delivery"
                 disabled={loading}
               />
             </Autocomplete>
@@ -283,7 +283,7 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
               value={formData.delivery_address}
               onChange={handleFormChange}
               className={formErrors.delivery_address ? 'input-error' : ''}
-              placeholder="Enter delivery address"
+              placeholder="Dirección del delivery"
               disabled={loading}
             />
           )}
@@ -294,16 +294,16 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
 
         <h3>Order Products</h3>
         {productLoading ? (
-          <Spin tip="Loading products..." />
+          <Spin tip="Cargando productos..." />
         ) : (
           <>
             {formData.orderProducts.length > 0 ? (
               <table className="data-table" style={{ width: '100%' }}>
                 <thead>
                   <tr>
-                    <th>Product</th>
-                    <th>Quantity</th>
-                    <th>Actions</th>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Aciones</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -325,12 +325,12 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
                 </tbody>
               </table>
             ) : (
-              <p>No products in this order.</p>
+              <p>No hay productos en esta orden.</p>
             )}
 
             <div style={{ marginTop: 20, marginBottom: 20, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <div style={{ flex: '1 1 45%' }}>
-                <label>Product*</label>
+                <label>Producto*</label>
                 <select
                   name="product_id"
                   value={selectedProduct.product_id}
@@ -339,7 +339,7 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
                   className={formErrors.product_id ? 'input-error' : ''}
                   style={{ width: '100%', padding: '4px' }}
                 >
-                  <option value="">Select a product</option>
+                  <option value="">Selecione un producto</option>
                   {warehouseProducts.map(p => (
                     <option key={p.id_producto} value={p.id_producto}>
                       {p.nombre_producto} - Stock: {p.cantidad_stock}
@@ -350,7 +350,7 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
               </div>
 
               <div style={{ flex: '1 1 25%' }}>
-                <label>Amount*</label>
+                <label>Cantidad*</label>
                 <input
                   type="number"
                   name="amount"
@@ -373,7 +373,7 @@ const EditOrderModal = ({ visible, order, onCancel, onSuccess, onError }) => {
                   disabled={loading || warehouseProducts.length === 0}
                   style={{ width: '100%' }}
                 >
-                  Add
+                  Agregar
                 </Button>
               </div>
             </div>

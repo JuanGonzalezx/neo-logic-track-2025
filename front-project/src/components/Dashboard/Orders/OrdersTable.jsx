@@ -111,11 +111,11 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
               <th>Dirección de Entrega</th>
               <th>ID de Repartidor</th>
               <th onClick={() => onSort('status')}>
-                Status {getSortIcon('status')}
+                Estatus {getSortIcon('status')}
               </th>
               {/* Ocultar almacén si es repartidor */}
-              {roleId !== '68146313ef7752d9d59866da' && <th>Warehouse</th>}
-              <th>Actions</th>
+              {roleId !== '68146313ef7752d9d59866da' && <th>Almacenes</th>}
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -205,13 +205,13 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
             loading={deleting}
             onClick={confirmDeleteOrder}
           >
-            Delete
+            Borrar
           </Button>,
         ]}
         maskClosable={!deleting}
         closable={!deleting}
       >
-        <p>Are you sure you want to delete this order? This action cannot be undone.</p>
+        <p>¿Esta seguro que quiere borrar esta orden? Esta accion es irreversible</p>
       </Modal>
     </div>
   );
