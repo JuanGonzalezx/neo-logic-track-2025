@@ -29,13 +29,13 @@ const getOrderById = async (req, res) => {
     });
 
     let coordinate = null;
-    if(order.coordinate_id) {
+    if (order.coordinate_id) {
       console.log("Fetching coordinate for order:", order.coordinate_id);
       coordinate = await findCoordinateById(order.coordinate_id);
       console.log("Coordinate found:", coordinate);
       if (!coordinate) {
-        console.warn(`Coordinate with ID ${order.coordinate_id} not found`); 
-     }
+        console.warn(`Coordinate with ID ${order.coordinate_id} not found`);
+      }
     }
     order = {
       ...order,
@@ -99,9 +99,9 @@ const createOrder = async (req, res) => {
         fullname: "No asignado"
       };
     } else {
-      
+
       let almacen = await findAlmacenById(id_almacen);
-      repartidores = await findRepartidorByCity(city);     
+      repartidores = await findRepartidorByCity(city);
 
       const repartidoresConCoordenadas = await Promise.all(
         repartidores.map(async (r) => {
@@ -147,7 +147,11 @@ const createOrder = async (req, res) => {
       });
 
       // Ordenar por distancia
-      repartidoresValidos.sort((a, b) => a.distancia - b.distancia);
+      repartidoresValidos.sort(async (a, b) => {
+        const distanciaA = await a.distancia;
+        const distanciaB = await b.distancia;
+        return distanciaA - distanciaB;
+      });
       console.log("Repartidores ordenados por distancia:", repartidoresValidos);
 
       repartidorMasCercano = repartidoresValidos[0];
