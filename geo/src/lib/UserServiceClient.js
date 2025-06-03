@@ -19,6 +19,21 @@ async function findUser(queryParams) {
     }
 }
 
+async function createUser(userData) {
+    try {
+        const response = await axios.post(USERS_API_BASE_URL, userData);
+        if (response.status === 201) {
+            console.log('Usuario creado con éxito:', response.data);
+            return response.data; // Devuelve el usuario creado
+        } else {
+            throw new Error('Error al crear usuario: ' + (response.data.message || 'Desconocido'));
+        }
+    } catch (error) {
+        console.error('Error creando usuario en el servicio de usuarios:', error.response ? error.response.data : error.message);
+        throw new Error(`Fallo al crear usuario: ${error.response ? error.response.data.message : 'Error desconocido'}`);
+    }
+}
+
 // async function findUserByEmail(email) {
 //     if (!email) return null;
 //     try {
@@ -58,6 +73,6 @@ async function findUser(queryParams) {
 //     }
 // }
 
-module.exports = { findUser, 
+module.exports = { findUser, createUser
     // createUser, findUserByEmail, findDespachadorByCity 
 };

@@ -20,7 +20,7 @@ const getAllUsers = async (req, res) => {
 const getUserById = async (req, res) => {
   const { id } = req.params;
   console.log
-  ("Fetching user with ID:", id);
+    ("Fetching user with ID:", id);
   try {
     const user = await prisma.users.findUnique({
       where: { id },
@@ -88,6 +88,9 @@ const getRepartidorByCity = async (req, res) => {
 
 const createUser = async (req, res) => {
   let { fullname, email, current_password, number, roleId, status = "PENDING", ciudadId } = req.body;
+
+  console.log(req.body);
+
 
   if (email) email = email.toLowerCase().trim();
 

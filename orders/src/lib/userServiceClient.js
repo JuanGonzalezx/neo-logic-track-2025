@@ -28,7 +28,7 @@ async function sendEmailOrder(email, fullname, order) {
       fullname,
       order
     };
-    const response = await axios.post(`${AUTH_API_BASE_URL}/order`, data);
+    const response = await axios.post(`${AUTH_API_BASE_URL}/auth/order`, data);
     return response.data;
   } catch (error) {
     console.error('Error sending email:', error.response ? error.response.data : error.message);

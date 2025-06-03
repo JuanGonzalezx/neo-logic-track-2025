@@ -2,7 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const { findUser, findRepartidorByCity, sendEmailOrder } = require('../lib/userServiceClient');
-const { findCityByAlmacen } = require('../lib/almacenServiceClient');
+const { findCityByAlmacen, findAlmacenById } = require('../lib/almacenServiceClient');
 const { validateOrderProducts, updateOrderService, deleteOrders, calcularDistancia } = require('../services/orderService');
 const { createCoordinate, createCoordinateForOrder, findCoordinateById, getLastCoordinateByUserId } = require('../lib/coordinateServiceClient');
 
@@ -99,7 +99,9 @@ const createOrder = async (req, res) => {
         fullname: "No asignado"
       };
     } else {
-      repartidores = await findRepartidorByCity(city)
+      
+      let almacen = await findAlmacenById(id_almacen);
+      repartidores = await findRepartidorByCity(city);     
 
       const repartidoresConCoordenadas = await Promise.all(
         repartidores.map(async (r) => {
@@ -137,8 +139,8 @@ const createOrder = async (req, res) => {
       // Calcular distancias
       repartidoresValidos.forEach((r) => {
         r.distancia = calcularDistancia(
-          latitude,
-          longitude,
+          almacen.direccion.latitud,
+          almacen.direccion.longitud,
           r.latitude,
           r.longitude
         );

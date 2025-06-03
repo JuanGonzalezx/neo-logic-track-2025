@@ -4,6 +4,8 @@ const prisma = new PrismaClient();
 // src/controllers/CoordinatesController.js
 const handleServiceError = require('../utils/errorHandler').handleServiceError;
 const CoordinatesService = require('../services/CoordinateService');
+const CoordianteUserService = require('../services/CoordianteUserService');
+
 
 class CoordinatesController {
     async create(req, res, next) {
@@ -68,6 +70,15 @@ class CoordinatesController {
         try {
             await CoordinatesService.delete(req.params.id);
             res.status(204).send("Coordinates deleted successfully");
+        } catch (error) {
+            handleServiceError(error, res, next);
+        }
+    }
+
+    async createRepartidoresWithCoordinates(req, res, next) {
+        try {
+            const coordinates = await CoordianteUserService.createRepartidoresWithCoordinates(req.body);
+            res.status(201).json(coordinates);
         } catch (error) {
             handleServiceError(error, res, next);
         }

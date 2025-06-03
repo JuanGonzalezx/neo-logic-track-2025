@@ -118,6 +118,49 @@ class CoordinateUserService {
             throw error;
         }
     }
+
+    async createRepartidoresWithCoordinates(data) {
+
+        const roleId = "68146313ef7752d9d59866da"; // Rol de repartidor
+        const createdUsers = [];
+        
+        for (let d of data) {
+            // 1. Crear el usuario
+            d = {   
+                ...d,   
+                roleId: roleId, // Asignar el rol de repartidor
+            }
+
+            const user = await UserService.createUser(d);
+
+            console.log(user);
+            
+            // 2. Crear las coordenadas
+            const coordinate = await prisma.coordinates.create({
+                data: {
+                    latitude: d.latitude,
+                    longitude: d.longitude,
+                    cityId: d.ciudadId
+                }
+            });
+
+            // 3. Enlazar el usuario con las coordenadas
+            const coordinatesUser = await prisma.coordinates_User.create({
+                data: {
+                    user_id: user.userId,
+                    coordinate_id: coordinate.id
+                }
+            });
+
+            createdUsers.push({
+                user,
+                coordinate,
+                coordinatesUser
+            });
+        }
+
+        return createdUsers;
+    }
 }
 
 module.exports = new CoordinateUserService();
