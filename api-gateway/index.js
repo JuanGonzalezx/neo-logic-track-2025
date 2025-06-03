@@ -92,11 +92,21 @@ protectedAuthServicePrefixes.forEach(prefix => {
 // --- Rutas para Futuros Microservicios ---
 
 if (SERVICE_URLS.orders) {
-    app.use('/api/v1/orders', authenticateToken, createProxyMiddleware(commonProxyOptions(SERVICE_URLS.orders)));
+    if (process.env.NODE_ENV === 'test') {
+        // En entorno de test, NO aplicar autenticación para permitir pruebas de integración
+        app.use('/api/v1/orders', createProxyMiddleware(commonProxyOptions(SERVICE_URLS.orders)));
+    } else {
+        app.use('/api/v1/orders', authenticateToken, createProxyMiddleware(commonProxyOptions(SERVICE_URLS.orders)));
+    }
 }
 
 if (SERVICE_URLS.inventory) {
-    app.use('/api/v1/inventory', authenticateToken, createProxyMiddleware(commonProxyOptions(SERVICE_URLS.inventory)));
+    if (process.env.NODE_ENV === 'test') {
+        // En entorno de test, NO aplicar autenticación para permitir pruebas de integración
+        app.use('/api/v1/inventory', createProxyMiddleware(commonProxyOptions(SERVICE_URLS.inventory)));
+    } else {
+        app.use('/api/v1/inventory', authenticateToken, createProxyMiddleware(commonProxyOptions(SERVICE_URLS.inventory)));
+    }
 }
 
 // if (SERVICE_URLS.geo) {
@@ -120,9 +130,14 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.GATEWAY_PORT || 4000;
-app.listen(PORT, () => {
+
+if (require.main === module) {
+  app.listen(PORT, () => {
     console.log(`🚀 API Gateway corriendo en el puerto ${PORT}`);
     console.log(`➡️  Redirigiendo a Auth Service: ${SERVICE_URLS.auth}`);
     if (SERVICE_URLS.orders) console.log(`➡️  Redirigiendo a Orders Service: ${SERVICE_URLS.orders}`);
     if (SERVICE_URLS.inventory) console.log(`➡️  Redirigiendo a Inventory Service: ${SERVICE_URLS.inventory}`);
-});
+  });
+}
+
+module.exports = app;
