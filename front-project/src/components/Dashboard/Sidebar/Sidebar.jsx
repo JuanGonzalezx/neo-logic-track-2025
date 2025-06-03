@@ -10,10 +10,12 @@ import {
   ChevronDown
 } from 'lucide-react';
 import './Sidebar.css';
+import { getUserFromToken } from '../../../api/auth';
 
 const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
   const location = useLocation();
   const [activeSection, setActiveSection] = useState(null);
+  const [roleId, setRoleId] = useState(null);
   const permissions = useSelector(state => state.auth?.permissions || []);
 
   useEffect(() => {
@@ -31,6 +33,24 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
       setActiveSection(null);
     }
   }, [location.pathname]);
+
+  useEffect(() => {
+    // Obtener el rol del usuario autenticado
+    const fetchRole = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const res = await getUserFromToken({ token });
+          if (res && res.role && res.role.id) {
+            setRoleId(res.role.id);
+          }
+        } catch {
+          // ignorar error
+        }
+      }
+    };
+    fetchRole();
+  }, []);
 
   const toggleSection = (section) => {
     setActiveSection(prev => (prev === section ? null : section));
@@ -312,15 +332,18 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
                       {collapsed ? <Package2 size={20} /> : <span>Todas las órdenes</span>}
                     </NavLink>
                   </li>
-                  <li className="sidebar-subnav-item">
-                    <NavLink
-                      to="/dashboard/repartidores"
-                      className={linkClass}
-                      onClick={handleNavLinkClick}
-                    >
-                      {collapsed ? <Users size={20} /> : <span>Listado de repartidores</span>}
-                    </NavLink>
-                  </li>
+                  {/* Ocultar acceso a repartidores si el usuario es repartidor */}
+                  {roleId !== '68146313ef7752d9d59866da' && (
+                    <li className="sidebar-subnav-item">
+                      <NavLink
+                        to="/dashboard/repartidores"
+                        className={linkClass}
+                        onClick={handleNavLinkClick}
+                      >
+                        {collapsed ? <Users size={20} /> : <span>Listado de repartidores</span>}
+                      </NavLink>
+                    </li>
+                  )}
                 </ul>
               )}
             </li>

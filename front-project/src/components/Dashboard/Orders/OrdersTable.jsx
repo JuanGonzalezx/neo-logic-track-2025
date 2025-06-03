@@ -9,26 +9,34 @@ import {
 } from '@ant-design/icons';
 import { Modal, Spin, Button } from 'antd';
 import { orderAPI } from '../../../api/order';
-import OrderDetailModal from './OrderDetailModal';
 import EditOrderModal from './EditOrderModal';
+import { getUserFromToken } from '../../../api/auth';
 
 const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }) => {
-  const [detailModalVisible, setDetailModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const navigate = useNavigate();
+  const [userId, setUserId] = useState(null);
+  const [roleId, setRoleId] = useState(null);
 
 
   // Estado para mostrar/ocultar modal de confirmación de borrado
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState(null);
-  const [deleting, setDeleting] = useState(false);
 
-  const showDetailModal = (order) => {
-    setSelectedOrder(order);
-    setDetailModalVisible(true);
-  };
+  React.useEffect(() => {
+    const fetchUser = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      const userResp = await getUserFromToken({ token });
+      if (userResp && userResp.id && userResp.role?.id) {
+        setUserId(userResp.id);
+        setRoleId(userResp.role.id);
+      }
+    };
+    fetchUser();
+  }, []);
 
   const showEditModal = (order) => {
     setSelectedOrder(order);
@@ -78,20 +86,19 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
     return sortDirection === 'asc' ? <ArrowUpOutlined /> : <ArrowDownOutlined />;
   };
 
-  if (loading) {
-    return (
-      <div className="loading-container">
-        <Spin tip="Processing..." />
-      </div>
-    );
-  }
   const goToTrackingPage = (order) => {
     navigate(`/dashboard/inventory/orders/${order.id}/tracking`);
   }
 
+  // Filtrar órdenes si es repartidor
+  let filteredOrders = orders;
+  if (roleId === '68146313ef7752d9d59866da' && userId) {
+    filteredOrders = orders.filter(order => order.delivery_id === userId);
+  }
+
   return (
     <div className="table-container">
-      {orders.length > 0 ? (
+      {filteredOrders.length > 0 ? (
         <table className="data-table">
           <thead>
             <tr>
@@ -106,12 +113,13 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
               <th onClick={() => onSort('status')}>
                 Status {getSortIcon('status')}
               </th>
-              <th>Warehouse</th>
+              {/* Ocultar almacén si es repartidor */}
+              {roleId !== '68146313ef7752d9d59866da' && <th>Warehouse</th>}
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {orders.map(order => (
+            {filteredOrders.map(order => (
               <tr key={order.id}>
                 <td>{order.id.substring(0, 8)}...</td>
                 <td>{formatDateTime(order.creation_date)}</td>
@@ -122,7 +130,8 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
                     {order.status}
                   </span>
                 </td>
-                <td>{order.id_almacen}</td>
+                {/* Ocultar almacén si es repartidor */}
+                {roleId !== '68146313ef7752d9d59866da' && <td>{order.id_almacen}</td>}
                 <td>
                   <div className="table-actions">
                     <button
@@ -143,7 +152,7 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
                       className="action-button delete"
                       onClick={() => showDeleteModal(order)}
                       title="Delete order"
-                      disabled={loading || deleting}
+                      disabled={deleting}
                     >
                       <DeleteOutlined />
                     </button>
@@ -157,27 +166,18 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
         <div className="no-results">No orders found</div>
       )}
 
-      {selectedOrder && (
-        <>
-          <OrderDetailModal
-            visible={detailModalVisible}
-            order={selectedOrder}
-            onCancel={() => setDetailModalVisible(false)}
-          />
-          <EditOrderModal
-            visible={editModalVisible}
-            order={selectedOrder}
-            onCancel={() => setEditModalVisible(false)}
-            onSuccess={(message) => {
-              setEditModalVisible(false);
-              onApiResponse({ type: 'success', message });
-            }}
-            onError={(message) => {
-              onApiResponse({ type: 'error', message });
-            }}
-          />
-        </>
-      )}
+      <EditOrderModal
+        visible={editModalVisible}
+        order={selectedOrder}
+        onCancel={() => setEditModalVisible(false)}
+        onSuccess={(message) => {
+          setEditModalVisible(false);
+          onApiResponse({ type: 'success', message });
+        }}
+        onError={(message) => {
+          onApiResponse({ type: 'error', message });
+        }}
+      />
 
       {/* Modal personalizado para confirmar borrado */}
       <Modal

@@ -103,6 +103,16 @@ const OrderList = () => {
     }
   };
 
+  // Si el usuario es repartidor, bloquear la vista de almacenes
+  const isRepartidor = userRole && (userRole.toLowerCase() === "repartidor" || userRole === "68146313ef7752d9d59866da");
+  // Si es repartidor, forzar el modo de vista a 'orders'
+  React.useEffect(() => {
+    if (isRepartidor && viewMode !== "orders") {
+      setViewMode("orders");
+    }
+    // eslint-disable-next-line
+  }, [isRepartidor]);
+
   // Filter warehouses by search term
   let filteredWarehouses = warehouses;
 
@@ -175,12 +185,15 @@ const OrderList = () => {
       </div>
 
       <div className="tabs-container">
-        <div
-          className={`tab ${viewMode === "warehouses" ? "active" : ""}`}
-          onClick={() => setViewMode("warehouses")}
-        >
-          Ver por almacén
-        </div>
+        {/* Solo mostrar la pestaña de almacenes si NO es repartidor */}
+        {!isRepartidor && (
+          <div
+            className={`tab ${viewMode === "warehouses" ? "active" : ""}`}
+            onClick={() => setViewMode("warehouses")}
+          >
+            Ver por almacén
+          </div>
+        )}
         <div
           className={`tab ${viewMode === "orders" ? "active" : ""}`}
           onClick={() => setViewMode("orders")}
@@ -205,7 +218,8 @@ const OrderList = () => {
         </div>
       </div>
 
-      {viewMode === "warehouses" ? (
+      {/* Solo mostrar la vista de almacenes si NO es repartidor */}
+      {viewMode === "warehouses" && !isRepartidor ? (
         <div className="warehouses-list">
           {filteredWarehouses.length > 0 ? (
             filteredWarehouses.map((warehouse) => {
