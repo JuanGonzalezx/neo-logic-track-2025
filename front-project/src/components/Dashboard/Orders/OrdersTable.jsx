@@ -81,7 +81,7 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
   if (loading) {
     return (
       <div className="loading-container">
-        <Spin tip="Procesando..." />
+        <Spin tip="Processing..." />
       </div>
     );
   }
@@ -96,18 +96,18 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
           <thead>
             <tr>
               <th onClick={() => onSort('id')}>
-                ID de Orden {getSortIcon('id')}
+                Order ID {getSortIcon('id')}
               </th>
               <th onClick={() => onSort('creation_date')}>
-                Fecha {getSortIcon('creation_date')}
+                Date {getSortIcon('creation_date')}
               </th>
-              <th>Dirección de entrega</th>
-              <th>ID de repartidor</th>
+              <th>Delivery Address</th>
+              <th>Delivery ID</th>
               <th onClick={() => onSort('status')}>
-                Estado {getSortIcon('status')}
+                Status {getSortIcon('status')}
               </th>
-              <th>Almacén</th>
-              <th>Acciones</th>
+              <th>Warehouse</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -116,7 +116,7 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
                 <td>{order.id.substring(0, 8)}...</td>
                 <td>{formatDateTime(order.creation_date)}</td>
                 <td>{order.delivery_address}</td>
-                <td>{order.delivery_id == "00000000-0000-0000-0000-000000000000" ? "Sin repartidor asignado" : order.delivery_id}</td>
+                <td>{order.delivery_id == "00000000-0000-0000-0000-000000000000" ? "Sin asignar Delivery aun" : order.delivery_id}</td>
                 <td>
                   <span className={`status-badge ${order.status}`}>
                     {order.status}
@@ -128,21 +128,21 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
                     <button
                       className="action-button view"
                       onClick={() => goToTrackingPage(order)}
-                      title="Ver detalles de la orden"
+                      title="View order details"
                     >
                       <EyeOutlined />
                     </button>
                     <button
                       className="action-button edit"
                       onClick={() => showEditModal(order)}
-                      title="Editar orden"
+                      title="Edit order"
                     >
                       <EditOutlined />
                     </button>
                     <button
                       className="action-button delete"
                       onClick={() => showDeleteModal(order)}
-                      title="Eliminar orden"
+                      title="Delete order"
                       disabled={loading || deleting}
                     >
                       <DeleteOutlined />
@@ -154,7 +154,7 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
           </tbody>
         </table>
       ) : (
-        <div className="no-results">No se encontraron órdenes</div>
+        <div className="no-results">No orders found</div>
       )}
 
       {selectedOrder && (
@@ -181,7 +181,7 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
 
       {/* Modal personalizado para confirmar borrado */}
       <Modal
-        title="Confirmar eliminación"
+        title="Confirm Delete"
         open={deleteModalVisible}
         onCancel={() => {
           if (!deleting) {
@@ -196,7 +196,7 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
               setOrderToDelete(null);
             }
           }} disabled={deleting}>
-            Cancelar
+            Cancel
           </Button>,
           <Button
             key="confirm"
@@ -205,13 +205,13 @@ const OrdersTable = ({ orders, onSort, sortField, sortDirection, onApiResponse }
             loading={deleting}
             onClick={confirmDeleteOrder}
           >
-            Eliminar
+            Delete
           </Button>,
         ]}
         maskClosable={!deleting}
         closable={!deleting}
       >
-        <p>¿Está seguro que desea eliminar esta orden? Esta acción no se puede deshacer.</p>
+        <p>Are you sure you want to delete this order? This action cannot be undone.</p>
       </Modal>
     </div>
   );
