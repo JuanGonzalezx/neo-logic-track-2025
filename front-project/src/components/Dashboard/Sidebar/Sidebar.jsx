@@ -231,6 +231,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
             )}
 
             {/* Inventory Section */}
+            {roleId !== '68146313ef7752d9d59866da' && (
             <li className="sidebar-nav-item">
               <div
                 className={`sidebar-nav-section ${activeSection === 'inventory' ? 'expanded' : ''}`}
@@ -302,6 +303,7 @@ const Sidebar = ({ collapsed, mobileOpen, closeMobileMenu }) => {
                 </ul>
               )}
             </li>
+            )}
 
             {/* Orders Section as separate dropdown */}
             <li className="sidebar-nav-item">
